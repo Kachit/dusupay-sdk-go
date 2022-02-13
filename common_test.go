@@ -16,7 +16,7 @@ func Test_Common_TransformStructToMapSuccess(t *testing.T) {
 	assert.Equal(t, req.Amount, result["amount"])
 	assert.Equal(t, req.ProviderId, result["provider_id"])
 	assert.Equal(t, string(req.Method), result["method"])
-	assert.Equal(t, string(req.Method), result["method"])
+	assert.Equal(t, string(req.Currency), result["currency"])
 }
 
 func Test_Common_TransformStructToMapError(t *testing.T) {
