@@ -56,7 +56,7 @@ func (r *ProvidersResource) GetList(ctx context.Context, filter ProvidersFilter)
 	err := filter.isValid()
 	query := make(map[string]interface{})
 	query["api_key"] = r.ResourceAbstract.cfg.PublicKey
-	rsp, err := r.ResourceAbstract.Get(ctx, "v1/payment-options/"+filter.buildPath(), query)
+	rsp, err := r.ResourceAbstract.get(ctx, "v1/payment-options/"+filter.buildPath(), query)
 	if err != nil {
 		return nil, fmt.Errorf("ProvidersResource@GetList error: %v", err)
 	}

@@ -32,12 +32,12 @@ func (tr *Transport) SendRequest(ctx context.Context, method string, path string
 	return tr.http.Do(req)
 }
 
-//Get method
+//get method
 func (tr *Transport) Get(ctx context.Context, path string, query map[string]interface{}) (resp *http.Response, err error) {
 	return tr.SendRequest(ctx, "GET", path, query, nil)
 }
 
-//Post method
+//post method
 func (tr *Transport) Post(ctx context.Context, path string, body map[string]interface{}, query map[string]interface{}) (resp *http.Response, err error) {
 	return tr.SendRequest(ctx, "POST", path, query, body)
 }

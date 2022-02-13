@@ -13,7 +13,7 @@ func Test_Merchants_BalancesResponse_UnmarshalSuccess(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func Test_Merchants_BalancesResponse_UnmarshalUnauthorized(t *testing.T) {
+func Test_Merchants_BalancesResponse_UnmarshalErrorUnauthorized(t *testing.T) {
 	var response BalancesResponse
 	body, _ := LoadStubResponseData("stubs/errors/401.json")
 	err := json.Unmarshal(body, &response)

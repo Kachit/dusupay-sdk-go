@@ -24,6 +24,10 @@ func (bf *BanksFilter) isValid() error {
 	return err
 }
 
+func (bf *BanksFilter) buildPath() string {
+	return string(bf.Method) + "/bank/" + string(bf.Country)
+}
+
 //Banks branches list filter
 //see https://docs.dusupay.com/sending-money/payouts/bank-branches
 type BanksBranchesFilter struct {
@@ -43,27 +47,43 @@ func (bbf *BanksBranchesFilter) isValid() error {
 	return err
 }
 
+func (bbf *BanksBranchesFilter) buildPath() string {
+	return "bank/" + string(bbf.Country) + "/branches/" + string(bbf.Bank)
+}
+
 //Banks resource wrapper
 type BanksResource struct {
 	*ResourceAbstract
 }
 
-//Get banks list
+//get banks list
 //see https://docs.dusupay.com/sending-money/payouts/bank-codes
 func (r *BanksResource) GetList(ctx context.Context, filter *BanksFilter) (*Response, error) {
 	err := filter.isValid()
 	if err != nil {
 		return nil, err
 	}
-	return nil, nil
+	query := make(map[string]interface{})
+	query["api_key"] = r.ResourceAbstract.cfg.PublicKey
+	rsp, err := r.ResourceAbstract.get(ctx, "v1/payment-options/"+filter.buildPath(), query)
+	if err != nil {
+		return nil, fmt.Errorf("BanksResource@GetList error: %v", err)
+	}
+	return rsp, err
 }
 
-//Get banks list
+//get banks branches list
 //see https://docs.dusupay.com/sending-money/payouts/bank-branches
 func (r *BanksResource) GetBranchesList(ctx context.Context, filter *BanksBranchesFilter) (*Response, error) {
 	err := filter.isValid()
 	if err != nil {
 		return nil, err
 	}
-	return nil, nil
+	query := make(map[string]interface{})
+	query["api_key"] = r.ResourceAbstract.cfg.PublicKey
+	rsp, err := r.ResourceAbstract.get(ctx, "v1/bank/"+filter.buildPath(), query)
+	if err != nil {
+		return nil, fmt.Errorf("BanksResource@GetBranchesList error: %v", err)
+	}
+	return rsp, err
 }

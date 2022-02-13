@@ -39,14 +39,14 @@ func Test_Providers_ProvidersFilter_BuildPath(t *testing.T) {
 	assert.Equal(t, `COLLECTION/CARD/KE`, result)
 }
 
-func Test_Providers_ProvidersResponse_UnmarshalSandbox(t *testing.T) {
+func Test_Providers_ProvidersResponse_UnmarshalSuccessSandbox(t *testing.T) {
 	var response ProvidersResponse
 	body, _ := LoadStubResponseData("stubs/providers/payment-options/success-sandbox.json")
 	err := json.Unmarshal(body, &response)
 	assert.NoError(t, err)
 }
 
-func Test_Providers_ProvidersResponse_Unmarshal(t *testing.T) {
+func Test_Providers_ProvidersResponse_UnmarshalSuccess(t *testing.T) {
 	var response ProvidersResponse
 	body, _ := LoadStubResponseData("stubs/providers/payment-options/success.json")
 	err := json.Unmarshal(body, &response)

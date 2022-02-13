@@ -6,7 +6,7 @@ import (
 )
 
 func Test_Banks_BanksFilter_IsValidSuccess(t *testing.T) {
-	filter := BanksFilter{Country: CountryCodeKenya, Method: "qwerty"}
+	filter := BanksFilter{Country: CountryCodeKenya, Method: TransactionMethodCard}
 	assert.Nil(t, filter.isValid())
 	assert.NoError(t, filter.isValid())
 }
@@ -23,6 +23,12 @@ func Test_Banks_BanksFilter_IsValidEmptyMethod(t *testing.T) {
 	result := filter.isValid()
 	assert.Error(t, result)
 	assert.Equal(t, `parameter "method" is empty`, result.Error())
+}
+
+func Test_Banks_BanksFilter_BuildPath(t *testing.T) {
+	filter := BanksFilter{Country: CountryCodeKenya, Method: TransactionMethodCard}
+	result := filter.buildPath()
+	assert.Equal(t, `CARD/bank/KE`, result)
 }
 
 func Test_Banks_BanksBranchesFilter_IsValidSuccess(t *testing.T) {
@@ -43,4 +49,10 @@ func Test_Banks_BanksBranchesFilter_IsValidEmptyBankCode(t *testing.T) {
 	result := filter.isValid()
 	assert.Error(t, result)
 	assert.Equal(t, `parameter "bank_code" is empty`, result.Error())
+}
+
+func Test_Banks_BanksBranchesFilter_BuildPath(t *testing.T) {
+	filter := BanksBranchesFilter{Country: CountryCodeKenya, Bank: "qwerty"}
+	result := filter.buildPath()
+	assert.Equal(t, `bank/KE/branches/qwerty`, result)
 }

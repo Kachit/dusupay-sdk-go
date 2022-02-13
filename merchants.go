@@ -20,11 +20,11 @@ type BalancesResponseDataItem struct {
 	Balance  float64      `json:"balance"`
 }
 
-//Get balances list
+//get balances list
 func (r *MerchantsResource) GetBalances(ctx context.Context) (*Response, error) {
 	query := make(map[string]interface{})
 	query["api_key"] = r.ResourceAbstract.cfg.PublicKey
-	rsp, err := r.ResourceAbstract.Get(ctx, "v1/merchants/balance", query)
+	rsp, err := r.ResourceAbstract.get(ctx, "v1/merchants/balance", query)
 	if err != nil {
 		return nil, fmt.Errorf("MerchantsResource@GetBalances error: %v", err)
 	}
