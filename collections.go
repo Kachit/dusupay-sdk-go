@@ -26,6 +26,7 @@ type CollectionRequest struct {
 	AccountEmail      string                `json:"account_email"`
 }
 
+//Check is valid CollectionRequest parameters
 func (cr *CollectionRequest) isValid() error {
 	return nil
 }

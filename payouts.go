@@ -14,6 +14,7 @@ type PayoutRequest struct {
 	Method   TransactionMethodCode `json:"method"`
 }
 
+//Check is valid PayoutRequest parameters
 func (pr *PayoutRequest) isValid() error {
 	return nil
 }

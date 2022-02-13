@@ -11,9 +11,6 @@ import (
 
 //NewHttpTransport create new http transport
 func NewHttpTransport(config *Config, h *http.Client) *Transport {
-	if h == nil {
-		h = &http.Client{}
-	}
 	rb := &RequestBuilder{cfg: config}
 	return &Transport{http: h, rb: rb}
 }
