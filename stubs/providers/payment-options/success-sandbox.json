@@ -1,0 +1,31 @@
+{
+  "code": 200,
+  "status": "success",
+  "message": "Request completed successfully.",
+  "data": [
+    {
+      "id": "mtn_ug",
+      "name": "MTN Mobile Money",
+      "transaction_currency": "UGX",
+      "min_amount": 3000,
+      "max_amount": 5000000,
+      "available": true,
+      "sandbox_test_accounts": {
+        "success": "256777000123",
+        "failure": "256777000456"
+      }
+    },
+    {
+      "id": "airtel_ug",
+      "name": "Airtel Money",
+      "transaction_currency": "UGX",
+      "min_amount": 3000,
+      "max_amount": 5000000,
+      "available": true,
+      "sandbox_test_accounts": {
+        "success": "256752000123",
+        "failure": "256752000456"
+      }
+    }
+  ]
+}

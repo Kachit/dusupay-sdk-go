@@ -17,6 +17,24 @@ type ProvidersFilter struct {
 	Country         CountryCode           `json:"country"`
 }
 
+type ProvidersResponse struct {
+	*ResponseBody
+	Data []*ProvidersResponseDataItem `json:"data,omitempty"`
+}
+
+type ProvidersResponseDataItem struct {
+	ID                  string `json:"id"`
+	Name                string `json:"name"`
+	TransactionCurrency string `json:"transaction_currency"`
+	MinAmount           int    `json:"min_amount"`
+	MaxAmount           int    `json:"max_amount"`
+	Available           bool   `json:"available"`
+	SandboxTestAccounts struct {
+		Success string `json:"success"`
+		Failure string `json:"failure"`
+	} `json:"sandbox_test_accounts"`
+}
+
 //Check is valid ProvidersFilter parameters
 func (pf *ProvidersFilter) isValid() error {
 	var err error
@@ -30,10 +48,17 @@ func (pf *ProvidersFilter) isValid() error {
 	return err
 }
 
+func (pf *ProvidersFilter) buildPath() string {
+	return string(pf.TransactionType) + "/" + string(pf.Method) + "/" + string(pf.Country)
+}
+
 func (r *ProvidersResource) GetList(ctx context.Context, filter ProvidersFilter) (*Response, error) {
 	err := filter.isValid()
+	query := make(map[string]interface{})
+	query["api_key"] = r.ResourceAbstract.cfg.PublicKey
+	rsp, err := r.ResourceAbstract.Get(ctx, "v1/payment-options/"+filter.buildPath(), query)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ProvidersResource@GetList error: %v", err)
 	}
-	return nil, nil
+	return rsp, err
 }

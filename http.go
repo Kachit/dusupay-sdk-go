@@ -94,9 +94,12 @@ func (rb *RequestBuilder) BuildRequest(ctx context.Context, method string, path 
 		return nil, fmt.Errorf("transport@request build uri: %v", err)
 	}
 	//build body
-	bodyReader, err := rb.buildBody(body)
-	if err != nil {
-		return nil, fmt.Errorf("transport@request build request body: %v", err)
+	var bodyReader io.Reader
+	if method == "POST" {
+		bodyReader, err = rb.buildBody(body)
+		if err != nil {
+			return nil, fmt.Errorf("transport@request build request body: %v", err)
+		}
 	}
 	//build request
 	req, err = http.NewRequestWithContext(ctx, strings.ToUpper(method), uri.String(), bodyReader)
@@ -121,6 +124,12 @@ func (r *Response) IsSuccess() bool {
 //GetRawResponse method
 func (r *Response) GetRawResponse() *http.Response {
 	return r.raw
+}
+
+//GetRawBody method
+func (r *Response) GetRawBody() string {
+	body, _ := r.ReadBody()
+	return string(body)
 }
 
 //Unmarshal method

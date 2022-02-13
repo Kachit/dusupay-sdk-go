@@ -1,6 +1,7 @@
 package dusupay
 
 import (
+	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -30,4 +31,24 @@ func Test_Providers_ProvidersFilter_IsValidEmptyTransactionType(t *testing.T) {
 	result := filter.isValid()
 	assert.Error(t, result)
 	assert.Equal(t, `parameter "transaction_type" is empty`, result.Error())
+}
+
+func Test_Providers_ProvidersFilter_BuildPath(t *testing.T) {
+	filter := ProvidersFilter{Country: CountryCodeKenya, Method: TransactionMethodCard, TransactionType: TransactionTypeCollection}
+	result := filter.buildPath()
+	assert.Equal(t, `COLLECTION/CARD/KE`, result)
+}
+
+func Test_Providers_ProvidersResponse_UnmarshalSandbox(t *testing.T) {
+	var response ProvidersResponse
+	body, _ := LoadStubResponseData("stubs/providers/payment-options/success-sandbox.json")
+	err := json.Unmarshal(body, &response)
+	assert.NoError(t, err)
+}
+
+func Test_Providers_ProvidersResponse_Unmarshal(t *testing.T) {
+	var response ProvidersResponse
+	body, _ := LoadStubResponseData("stubs/providers/payment-options/success.json")
+	err := json.Unmarshal(body, &response)
+	assert.NoError(t, err)
 }

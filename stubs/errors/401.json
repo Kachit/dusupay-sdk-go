@@ -1,0 +1,6 @@
+{
+  "code": 401,
+  "status": "error",
+  "message": "Unauthorized API access. Unknown Merchant",
+  "data": {}
+}

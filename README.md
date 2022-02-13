@@ -23,11 +23,11 @@ package main
 import (
 	"fmt"
     "context"
-	dusupay "github.com/kachit/dusupay-sdk-go"
+    dusupay "github.com/kachit/dusupay-sdk-go"
 )
 
 func main(){
-	cfg := dusupay.NewConfig("Your public key", "Your secret key")
+    cfg := dusupay.NewConfig("Your public key", "Your secret key")
     client, err := dusupay.NewClientFromConfig(cfg, nil)
     if err != nil {
         fmt.Printf("config parameter error " + err.Error())

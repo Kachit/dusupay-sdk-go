@@ -1,0 +1,15 @@
+{
+  "code": 200,
+  "status": "success",
+  "message": "Request completed successfully.",
+  "data": [
+    {
+      "currency": "UGX",
+      "balance": 5475.816
+    },
+    {
+      "currency": "USD",
+      "balance": 12
+    }
+  ]
+}

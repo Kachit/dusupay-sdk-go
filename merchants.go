@@ -12,12 +12,12 @@ type MerchantsResource struct {
 
 type BalancesResponse struct {
 	*ResponseBody
-	Data []*BalancesResponseDataItem `json:"data"`
+	Data []*BalancesResponseDataItem `json:"data,omitempty"`
 }
 
 type BalancesResponseDataItem struct {
-	Currency string  `json:"currency"`
-	Balance  float64 `json:"balance"`
+	Currency CurrencyCode `json:"currency"`
+	Balance  float64      `json:"balance"`
 }
 
 //Get balances list
