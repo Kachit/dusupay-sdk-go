@@ -22,11 +22,18 @@ package main
 
 import (
 	"fmt"
+    "context"
 	dusupay "github.com/kachit/dusupay-sdk-go"
-	"time"
 )
 
 func main(){
-        
+	cfg := dusupay.NewConfig("Your public key", "Your secret key")
+    client, err := dusupay.NewClientFromConfig(cfg, nil)
+    if err != nil {
+        fmt.Printf("config parameter error " + err.Error())
+    }
+
+    ctx := context.Background()
+    response, err := client.Merchants().GetBalances(ctx)   
 }
 ```

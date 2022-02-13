@@ -9,7 +9,7 @@ import (
 //see https://docs.dusupay.com/sending-money/payouts/bank-codes
 type BanksFilter struct {
 	Method TransactionMethodCode `json:"method"`
-	//ISO-2 country code from those supported.
+	//ISO-2 country code from those supported
 	Country CountryCode `json:"country_code"`
 }
 
@@ -27,7 +27,7 @@ func (bf *BanksFilter) isValid() error {
 //Banks branches list filter
 //see https://docs.dusupay.com/sending-money/payouts/bank-branches
 type BanksBranchesFilter struct {
-	//ISO-2 country code from those supported.
+	//ISO-2 country code from those supported
 	Country CountryCode `json:"country_code"`
 	Bank    string      `json:"bank_code"`
 }
