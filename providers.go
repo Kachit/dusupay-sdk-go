@@ -7,6 +7,7 @@ type ProvidersResource struct {
 	*ResourceAbstract
 }
 
+//Providers list filter
 type ProvidersFilter struct {
 	TransactionType TransactionTypeCode   `json:"transaction_type"`
 	Method          TransactionMethodCode `json:"method"`

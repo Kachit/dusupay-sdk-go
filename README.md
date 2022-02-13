@@ -6,12 +6,12 @@
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/kachit/dusupay-sdk-go/blob/master/LICENSE)
 
 ## Description
-Unofficial Dusupay API Client for Go
+Unofficial Dusupay payment gateway API Client for Go
 
 ## API documentation
 https://docs.dusupay.com/
 
-## Download
+## Installation
 ```shell
 go get -u github.com/kachit/dusupay-sdk-go
 ```

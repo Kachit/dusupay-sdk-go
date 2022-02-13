@@ -38,3 +38,8 @@ func (c *Client) Merchants() *MerchantsResource {
 func (c *Client) Refunds() *RefundsResource {
 	return &RefundsResource{}
 }
+
+//Banks resource
+func (c *Client) Banks() *BanksResource {
+	return &BanksResource{}
+}
