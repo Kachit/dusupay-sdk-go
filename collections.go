@@ -4,6 +4,10 @@ type CollectionsResource struct {
 	*ResourceAbstract
 }
 
+func (r *CollectionsResource) create(req *CollectionRequest) (*Response, error) {
+	return nil, nil
+}
+
 type CollectionRequest struct {
 	ApiKey            string                `json:"api_key"`
 	Currency          CurrencyCode          `json:"currency"`

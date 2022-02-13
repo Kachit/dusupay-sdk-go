@@ -1,9 +1,9 @@
 # Dusupay API SDK GO (Unofficial)
-[![Build Status](https://travis-ci.org/Kachit/dusupay-api-client-go.svg?branch=master)](https://travis-ci.org/Kachit/dusupay-api-client-go)
-[![codecov](https://codecov.io/gh/Kachit/dusupay-api-client-go/branch/master/graph/badge.svg)](https://codecov.io/gh/Kachit/dusupay-api-client-go)
-[![Go Report Card](https://goreportcard.com/badge/github.com/kachit/dusupay-api-client-go)](https://goreportcard.com/report/github.com/kachit/dusupay-api-client-go)
-[![Release](https://img.shields.io/github/v/release/Kachit/dusupay-api-client-go.svg)](https://github.com/Kachit/dusupay-api-client-go/releases)
-[![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/kachit/dusupay-api-client-go/blob/master/LICENSE)
+[![Build Status](https://travis-ci.org/Kachit/dusupay-sdk-go.svg?branch=master)](https://travis-ci.org/Kachit/dusupay-sdk-go)
+[![codecov](https://codecov.io/gh/Kachit/dusupay-sdk-go/branch/master/graph/badge.svg)](https://codecov.io/gh/Kachit/dusupay-sdk-go)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kachit/dusupay-sdk-go)](https://goreportcard.com/report/github.com/kachit/dusupay-sdk-go)
+[![Release](https://img.shields.io/github/v/release/Kachit/dusupay-sdk-go.svg)](https://github.com/Kachit/dusupay-sdk-go/releases)
+[![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/kachit/dusupay-sdk-go/blob/master/LICENSE)
 
 ## Description
 Unofficial Dusupay API Client for Go
@@ -13,7 +13,7 @@ https://docs.dusupay.com/
 
 ## Download
 ```shell
-go get -u github.com/kachit/dusupay-api-client-go
+go get -u github.com/kachit/dusupay-sdk-go
 ```
 
 ```go
@@ -21,7 +21,7 @@ package main
 
 import (
 	"fmt"
-	dusupay "github.com/kachit/dusupay-api-client-go"
+	dusupay "github.com/kachit/dusupay-sdk-go"
 	"time"
 )
 

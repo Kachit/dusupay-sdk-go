@@ -10,3 +10,7 @@ type PayoutRequest struct {
 	Amount   float64               `json:"amount"`
 	Method   TransactionMethodCode `json:"method"`
 }
+
+func (r *PayoutsResource) create(req *PayoutRequest) (*Response, error) {
+	return nil, nil
+}

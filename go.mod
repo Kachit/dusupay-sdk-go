@@ -1,4 +1,4 @@
-module github.com/kachit/dusupay-api-client-go
+module github.com/kachit/dusupay-sdk-go
 
 go 1.16
 

@@ -1,5 +1,7 @@
 package dusupay
 
+import "encoding/json"
+
 type TransactionStatusCode string
 
 const TransactionStatusPending TransactionStatusCode = "PENDING"
@@ -32,16 +34,29 @@ const CountryCodeEurope CountryCode = "EU"
 
 type CurrencyCode string
 
-const CountryCodeUGX CurrencyCode = "UGX"
-const CountryCodeKES CurrencyCode = "KES"
-const CountryCodeTZS CurrencyCode = "TZS"
-const CountryCodeRWF CurrencyCode = "RWF"
-const CountryCodeBIF CurrencyCode = "BIF"
-const CountryCodeGHS CurrencyCode = "GHS"
-const CountryCodeXAF CurrencyCode = "XAF"
-const CountryCodeZAR CurrencyCode = "ZAR"
-const CountryCodeNGN CurrencyCode = "NGN"
-const CountryCodeZMW CurrencyCode = "ZMW"
-const CountryCodeUSD CurrencyCode = "USD"
-const CountryCodeGBP CurrencyCode = "GBP"
-const CountryCodeEUR CurrencyCode = "EUR"
+const CurrencyCodeUGX CurrencyCode = "UGX"
+const CurrencyCodeKES CurrencyCode = "KES"
+const CurrencyCodeTZS CurrencyCode = "TZS"
+const CurrencyCodeRWF CurrencyCode = "RWF"
+const CurrencyCodeBIF CurrencyCode = "BIF"
+const CurrencyCodeGHS CurrencyCode = "GHS"
+const CurrencyCodeXAF CurrencyCode = "XAF"
+const CurrencyCodeZAR CurrencyCode = "ZAR"
+const CurrencyCodeNGN CurrencyCode = "NGN"
+const CurrencyCodeZMW CurrencyCode = "ZMW"
+const CurrencyCodeUSD CurrencyCode = "USD"
+const CurrencyCodeGBP CurrencyCode = "GBP"
+const CurrencyCodeEUR CurrencyCode = "EUR"
+
+func transformStructToMap(st interface{}) (map[string]interface{}, error) {
+	bytes, err := json.Marshal(st)
+	if err != nil {
+		return nil, err
+	}
+	jsonMap := make(map[string]interface{})
+	err = json.Unmarshal(bytes, &jsonMap)
+	if err != nil {
+		return nil, err
+	}
+	return jsonMap, nil
+}
