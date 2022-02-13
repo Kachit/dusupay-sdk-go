@@ -2,6 +2,11 @@ package dusupay
 
 import "encoding/json"
 
+type TransactionTypeCode string
+
+const TransactionTypeCollection TransactionTypeCode = "COLLECTION"
+const TransactionTypePayout TransactionTypeCode = "PAYOUT"
+
 type TransactionStatusCode string
 
 const TransactionStatusPending TransactionStatusCode = "PENDING"

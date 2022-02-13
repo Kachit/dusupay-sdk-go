@@ -1,5 +1,8 @@
 package dusupay
 
+import "context"
+
+//Payouts resource wrapper
 type PayoutsResource struct {
 	*ResourceAbstract
 }
@@ -11,6 +14,10 @@ type PayoutRequest struct {
 	Method   TransactionMethodCode `json:"method"`
 }
 
-func (r *PayoutsResource) create(req *PayoutRequest) (*Response, error) {
+func (pr *PayoutRequest) isValid() error {
+	return nil
+}
+
+func (r *PayoutsResource) create(ctx context.Context, req *PayoutRequest) (*Response, error) {
 	return nil, nil
 }

@@ -1,10 +1,13 @@
 package dusupay
 
+import "context"
+
+//Collections resource wrapper
 type CollectionsResource struct {
 	*ResourceAbstract
 }
 
-func (r *CollectionsResource) create(req *CollectionRequest) (*Response, error) {
+func (r *CollectionsResource) create(ctx context.Context, req *CollectionRequest) (*Response, error) {
 	return nil, nil
 }
 
@@ -21,6 +24,10 @@ type CollectionRequest struct {
 	RedirectUrl       string                `json:"redirect_url"`
 	AccountName       string                `json:"account_name"`
 	AccountEmail      string                `json:"account_email"`
+}
+
+func (cr *CollectionRequest) isValid() error {
+	return nil
 }
 
 type CollectionResponse struct {

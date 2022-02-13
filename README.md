@@ -16,6 +16,7 @@ https://docs.dusupay.com/
 go get -u github.com/kachit/dusupay-sdk-go
 ```
 
+## Usage
 ```go
 package main
 

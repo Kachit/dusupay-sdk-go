@@ -2,6 +2,7 @@ package dusupay
 
 import "net/http"
 
+//Base Client
 type Client struct {
 }
 
@@ -11,4 +12,29 @@ func NewClientFromConfig(config *Config, cl *http.Client) *Client {
 		cl = &http.Client{}
 	}
 	return &Client{}
+}
+
+//Collections resource
+func (c *Client) Collections() *CollectionsResource {
+	return &CollectionsResource{}
+}
+
+//Payouts resource
+func (c *Client) Payouts() *PayoutsResource {
+	return &PayoutsResource{}
+}
+
+//Providers resource
+func (c *Client) Providers() *ProvidersResource {
+	return &ProvidersResource{}
+}
+
+//Merchants resource
+func (c *Client) Merchants() *MerchantsResource {
+	return &MerchantsResource{}
+}
+
+//Refunds resource
+func (c *Client) Refunds() *RefundsResource {
+	return &RefundsResource{}
 }
