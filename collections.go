@@ -10,8 +10,20 @@ type CollectionsResource struct {
 	*ResourceAbstract
 }
 
-func (r *CollectionsResource) create(ctx context.Context, req *CollectionRequest) (*Response, error) {
-	return nil, nil
+func (r *CollectionsResource) Create(ctx context.Context, req *CollectionRequest) (*Response, error) {
+	err := req.isValid()
+	if err != nil {
+		return nil, fmt.Errorf("CollectionsResource@Create error: %v", err)
+	}
+	post, err := transformStructToMap(req)
+	if err != nil {
+		return nil, fmt.Errorf("CollectionsResource@Create error: %v", err)
+	}
+	rsp, err := r.ResourceAbstract.post(ctx, "v1/collections", post, nil)
+	if err != nil {
+		return nil, fmt.Errorf("CollectionsResource@Create error: %v", err)
+	}
+	return rsp, err
 }
 
 type CollectionRequest struct {
@@ -26,6 +38,7 @@ type CollectionRequest struct {
 	RedirectUrl       string                `json:"redirect_url"`
 	AccountName       string                `json:"account_name"`
 	AccountEmail      string                `json:"account_email"`
+	Voucher           string                `json:"voucher"`
 }
 
 //Check is valid CollectionRequest parameters
@@ -52,4 +65,28 @@ func (cr *CollectionRequest) isValid() error {
 }
 
 type CollectionResponse struct {
+	*ResponseBody
+	Data *CollectionResponseData `json:"data"`
+}
+
+type CollectionResponseData struct {
+	ID                int64   `json:"id"`
+	RequestAmount     float64 `json:"request_amount"`
+	RequestCurrency   string  `json:"request_currency"`
+	AccountAmount     float64 `json:"account_amount"`
+	AccountCurrency   string  `json:"account_currency"`
+	TransactionFee    float64 `json:"transaction_fee"`
+	TotalCredit       float64 `json:"total_credit"`
+	ProviderID        string  `json:"provider_id"`
+	MerchantReference string  `json:"merchant_reference"`
+	InternalReference string  `json:"internal_reference"`
+	TransactionStatus string  `json:"transaction_status"`
+	TransactionType   string  `json:"transaction_type"`
+	Message           string  `json:"message"`
+	CustomerCharged   bool    `json:"customer_charged"`
+	PaymentURL        string  `json:"payment_url"`
+	Instructions      []struct {
+		StepNo      string `json:"step_no"`
+		Description string `json:"description"`
+	} `json:"instructions"`
 }

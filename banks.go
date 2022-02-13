@@ -63,9 +63,7 @@ func (r *BanksResource) GetList(ctx context.Context, filter *BanksFilter) (*Resp
 	if err != nil {
 		return nil, err
 	}
-	query := make(map[string]interface{})
-	query["api_key"] = r.ResourceAbstract.cfg.PublicKey
-	rsp, err := r.ResourceAbstract.get(ctx, "v1/payment-options/"+filter.buildPath(), query)
+	rsp, err := r.ResourceAbstract.get(ctx, "v1/payment-options/"+filter.buildPath(), nil)
 	if err != nil {
 		return nil, fmt.Errorf("BanksResource@GetList error: %v", err)
 	}
@@ -79,9 +77,7 @@ func (r *BanksResource) GetBranchesList(ctx context.Context, filter *BanksBranch
 	if err != nil {
 		return nil, err
 	}
-	query := make(map[string]interface{})
-	query["api_key"] = r.ResourceAbstract.cfg.PublicKey
-	rsp, err := r.ResourceAbstract.get(ctx, "v1/bank/"+filter.buildPath(), query)
+	rsp, err := r.ResourceAbstract.get(ctx, "v1/bank/"+filter.buildPath(), nil)
 	if err != nil {
 		return nil, fmt.Errorf("BanksResource@GetBranchesList error: %v", err)
 	}

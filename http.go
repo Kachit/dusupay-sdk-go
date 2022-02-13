@@ -78,6 +78,15 @@ func (rb *RequestBuilder) buildHeaders() http.Header {
 }
 
 //buildBody method
+func (rb *RequestBuilder) buildRequestParams(params map[string]interface{}) map[string]interface{} {
+	if params == nil {
+		params = make(map[string]interface{})
+	}
+	params["api_key"] = rb.cfg.PublicKey
+	return params
+}
+
+//buildBody method
 func (rb *RequestBuilder) buildBody(data map[string]interface{}) (io.Reader, error) {
 	b, err := json.Marshal(data)
 	if err != nil {
@@ -88,18 +97,21 @@ func (rb *RequestBuilder) buildBody(data map[string]interface{}) (io.Reader, err
 
 //BuildRequest method
 func (rb *RequestBuilder) BuildRequest(ctx context.Context, method string, path string, query map[string]interface{}, body map[string]interface{}) (req *http.Request, err error) {
-	//build uri
-	uri, err := rb.buildUri(path, query)
-	if err != nil {
-		return nil, fmt.Errorf("transport@request build uri: %v", err)
-	}
 	//build body
 	var bodyReader io.Reader
 	if method == "POST" {
+		body = rb.buildRequestParams(body)
 		bodyReader, err = rb.buildBody(body)
 		if err != nil {
 			return nil, fmt.Errorf("transport@request build request body: %v", err)
 		}
+	} else {
+		query = rb.buildRequestParams(query)
+	}
+	//build uri
+	uri, err := rb.buildUri(path, query)
+	if err != nil {
+		return nil, fmt.Errorf("transport@request build uri: %v", err)
 	}
 	//build request
 	req, err = http.NewRequestWithContext(ctx, strings.ToUpper(method), uri.String(), bodyReader)
