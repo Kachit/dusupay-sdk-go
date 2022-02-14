@@ -1,0 +1,20 @@
+{
+  "code": 202,
+  "status": "accepted",
+  "message": "Transaction Initiated",
+  "data": {
+    "id": 124468,
+    "request_amount": 700,
+    "request_currency": "UGX",
+    "account_amount": 700,
+    "account_currency": "UGX",
+    "transaction_fee": 1500,
+    "total_debit": 2200,
+    "provider_id": "mtn_ug",
+    "merchant_reference": "payout-1005",
+    "internal_reference": "DUSUPAY405GZMDVTKASJL8UQ",
+    "transaction_status": "PENDING",
+    "transaction_type": "payout",
+    "message": "Transaction Initiated"
+  }
+}

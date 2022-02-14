@@ -52,7 +52,7 @@ type ProvidersResource struct {
 	*ResourceAbstract
 }
 
-func (r *ProvidersResource) GetList(ctx context.Context, filter ProvidersFilter) (*Response, error) {
+func (r *ProvidersResource) GetList(ctx context.Context, filter *ProvidersFilter) (*Response, error) {
 	err := filter.isValid()
 	if err != nil {
 		return nil, fmt.Errorf("ProvidersResource@GetList error: %v", err)

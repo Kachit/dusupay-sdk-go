@@ -52,21 +52,21 @@ type CollectionResponse struct {
 
 //CollectionResponseData struct
 type CollectionResponseData struct {
-	ID                int64   `json:"id"`
-	RequestAmount     float64 `json:"request_amount"`
-	RequestCurrency   string  `json:"request_currency"`
-	AccountAmount     float64 `json:"account_amount"`
-	AccountCurrency   string  `json:"account_currency"`
-	TransactionFee    float64 `json:"transaction_fee"`
-	TotalCredit       float64 `json:"total_credit"`
-	ProviderID        string  `json:"provider_id"`
-	MerchantReference string  `json:"merchant_reference"`
-	InternalReference string  `json:"internal_reference"`
-	TransactionStatus string  `json:"transaction_status"`
-	TransactionType   string  `json:"transaction_type"`
-	Message           string  `json:"message"`
-	CustomerCharged   bool    `json:"customer_charged"`
-	PaymentURL        string  `json:"payment_url"`
+	ID                int64                 `json:"id"`
+	RequestAmount     float64               `json:"request_amount"`
+	RequestCurrency   string                `json:"request_currency"`
+	AccountAmount     float64               `json:"account_amount"`
+	AccountCurrency   string                `json:"account_currency"`
+	TransactionFee    float64               `json:"transaction_fee"`
+	TotalCredit       float64               `json:"total_credit"`
+	ProviderID        string                `json:"provider_id"`
+	MerchantReference string                `json:"merchant_reference"`
+	InternalReference string                `json:"internal_reference"`
+	TransactionStatus TransactionStatusCode `json:"transaction_status"`
+	TransactionType   TransactionTypeCode   `json:"transaction_type"`
+	Message           string                `json:"message"`
+	CustomerCharged   bool                  `json:"customer_charged"`
+	PaymentURL        string                `json:"payment_url"`
 	Instructions      []struct {
 		StepNo      string `json:"step_no"`
 		Description string `json:"description"`

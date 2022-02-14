@@ -1,6 +1,7 @@
 package dusupay
 
 import (
+	"context"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -55,4 +56,26 @@ func Test_Banks_BanksBranchesFilter_BuildPath(t *testing.T) {
 	filter := BanksBranchesFilter{Country: CountryCodeKenya, Bank: "qwerty"}
 	result := filter.buildPath()
 	assert.Equal(t, `bank/KE/branches/qwerty`, result)
+}
+
+func Test_Banks_BanksResource_GetListInvalidFilter(t *testing.T) {
+	config := BuildStubConfig()
+	transport := NewHttpTransport(config, nil)
+	ctx := context.Background()
+	filter := &BanksFilter{}
+	resource := &BanksResource{ResourceAbstract: NewResourceAbstract(transport, config)}
+	rsp, err := resource.GetList(ctx, filter)
+	assert.Nil(t, rsp)
+	assert.Error(t, err)
+}
+
+func Test_Banks_BanksResource_GetBranchesListInvalidFilter(t *testing.T) {
+	config := BuildStubConfig()
+	transport := NewHttpTransport(config, nil)
+	ctx := context.Background()
+	filter := &BanksBranchesFilter{}
+	resource := &BanksResource{ResourceAbstract: NewResourceAbstract(transport, config)}
+	rsp, err := resource.GetBranchesList(ctx, filter)
+	assert.Nil(t, rsp)
+	assert.Error(t, err)
 }

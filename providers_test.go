@@ -58,7 +58,7 @@ func Test_Providers_ProvidersResource_GetListInvalidFilter(t *testing.T) {
 	config := BuildStubConfig()
 	transport := NewHttpTransport(config, nil)
 	ctx := context.Background()
-	filter := ProvidersFilter{}
+	filter := &ProvidersFilter{}
 	resource := &ProvidersResource{ResourceAbstract: NewResourceAbstract(transport, config)}
 	rsp, err := resource.GetList(ctx, filter)
 	assert.Nil(t, rsp)
