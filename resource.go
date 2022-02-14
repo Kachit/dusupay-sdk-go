@@ -30,6 +30,6 @@ func (r *ResourceAbstract) post(ctx context.Context, path string, body map[strin
 }
 
 //NewResourceAbstract Create new resource abstract
-func NewResourceAbstract(transport *Transport) *ResourceAbstract {
-	return &ResourceAbstract{tr: transport, cfg: transport.rb.cfg}
+func NewResourceAbstract(transport *Transport, config *Config) *ResourceAbstract {
+	return &ResourceAbstract{tr: transport, cfg: config}
 }

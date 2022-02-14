@@ -51,6 +51,28 @@ func Test_HTTP_RequestBuilder_BuildBody(t *testing.T) {
 	assert.NotEmpty(t, body)
 }
 
+func Test_HTTP_RequestBuilder_BuildAuthParams(t *testing.T) {
+	cfg := BuildStubConfig()
+	builder := RequestBuilder{cfg: cfg}
+
+	data := make(map[string]interface{})
+	data["foo"] = "bar"
+	data["bar"] = "baz"
+
+	result := builder.buildAuthParams(data)
+	assert.Equal(t, data["foo"], result["foo"])
+	assert.Equal(t, data["bar"], result["bar"])
+	assert.Equal(t, cfg.PublicKey, result["api_key"])
+}
+
+func Test_HTTP_RequestBuilder_BuildAuthParamsEmpty(t *testing.T) {
+	cfg := BuildStubConfig()
+	builder := RequestBuilder{cfg: cfg}
+
+	result := builder.buildAuthParams(nil)
+	assert.Equal(t, cfg.PublicKey, result["api_key"])
+}
+
 func Test_HTTP_NewHttpTransport(t *testing.T) {
 	cfg := BuildStubConfig()
 	transport := NewHttpTransport(cfg, nil)

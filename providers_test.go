@@ -1,6 +1,7 @@
 package dusupay
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -51,4 +52,15 @@ func Test_Providers_ProvidersResponse_UnmarshalSuccess(t *testing.T) {
 	body, _ := LoadStubResponseData("stubs/providers/payment-options/success.json")
 	err := json.Unmarshal(body, &response)
 	assert.NoError(t, err)
+}
+
+func Test_Providers_ProvidersResource_GetListInvalidFilter(t *testing.T) {
+	config := BuildStubConfig()
+	transport := NewHttpTransport(config, nil)
+	ctx := context.Background()
+	filter := ProvidersFilter{}
+	resource := &ProvidersResource{ResourceAbstract: NewResourceAbstract(transport, config)}
+	rsp, err := resource.GetList(ctx, filter)
+	assert.Nil(t, rsp)
+	assert.Error(t, err)
 }

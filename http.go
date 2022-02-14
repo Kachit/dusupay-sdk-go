@@ -77,8 +77,8 @@ func (rb *RequestBuilder) buildHeaders() http.Header {
 	return headers
 }
 
-//buildBody method
-func (rb *RequestBuilder) buildRequestParams(params map[string]interface{}) map[string]interface{} {
+//buildAuthParams method
+func (rb *RequestBuilder) buildAuthParams(params map[string]interface{}) map[string]interface{} {
 	if params == nil {
 		params = make(map[string]interface{})
 	}
@@ -100,13 +100,13 @@ func (rb *RequestBuilder) BuildRequest(ctx context.Context, method string, path 
 	//build body
 	var bodyReader io.Reader
 	if method == "POST" {
-		body = rb.buildRequestParams(body)
+		body = rb.buildAuthParams(body)
 		bodyReader, err = rb.buildBody(body)
 		if err != nil {
 			return nil, fmt.Errorf("transport@request build request body: %v", err)
 		}
 	} else {
-		query = rb.buildRequestParams(query)
+		query = rb.buildAuthParams(query)
 	}
 	//build uri
 	uri, err := rb.buildUri(path, query)

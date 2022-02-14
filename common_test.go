@@ -2,6 +2,7 @@ package dusupay
 
 import (
 	"github.com/stretchr/testify/assert"
+	"math"
 	"testing"
 )
 
@@ -19,8 +20,14 @@ func Test_Common_TransformStructToMapSuccess(t *testing.T) {
 	assert.Equal(t, string(req.Currency), result["currency"])
 }
 
-func Test_Common_TransformStructToMapError(t *testing.T) {
+func Test_Common_TransformStructToMapErrorUnmarshal(t *testing.T) {
 	result, err := transformStructToMap("foo")
+	assert.Error(t, err)
+	assert.Nil(t, result)
+}
+
+func Test_Common_TransformStructToMapErrorMarshal(t *testing.T) {
+	result, err := transformStructToMap(math.Inf(1))
 	assert.Error(t, err)
 	assert.Nil(t, result)
 }

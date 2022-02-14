@@ -5,16 +5,28 @@ import (
 	"fmt"
 )
 
-//Providers resource wrapper
-type ProvidersResource struct {
-	*ResourceAbstract
-}
-
 //Providers list filter
 type ProvidersFilter struct {
 	TransactionType TransactionTypeCode   `json:"transaction_type"`
 	Method          TransactionMethodCode `json:"method"`
 	Country         CountryCode           `json:"country"`
+}
+
+//Check is valid ProvidersFilter parameters
+func (pf *ProvidersFilter) isValid() error {
+	var err error
+	if pf.Country == "" {
+		err = fmt.Errorf(`parameter "country_code" is empty`)
+	} else if pf.Method == "" {
+		err = fmt.Errorf(`parameter "method" is empty`)
+	} else if pf.TransactionType == "" {
+		err = fmt.Errorf(`parameter "transaction_type" is empty`)
+	}
+	return err
+}
+
+func (pf *ProvidersFilter) buildPath() string {
+	return string(pf.TransactionType) + "/" + string(pf.Method) + "/" + string(pf.Country)
 }
 
 type ProvidersResponse struct {
@@ -35,21 +47,9 @@ type ProvidersResponseDataItem struct {
 	} `json:"sandbox_test_accounts"`
 }
 
-//Check is valid ProvidersFilter parameters
-func (pf *ProvidersFilter) isValid() error {
-	var err error
-	if pf.Country == "" {
-		err = fmt.Errorf(`parameter "country_code" is empty`)
-	} else if pf.Method == "" {
-		err = fmt.Errorf(`parameter "method" is empty`)
-	} else if pf.TransactionType == "" {
-		err = fmt.Errorf(`parameter "transaction_type" is empty`)
-	}
-	return err
-}
-
-func (pf *ProvidersFilter) buildPath() string {
-	return string(pf.TransactionType) + "/" + string(pf.Method) + "/" + string(pf.Country)
+//Providers resource wrapper
+type ProvidersResource struct {
+	*ResourceAbstract
 }
 
 func (r *ProvidersResource) GetList(ctx context.Context, filter ProvidersFilter) (*Response, error) {

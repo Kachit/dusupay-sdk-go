@@ -5,29 +5,6 @@ import (
 	"fmt"
 )
 
-//Collections resource wrapper
-type CollectionsResource struct {
-	*ResourceAbstract
-}
-
-//Create collection request
-//see https://docs.dusupay.com/receiving-money/collections/post-collection-request
-func (r *CollectionsResource) Create(ctx context.Context, req *CollectionRequest) (*Response, error) {
-	err := req.isValid()
-	if err != nil {
-		return nil, fmt.Errorf("CollectionsResource@Create error: %v", err)
-	}
-	post, err := transformStructToMap(req)
-	if err != nil {
-		return nil, fmt.Errorf("CollectionsResource@Create error: %v", err)
-	}
-	rsp, err := r.ResourceAbstract.post(ctx, "v1/collections", post, nil)
-	if err != nil {
-		return nil, fmt.Errorf("CollectionsResource@Create error: %v", err)
-	}
-	return rsp, err
-}
-
 //CollectionRequest struct
 type CollectionRequest struct {
 	Currency          CurrencyCode          `json:"currency"`
@@ -94,4 +71,27 @@ type CollectionResponseData struct {
 		StepNo      string `json:"step_no"`
 		Description string `json:"description"`
 	} `json:"instructions"`
+}
+
+//Collections resource wrapper
+type CollectionsResource struct {
+	*ResourceAbstract
+}
+
+//Create collection request
+//see https://docs.dusupay.com/receiving-money/collections/post-collection-request
+func (r *CollectionsResource) Create(ctx context.Context, req *CollectionRequest) (*Response, error) {
+	err := req.isValid()
+	if err != nil {
+		return nil, fmt.Errorf("CollectionsResource@Create error: %v", err)
+	}
+	post, err := transformStructToMap(req)
+	if err != nil {
+		return nil, fmt.Errorf("CollectionsResource@Create error: %v", err)
+	}
+	rsp, err := r.ResourceAbstract.post(ctx, "v1/collections", post, nil)
+	if err != nil {
+		return nil, fmt.Errorf("CollectionsResource@Create error: %v", err)
+	}
+	return rsp, err
 }

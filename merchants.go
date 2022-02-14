@@ -5,11 +5,6 @@ import (
 	"fmt"
 )
 
-//Merchants resource wrapper
-type MerchantsResource struct {
-	*ResourceAbstract
-}
-
 type BalancesResponse struct {
 	*ResponseBody
 	Data []*BalancesResponseDataItem `json:"data,omitempty"`
@@ -18,6 +13,11 @@ type BalancesResponse struct {
 type BalancesResponseDataItem struct {
 	Currency CurrencyCode `json:"currency"`
 	Balance  float64      `json:"balance"`
+}
+
+//Merchants resource wrapper
+type MerchantsResource struct {
+	*ResourceAbstract
 }
 
 //get balances list
