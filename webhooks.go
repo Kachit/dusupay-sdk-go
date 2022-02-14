@@ -1,5 +1,9 @@
 package dusupay
 
+type WebhookInterface interface {
+	GetPayloadString() string
+}
+
 type CollectionWebhook struct {
 	ID                int64   `json:"id"`
 	RequestAmount     float64 `json:"request_amount"`

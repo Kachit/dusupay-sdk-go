@@ -2,10 +2,10 @@ package dusupay
 
 import (
 	"context"
+	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"net/http"
-
-	//"net/http"
 	"testing"
 )
 
@@ -14,8 +14,8 @@ func Test_HTTP_RequestBuilder_BuildUriWithoutQueryParams(t *testing.T) {
 	builder := RequestBuilder{cfg: cfg}
 	uri, err := builder.buildUri("qwerty", nil)
 	assert.NotEmpty(t, uri)
-	assert.Equal(t, SandboxAPIUrl+"/qwerty", uri.String())
 	assert.Nil(t, err)
+	assert.Equal(t, SandboxAPIUrl+"/qwerty", uri.String())
 }
 
 func Test_HTTP_RequestBuilder_BuildUriWithQueryParams(t *testing.T) {
@@ -28,8 +28,8 @@ func Test_HTTP_RequestBuilder_BuildUriWithQueryParams(t *testing.T) {
 
 	uri, err := builder.buildUri("qwerty", data)
 	assert.NotEmpty(t, uri)
-	assert.Equal(t, SandboxAPIUrl+"/qwerty?bar=baz&foo=bar", uri.String())
 	assert.Nil(t, err)
+	assert.Equal(t, SandboxAPIUrl+"/qwerty?bar=baz&foo=bar", uri.String())
 }
 
 func Test_HTTP_RequestBuilder_BuildHeaders(t *testing.T) {
@@ -108,4 +108,67 @@ func Test_HTTP_NewHttpTransport(t *testing.T) {
 	cfg := BuildStubConfig()
 	transport := NewHttpTransport(cfg, nil)
 	assert.NotEmpty(t, transport)
+}
+
+func Test_HTTP_Transport_SendRequestSuccess(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	body, _ := LoadStubResponseData("stubs/merchants/balance/success.json")
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/foo?api_key=PublicKey", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+	resp, err := transport.SendRequest(ctx, http.MethodGet, "foo", nil, nil)
+
+	assert.NoError(t, err)
+	assert.NotEmpty(t, resp)
+
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+}
+
+func Test_HTTP_Transport_Get(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	body, _ := LoadStubResponseData("stubs/merchants/balance/success.json")
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/foo?api_key=PublicKey", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+	resp, err := transport.Get(ctx, "foo", nil)
+
+	assert.NoError(t, err)
+	assert.NotEmpty(t, resp)
+
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+}
+
+func Test_HTTP_Transport_Post(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	body, _ := LoadStubResponseData("stubs/merchants/balance/success.json")
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri+"/foo", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+	resp, err := transport.Post(ctx, "foo", nil, nil)
+
+	assert.NoError(t, err)
+	assert.NotEmpty(t, resp)
+
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
 }

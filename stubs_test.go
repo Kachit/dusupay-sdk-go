@@ -15,6 +15,10 @@ func BuildStubConfig() *Config {
 	}
 }
 
+func BuildStubHttpTransport() *Transport {
+	return NewHttpTransport(BuildStubConfig(), &http.Client{})
+}
+
 func LoadStubResponseData(path string) ([]byte, error) {
 	return ioutil.ReadFile(path)
 }
