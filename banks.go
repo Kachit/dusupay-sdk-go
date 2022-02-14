@@ -51,6 +51,28 @@ func (bbf *BanksBranchesFilter) buildPath() string {
 	return "bank/" + string(bbf.Country) + "/branches/" + string(bbf.Bank)
 }
 
+//BanksBranchesResponse struct
+type BanksResponse struct {
+	*ResponseBody
+	Data []*BanksResponseDataItem `json:"data,omitempty"`
+}
+
+type BanksResponseDataItem struct {
+	Code string `json:"code"`
+	Name string `json:"name"`
+}
+
+//BanksBranchesResponse struct
+type BanksBranchesResponse struct {
+	*ResponseBody
+	Data []*BanksBranchesResponseDataItem `json:"data,omitempty"`
+}
+
+type BanksBranchesResponseDataItem struct {
+	Code string `json:"code"`
+	Name string `json:"name"`
+}
+
 //Banks resource wrapper
 type BanksResource struct {
 	*ResourceAbstract

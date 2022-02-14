@@ -1,0 +1,19 @@
+{
+  "code": 200,
+  "status": "success",
+  "message": "Request completed successfully.",
+  "data": [
+    {
+      "code": "GH030243",
+      "name": "BARCLAYS BANK(GH) LTD-NKAWKAW"
+    },
+    {
+      "code": "GH030116",
+      "name": "BARCLAYS BANK (GH) LTD-BCM"
+    },
+    {
+      "code": "GH030653",
+      "name": "BARCLAYS BANK(GH)NEW SUAME MAGAZINE"
+    }
+  ]
+}

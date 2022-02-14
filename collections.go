@@ -10,6 +10,8 @@ type CollectionsResource struct {
 	*ResourceAbstract
 }
 
+//Create collection request
+//see https://docs.dusupay.com/receiving-money/collections/post-collection-request
 func (r *CollectionsResource) Create(ctx context.Context, req *CollectionRequest) (*Response, error) {
 	err := req.isValid()
 	if err != nil {
@@ -26,6 +28,7 @@ func (r *CollectionsResource) Create(ctx context.Context, req *CollectionRequest
 	return rsp, err
 }
 
+//CollectionRequest struct
 type CollectionRequest struct {
 	Currency          CurrencyCode          `json:"currency"`
 	Amount            float64               `json:"amount"`
@@ -64,11 +67,13 @@ func (cr *CollectionRequest) isValid() error {
 	return err
 }
 
+//CollectionResponse struct
 type CollectionResponse struct {
 	*ResponseBody
 	Data *CollectionResponseData `json:"data"`
 }
 
+//CollectionResponseData struct
 type CollectionResponseData struct {
 	ID                int64   `json:"id"`
 	RequestAmount     float64 `json:"request_amount"`
