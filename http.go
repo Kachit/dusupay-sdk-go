@@ -24,6 +24,7 @@ type Transport struct {
 	rb   *RequestBuilder
 }
 
+//Send request method
 func (tr *Transport) SendRequest(ctx context.Context, method string, path string, query map[string]interface{}, body map[string]interface{}) (resp *http.Response, err error) {
 	req, err := tr.rb.BuildRequest(ctx, method, path, query, body)
 	if err != nil {
@@ -32,14 +33,14 @@ func (tr *Transport) SendRequest(ctx context.Context, method string, path string
 	return tr.http.Do(req)
 }
 
-//get method
+//Get method
 func (tr *Transport) Get(ctx context.Context, path string, query map[string]interface{}) (resp *http.Response, err error) {
-	return tr.SendRequest(ctx, "GET", path, query, nil)
+	return tr.SendRequest(ctx, http.MethodGet, path, query, nil)
 }
 
-//post method
+//Post method
 func (tr *Transport) Post(ctx context.Context, path string, body map[string]interface{}, query map[string]interface{}) (resp *http.Response, err error) {
-	return tr.SendRequest(ctx, "POST", path, query, body)
+	return tr.SendRequest(ctx, http.MethodPost, path, query, body)
 }
 
 //RequestBuilder handler
@@ -47,7 +48,7 @@ type RequestBuilder struct {
 	cfg *Config
 }
 
-//buildUri method
+//BuildUri method
 func (rb *RequestBuilder) buildUri(path string, query map[string]interface{}) (uri *url.URL, err error) {
 	u, err := url.Parse(rb.cfg.Uri)
 	if err != nil {
@@ -58,7 +59,7 @@ func (rb *RequestBuilder) buildUri(path string, query map[string]interface{}) (u
 	return u, err
 }
 
-//buildQueryParams method
+//BuildQueryParams method
 func (rb *RequestBuilder) buildQueryParams(query map[string]interface{}) string {
 	q := url.Values{}
 	if query != nil {
@@ -69,7 +70,7 @@ func (rb *RequestBuilder) buildQueryParams(query map[string]interface{}) string 
 	return q.Encode()
 }
 
-//buildHeaders method
+//BuildHeaders method
 func (rb *RequestBuilder) buildHeaders() http.Header {
 	headers := http.Header{}
 	headers.Set("Content-Type", "application/json")
@@ -77,7 +78,7 @@ func (rb *RequestBuilder) buildHeaders() http.Header {
 	return headers
 }
 
-//buildAuthParams method
+//BuildAuthParams method
 func (rb *RequestBuilder) buildAuthParams(params map[string]interface{}) map[string]interface{} {
 	if params == nil {
 		params = make(map[string]interface{})
@@ -86,7 +87,7 @@ func (rb *RequestBuilder) buildAuthParams(params map[string]interface{}) map[str
 	return params
 }
 
-//buildBody method
+//BuildBody method
 func (rb *RequestBuilder) buildBody(data map[string]interface{}) (io.Reader, error) {
 	b, err := json.Marshal(data)
 	if err != nil {
@@ -97,9 +98,10 @@ func (rb *RequestBuilder) buildBody(data map[string]interface{}) (io.Reader, err
 
 //BuildRequest method
 func (rb *RequestBuilder) BuildRequest(ctx context.Context, method string, path string, query map[string]interface{}, body map[string]interface{}) (req *http.Request, err error) {
+	method = strings.ToUpper(method)
 	//build body
 	var bodyReader io.Reader
-	if method == "POST" {
+	if method == http.MethodPost {
 		body = rb.buildAuthParams(body)
 		bodyReader, err = rb.buildBody(body)
 		if err != nil {
@@ -114,7 +116,7 @@ func (rb *RequestBuilder) BuildRequest(ctx context.Context, method string, path 
 		return nil, fmt.Errorf("transport@request build uri: %v", err)
 	}
 	//build request
-	req, err = http.NewRequestWithContext(ctx, strings.ToUpper(method), uri.String(), bodyReader)
+	req, err = http.NewRequestWithContext(ctx, method, uri.String(), bodyReader)
 	if err != nil {
 		return nil, fmt.Errorf("transport@request new request error: %v", err)
 	}

@@ -1,7 +1,10 @@
 package dusupay
 
 import (
+	"context"
 	"github.com/stretchr/testify/assert"
+	"net/http"
+
 	//"net/http"
 	"testing"
 )
@@ -71,6 +74,34 @@ func Test_HTTP_RequestBuilder_BuildAuthParamsEmpty(t *testing.T) {
 
 	result := builder.buildAuthParams(nil)
 	assert.Equal(t, cfg.PublicKey, result["api_key"])
+}
+
+func Test_HTTP_RequestBuilder_BuildRequestGET(t *testing.T) {
+	cfg := BuildStubConfig()
+	builder := RequestBuilder{cfg: cfg}
+
+	ctx := context.Background()
+	result, err := builder.BuildRequest(ctx, "get", "foo", map[string]interface{}{"foo": "bar"}, map[string]interface{}{"foo": "bar"})
+	assert.NoError(t, err)
+	assert.Equal(t, http.MethodGet, result.Method)
+	assert.Equal(t, "https://sandbox.dusupay.com/foo?api_key=PublicKey&foo=bar", result.URL.String())
+	assert.Equal(t, "application/json", result.Header.Get("Content-Type"))
+	assert.Equal(t, cfg.SecretKey, result.Header.Get("secret-key"))
+	assert.Nil(t, result.Body)
+}
+
+func Test_HTTP_RequestBuilder_BuildRequestPOST(t *testing.T) {
+	cfg := BuildStubConfig()
+	builder := RequestBuilder{cfg: cfg}
+
+	ctx := context.Background()
+	result, err := builder.BuildRequest(ctx, "post", "foo", map[string]interface{}{"foo": "bar"}, map[string]interface{}{"foo": "bar"})
+	assert.NoError(t, err)
+	assert.Equal(t, http.MethodPost, result.Method)
+	assert.Equal(t, "https://sandbox.dusupay.com/foo?foo=bar", result.URL.String())
+	assert.Equal(t, "application/json", result.Header.Get("Content-Type"))
+	assert.Equal(t, cfg.SecretKey, result.Header.Get("secret-key"))
+	assert.NotEmpty(t, result.Body)
 }
 
 func Test_HTTP_NewHttpTransport(t *testing.T) {

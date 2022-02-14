@@ -6,6 +6,7 @@ type TransactionTypeCode string
 
 const TransactionTypeCollection TransactionTypeCode = "COLLECTION"
 const TransactionTypePayout TransactionTypeCode = "PAYOUT"
+const TransactionTypeRefund TransactionTypeCode = "REFUND"
 
 type TransactionStatusCode string
 

@@ -44,12 +44,13 @@ func (pr *PayoutRequest) isValid() error {
 	return err
 }
 
-//CollectionResponse struct
+//PayoutResponse struct
 type PayoutResponse struct {
 	*ResponseBody
 	Data *PayoutResponseData `json:"data"`
 }
 
+//PayoutResponseData struct
 type PayoutResponseData struct {
 	ID                int64                 `json:"id"`
 	RequestAmount     float64               `json:"request_amount"`
@@ -71,6 +72,8 @@ type PayoutsResource struct {
 	*ResourceAbstract
 }
 
+//Create payout request
+//see https://docs.dusupay.com/sending-money/payouts/post-payout-request
 func (r *PayoutsResource) Create(ctx context.Context, req *PayoutRequest) (*Response, error) {
 	err := req.isValid()
 	if err != nil {
