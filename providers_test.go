@@ -45,6 +45,17 @@ func Test_Providers_ProvidersResponse_UnmarshalSuccessSandbox(t *testing.T) {
 	body, _ := LoadStubResponseData("stubs/providers/payment-options/success-sandbox.json")
 	err := json.Unmarshal(body, &response)
 	assert.NoError(t, err)
+	assert.Equal(t, 200, response.Code)
+	assert.Equal(t, "success", response.Status)
+	assert.Equal(t, "Request completed successfully.", response.Message)
+	assert.Equal(t, "mtn_ug", (*response.Data)[0].ID)
+	assert.Equal(t, "MTN Mobile Money", (*response.Data)[0].Name)
+	assert.Equal(t, "UGX", (*response.Data)[0].TransactionCurrency)
+	assert.Equal(t, float64(3000), (*response.Data)[0].MinAmount)
+	assert.Equal(t, float64(5000000), (*response.Data)[0].MaxAmount)
+	assert.Equal(t, true, (*response.Data)[0].Available)
+	assert.Equal(t, "256777000456", (*response.Data)[0].SandboxTestAccounts.Failure)
+	assert.Equal(t, "256777000123", (*response.Data)[0].SandboxTestAccounts.Success)
 }
 
 func Test_Providers_ProvidersResponse_UnmarshalSuccess(t *testing.T) {
@@ -52,6 +63,27 @@ func Test_Providers_ProvidersResponse_UnmarshalSuccess(t *testing.T) {
 	body, _ := LoadStubResponseData("stubs/providers/payment-options/success.json")
 	err := json.Unmarshal(body, &response)
 	assert.NoError(t, err)
+	assert.Equal(t, 200, response.Code)
+	assert.Equal(t, "success", response.Status)
+	assert.Equal(t, "Request completed successfully.", response.Message)
+	assert.Equal(t, "mtn_ug", (*response.Data)[0].ID)
+	assert.Equal(t, "MTN Mobile Money", (*response.Data)[0].Name)
+	assert.Equal(t, "UGX", (*response.Data)[0].TransactionCurrency)
+	assert.Equal(t, float64(3000), (*response.Data)[0].MinAmount)
+	assert.Equal(t, float64(5000000), (*response.Data)[0].MaxAmount)
+	assert.Equal(t, true, (*response.Data)[0].Available)
+	assert.Empty(t, (*response.Data)[0].SandboxTestAccounts)
+}
+
+func Test_Providers_ProvidersResponse_UnmarshalErrorUnauthorized(t *testing.T) {
+	var response ProvidersResponse
+	body, _ := LoadStubResponseData("stubs/errors/401.json")
+	err := json.Unmarshal(body, &response)
+	assert.NoError(t, err)
+	assert.Equal(t, 401, response.Code)
+	assert.Equal(t, "error", response.Status)
+	assert.Equal(t, "Unauthorized API access. Unknown Merchant", response.Message)
+	assert.Empty(t, response.Data)
 }
 
 func Test_Providers_ProvidersResource_GetListInvalidFilter(t *testing.T) {

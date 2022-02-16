@@ -47,24 +47,24 @@ func (pr *PayoutRequest) isValid() error {
 //PayoutResponse struct
 type PayoutResponse struct {
 	*ResponseBody
-	Data *PayoutResponseData `json:"data"`
+	Data *PayoutResponseData `json:"data,omitempty"`
 }
 
 //PayoutResponseData struct
 type PayoutResponseData struct {
-	ID                int64                 `json:"id"`
-	RequestAmount     float64               `json:"request_amount"`
-	RequestCurrency   string                `json:"request_currency"`
-	AccountAmount     float64               `json:"account_amount"`
-	AccountCurrency   string                `json:"account_currency"`
-	TransactionFee    float64               `json:"transaction_fee"`
-	TotalDebit        float64               `json:"total_debit"`
-	ProviderID        string                `json:"provider_id"`
-	MerchantReference string                `json:"merchant_reference"`
-	InternalReference string                `json:"internal_reference"`
-	TransactionStatus TransactionStatusCode `json:"transaction_status"`
-	TransactionType   TransactionTypeCode   `json:"transaction_type"`
-	Message           string                `json:"message"`
+	ID                int64   `json:"id"`
+	RequestAmount     float64 `json:"request_amount"`
+	RequestCurrency   string  `json:"request_currency"`
+	AccountAmount     float64 `json:"account_amount"`
+	AccountCurrency   string  `json:"account_currency"`
+	TransactionFee    float64 `json:"transaction_fee"`
+	TotalDebit        float64 `json:"total_debit"`
+	ProviderID        string  `json:"provider_id"`
+	MerchantReference string  `json:"merchant_reference"`
+	InternalReference string  `json:"internal_reference"`
+	TransactionStatus string  `json:"transaction_status"`
+	TransactionType   string  `json:"transaction_type"`
+	Message           string  `json:"message"`
 }
 
 //Payouts resource wrapper
@@ -72,8 +72,7 @@ type PayoutsResource struct {
 	*ResourceAbstract
 }
 
-//Create payout request
-//see https://docs.dusupay.com/sending-money/payouts/post-payout-request
+//Create payout request (see https://docs.dusupay.com/sending-money/payouts/post-payout-request)
 func (r *PayoutsResource) Create(ctx context.Context, req *PayoutRequest) (*Response, error) {
 	err := req.isValid()
 	if err != nil {

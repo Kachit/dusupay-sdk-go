@@ -37,7 +37,7 @@ type MerchantsResource struct {
 	*ResourceAbstract
 }
 
-//get balances list
+//Get balances list (see https://docs.dusupay.com/appendix/account-balance)
 func (r *MerchantsResource) GetBalances(ctx context.Context) (*Response, error) {
 	rsp, err := r.ResourceAbstract.get(ctx, "v1/merchants/balance", nil)
 	if err != nil {

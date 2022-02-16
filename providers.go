@@ -2,6 +2,7 @@ package dusupay
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 )
 
@@ -31,20 +32,36 @@ func (pf *ProvidersFilter) buildPath() string {
 
 type ProvidersResponse struct {
 	*ResponseBody
-	Data []*ProvidersResponseDataItem `json:"data,omitempty"`
+	Data *ProvidersResponseData `json:"data,omitempty"`
+}
+
+type ProvidersResponseData []*ProvidersResponseDataItem
+
+//UnmarshalJSON
+func (rsp *ProvidersResponseData) UnmarshalJSON(data []byte) error {
+	if isEmptyObjectResponseData(data) {
+		return nil
+	}
+	var arr []*ProvidersResponseDataItem
+	err := json.Unmarshal(data, &arr)
+	if err != nil {
+		return err
+	}
+	*rsp = append(*rsp, arr...)
+	return nil
 }
 
 type ProvidersResponseDataItem struct {
-	ID                  string `json:"id"`
-	Name                string `json:"name"`
-	TransactionCurrency string `json:"transaction_currency"`
-	MinAmount           int    `json:"min_amount"`
-	MaxAmount           int    `json:"max_amount"`
-	Available           bool   `json:"available"`
+	ID                  string  `json:"id"`
+	Name                string  `json:"name"`
+	TransactionCurrency string  `json:"transaction_currency"`
+	MinAmount           float64 `json:"min_amount"`
+	MaxAmount           float64 `json:"max_amount"`
+	Available           bool    `json:"available"`
 	SandboxTestAccounts struct {
 		Success string `json:"success"`
 		Failure string `json:"failure"`
-	} `json:"sandbox_test_accounts"`
+	} `json:"sandbox_test_accounts,omitempty"`
 }
 
 //Providers resource wrapper
@@ -52,6 +69,7 @@ type ProvidersResource struct {
 	*ResourceAbstract
 }
 
+//Get providers list (see https://docs.dusupay.com/appendix/payment-options/payment-providers)
 func (r *ProvidersResource) GetList(ctx context.Context, filter *ProvidersFilter) (*Response, error) {
 	err := filter.isValid()
 	if err != nil {

@@ -2,6 +2,7 @@ package dusupay
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -145,6 +146,44 @@ func Test_Collections_CollectionRequest_IsValidEmptyRedirectUrlMobileMoneyWithou
 	result := request.isValid()
 	assert.Error(t, result)
 	assert.Equal(t, `parameter "account_number" is empty`, result.Error())
+}
+
+func Test_Collections_CollectionResponse_UnmarshalSuccess(t *testing.T) {
+	var response CollectionResponse
+	body, _ := LoadStubResponseData("stubs/collections/create/success.json")
+	err := json.Unmarshal(body, &response)
+	assert.NoError(t, err)
+	assert.Equal(t, 202, response.Code)
+	assert.Equal(t, "accepted", response.Status)
+	assert.Equal(t, "Transaction Initiated", response.Message)
+	assert.Equal(t, int64(226), response.Data.ID)
+	assert.Equal(t, 0.2, response.Data.RequestAmount)
+	assert.Equal(t, "USD", response.Data.RequestCurrency)
+	assert.Equal(t, 737.9934, response.Data.AccountAmount)
+	assert.Equal(t, "UGX", response.Data.AccountCurrency)
+	assert.Equal(t, 21.4018, response.Data.TransactionFee)
+	assert.Equal(t, 716.5916, response.Data.TotalCredit)
+	assert.Equal(t, "mtn_ug", response.Data.ProviderID)
+	assert.Equal(t, "76859aae-f148-48c5-9901-2e474cf19b71", response.Data.MerchantReference)
+	assert.Equal(t, "DUSUPAY405GZM1G5JXGA71IK", response.Data.InternalReference)
+	assert.Equal(t, "PENDING", response.Data.TransactionStatus)
+	assert.Equal(t, "collection", response.Data.TransactionType)
+	assert.Equal(t, "Transaction Initiated", response.Data.Message)
+	assert.Equal(t, false, response.Data.CustomerCharged)
+	assert.Equal(t, "https://sandbox.dusupay.com/v1/complete-payment/DUSUPAY405GZM1G5JXGA71IK", response.Data.PaymentURL)
+	assert.Equal(t, "Ensure that you have sufficient balance on your MTN Mobile Money account", response.Data.Instructions[0].Description)
+	assert.Equal(t, "1", response.Data.Instructions[0].StepNo)
+}
+
+func Test_Collections_CollectionResponse_UnmarshalErrorUnauthorized(t *testing.T) {
+	var response CollectionResponse
+	body, _ := LoadStubResponseData("stubs/errors/401.json")
+	err := json.Unmarshal(body, &response)
+	assert.NoError(t, err)
+	assert.Equal(t, 401, response.Code)
+	assert.Equal(t, "error", response.Status)
+	assert.Equal(t, "Unauthorized API access. Unknown Merchant", response.Message)
+	assert.Empty(t, response.Data)
 }
 
 func Test_Collections_CollectionsResource_CreateInvalidRequest(t *testing.T) {

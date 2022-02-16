@@ -22,24 +22,24 @@ func (rr *RefundRequest) isValid() error {
 //RefundResponse struct
 type RefundResponse struct {
 	*ResponseBody
-	Data *RefundResponseData `json:"data"`
+	Data *RefundResponseData `json:"data,omitempty"`
 }
 
 //RefundResponseData struct
 type RefundResponseData struct {
-	ID                  int64                 `json:"id"`
-	RefundAmount        float64               `json:"refund_amount"`
-	RefundCurrency      string                `json:"refund_currency"`
-	TransactionFee      float64               `json:"transaction_fee"`
-	TotalDebit          float64               `json:"total_debit"`
-	ProviderID          string                `json:"provider_id"`
-	MerchantReference   string                `json:"merchant_reference"`
-	CollectionReference string                `json:"collection_reference"`
-	InternalReference   string                `json:"internal_reference"`
-	TransactionType     TransactionTypeCode   `json:"transaction_type"`
-	TransactionStatus   TransactionStatusCode `json:"transaction_status"`
-	AccountNumber       string                `json:"account_number"`
-	Message             string                `json:"message"`
+	ID                  int64   `json:"id"`
+	RefundAmount        float64 `json:"refund_amount"`
+	RefundCurrency      string  `json:"refund_currency"`
+	TransactionFee      float64 `json:"transaction_fee"`
+	TotalDebit          float64 `json:"total_debit"`
+	ProviderID          string  `json:"provider_id"`
+	MerchantReference   string  `json:"merchant_reference"`
+	CollectionReference string  `json:"collection_reference"`
+	InternalReference   string  `json:"internal_reference"`
+	TransactionType     string  `json:"transaction_type"`
+	TransactionStatus   string  `json:"transaction_status"`
+	AccountNumber       string  `json:"account_number"`
+	Message             string  `json:"message"`
 }
 
 //Refunds resource wrapper
@@ -47,8 +47,7 @@ type RefundsResource struct {
 	*ResourceAbstract
 }
 
-//Create refund request
-//see https://docs.dusupay.com/appendix/refunds
+//Create refund request (see https://docs.dusupay.com/appendix/refunds)
 func (r *RefundsResource) Create(ctx context.Context, req *RefundRequest) (*Response, error) {
 	err := req.isValid()
 	if err != nil {
