@@ -2,6 +2,7 @@ package dusupay
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 )
 
@@ -54,7 +55,23 @@ func (bbf *BanksBranchesFilter) buildPath() string {
 //BanksBranchesResponse struct
 type BanksResponse struct {
 	*ResponseBody
-	Data []*BanksResponseDataItem `json:"data,omitempty"`
+	Data *BanksResponseData `json:"data,omitempty"`
+}
+
+type BanksResponseData []*BanksResponseDataItem
+
+//UnmarshalJSON
+func (rsp *BanksResponseData) UnmarshalJSON(data []byte) error {
+	if isEmptyObjectResponseData(data) {
+		return nil
+	}
+	var arr []*BanksResponseDataItem
+	err := json.Unmarshal(data, &arr)
+	if err != nil {
+		return err
+	}
+	*rsp = append(*rsp, arr...)
+	return nil
 }
 
 type BanksResponseDataItem struct {
@@ -65,7 +82,23 @@ type BanksResponseDataItem struct {
 //BanksBranchesResponse struct
 type BanksBranchesResponse struct {
 	*ResponseBody
-	Data []*BanksBranchesResponseDataItem `json:"data,omitempty"`
+	Data *BanksBranchesResponseData `json:"data,omitempty"`
+}
+
+type BanksBranchesResponseData []*BanksBranchesResponseDataItem
+
+//UnmarshalJSON
+func (rsp *BanksBranchesResponseData) UnmarshalJSON(data []byte) error {
+	if isEmptyObjectResponseData(data) {
+		return nil
+	}
+	var arr []*BanksBranchesResponseDataItem
+	err := json.Unmarshal(data, &arr)
+	if err != nil {
+		return err
+	}
+	*rsp = append(*rsp, arr...)
+	return nil
 }
 
 type BanksBranchesResponseDataItem struct {
@@ -78,8 +111,7 @@ type BanksResource struct {
 	*ResourceAbstract
 }
 
-//get banks list
-//see https://docs.dusupay.com/sending-money/payouts/bank-codes
+//Get banks list (see https://docs.dusupay.com/sending-money/payouts/bank-codes)
 func (r *BanksResource) GetList(ctx context.Context, filter *BanksFilter) (*Response, error) {
 	err := filter.isValid()
 	if err != nil {
@@ -92,8 +124,7 @@ func (r *BanksResource) GetList(ctx context.Context, filter *BanksFilter) (*Resp
 	return rsp, err
 }
 
-//get banks branches list
-//see https://docs.dusupay.com/sending-money/payouts/bank-branches
+//Get banks branches list (see https://docs.dusupay.com/sending-money/payouts/bank-branches)
 func (r *BanksResource) GetBranchesList(ctx context.Context, filter *BanksBranchesFilter) (*Response, error) {
 	err := filter.isValid()
 	if err != nil {

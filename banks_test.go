@@ -2,6 +2,7 @@ package dusupay
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -78,4 +79,50 @@ func Test_Banks_BanksResource_GetBranchesListInvalidFilter(t *testing.T) {
 	rsp, err := resource.GetBranchesList(ctx, filter)
 	assert.Nil(t, rsp)
 	assert.Error(t, err)
+}
+
+func Test_Banks_BanksResponse_UnmarshalSuccess(t *testing.T) {
+	var response BanksResponse
+	body, _ := LoadStubResponseData("stubs/banks/list/success.json")
+	err := json.Unmarshal(body, &response)
+	assert.NoError(t, err)
+	assert.Equal(t, 200, response.Code)
+	assert.Equal(t, "success", response.Status)
+	assert.Equal(t, "Request completed successfully.", response.Message)
+	assert.Equal(t, "GH030243", (*response.Data)[0].Code)
+	assert.Equal(t, "BARCLAYS BANK(GH) LTD-NKAWKAW", (*response.Data)[0].Name)
+}
+
+func Test_Banks_BanksResponse_UnmarshalErrorUnauthorized(t *testing.T) {
+	var response BanksResponse
+	body, _ := LoadStubResponseData("stubs/errors/401.json")
+	err := json.Unmarshal(body, &response)
+	assert.NoError(t, err)
+	assert.Equal(t, 401, response.Code)
+	assert.Equal(t, "error", response.Status)
+	assert.Equal(t, "Unauthorized API access. Unknown Merchant", response.Message)
+	assert.Empty(t, response.Data)
+}
+
+func Test_Banks_BanksBranchesResponse_UnmarshalSuccess(t *testing.T) {
+	var response BanksBranchesResponse
+	body, _ := LoadStubResponseData("stubs/banks/branches/success.json")
+	err := json.Unmarshal(body, &response)
+	assert.NoError(t, err)
+	assert.Equal(t, 200, response.Code)
+	assert.Equal(t, "success", response.Status)
+	assert.Equal(t, "Request completed successfully.", response.Message)
+	assert.Equal(t, "GH030243", (*response.Data)[0].Code)
+	assert.Equal(t, "BARCLAYS BANK(GH) LTD-NKAWKAW", (*response.Data)[0].Name)
+}
+
+func Test_Banks_BanksBranchesResponse_UnmarshalErrorUnauthorized(t *testing.T) {
+	var response BanksBranchesResponse
+	body, _ := LoadStubResponseData("stubs/errors/401.json")
+	err := json.Unmarshal(body, &response)
+	assert.NoError(t, err)
+	assert.Equal(t, 401, response.Code)
+	assert.Equal(t, "error", response.Status)
+	assert.Equal(t, "Unauthorized API access. Unknown Merchant", response.Message)
+	assert.Empty(t, response.Data)
 }

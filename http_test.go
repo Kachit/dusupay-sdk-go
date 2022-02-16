@@ -104,6 +104,21 @@ func Test_HTTP_RequestBuilder_BuildRequestPOST(t *testing.T) {
 	assert.NotEmpty(t, result.Body)
 }
 
+func Test_HTTP_IsEmptyObjectResponseDataEmptyObject(t *testing.T) {
+	data := "{}"
+	assert.True(t, isEmptyObjectResponseData([]byte(data)))
+}
+
+func Test_HTTP_IsEmptyObjectResponseDataFilledObject(t *testing.T) {
+	data := `{"foo":"bar"}`
+	assert.False(t, isEmptyObjectResponseData([]byte(data)))
+}
+
+func Test_HTTP_IsEmptyObjectResponseDataEmptyArray(t *testing.T) {
+	data := "[]"
+	assert.False(t, isEmptyObjectResponseData([]byte(data)))
+}
+
 func Test_HTTP_NewHttpTransport(t *testing.T) {
 	cfg := BuildStubConfig()
 	transport := NewHttpTransport(cfg, nil)

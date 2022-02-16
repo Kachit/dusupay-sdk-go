@@ -171,3 +171,7 @@ type ResponseBody struct {
 	Status  string `json:"status"`
 	Message string `json:"message"`
 }
+
+func isEmptyObjectResponseData(data []byte) bool {
+	return data[0] == 123 && data[1] == 125
+}

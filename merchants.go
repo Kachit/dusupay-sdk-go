@@ -2,17 +2,34 @@ package dusupay
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 )
 
 type BalancesResponse struct {
 	*ResponseBody
-	Data []*BalancesResponseDataItem `json:"data,omitempty"`
+	Data *BalancesResponseData `json:"data,omitempty"`
+}
+
+type BalancesResponseData []*BalancesResponseDataItem
+
+//UnmarshalJSON
+func (brd *BalancesResponseData) UnmarshalJSON(data []byte) error {
+	if isEmptyObjectResponseData(data) {
+		return nil
+	}
+	var arr []*BalancesResponseDataItem
+	err := json.Unmarshal(data, &arr)
+	if err != nil {
+		return err
+	}
+	*brd = append(*brd, arr...)
+	return nil
 }
 
 type BalancesResponseDataItem struct {
-	Currency CurrencyCode `json:"currency"`
-	Balance  float64      `json:"balance"`
+	Currency string  `json:"currency"`
+	Balance  float64 `json:"balance"`
 }
 
 //Merchants resource wrapper
