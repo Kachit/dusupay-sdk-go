@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 )
 
 type BalancesResponse struct {
@@ -38,10 +39,15 @@ type MerchantsResource struct {
 }
 
 //Get balances list (see https://docs.dusupay.com/appendix/account-balance)
-func (r *MerchantsResource) GetBalances(ctx context.Context) (*Response, error) {
-	rsp, err := r.ResourceAbstract.get(ctx, "v1/merchants/balance", nil)
+func (r *MerchantsResource) GetBalances(ctx context.Context) (*BalancesResponse, *http.Response, error) {
+	rsp, err := r.ResourceAbstract.tr.Get(ctx, "v1/merchants/balance", nil)
 	if err != nil {
-		return nil, fmt.Errorf("MerchantsResource@GetBalances error: %v", err)
+		return nil, nil, fmt.Errorf("MerchantsResource@GetBalances error: %v", err)
 	}
-	return rsp, err
+	var balances BalancesResponse
+	err = unmarshalResponse(*rsp, &balances)
+	if err != nil {
+		return nil, nil, fmt.Errorf("MerchantsResource@GetBalances error: %v", err)
+	}
+	return &balances, rsp, err
 }

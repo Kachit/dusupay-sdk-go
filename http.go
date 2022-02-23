@@ -130,46 +130,30 @@ type Response struct {
 	raw *http.Response
 }
 
-//IsSuccess method
-func (r *Response) IsSuccess() bool {
-	return r.raw.StatusCode < http.StatusMultipleChoices
-}
-
-//GetRawResponse method
-func (r *Response) GetRawResponse() *http.Response {
-	return r.raw
-}
-
-//GetRawBody method
-func (r *Response) GetRawBody() string {
-	body, _ := r.ReadBody()
-	return string(body)
-}
-
-//Unmarshal method
-func (r *Response) Unmarshal(v interface{}) error {
-	data, err := r.ReadBody()
-	if err != nil {
-		return fmt.Errorf("Response@Unmarshal read body: %v", err)
-	}
-	return json.Unmarshal(data, &v)
-}
-
-//ReadBody method
-func (r *Response) ReadBody() ([]byte, error) {
-	defer r.raw.Body.Close()
-	return ioutil.ReadAll(r.raw.Body)
-}
-
 //NewResponse create new response
 func NewResponse(raw *http.Response) *Response {
 	return &Response{raw: raw}
 }
 
+//Response body
 type ResponseBody struct {
 	Code    int    `json:"code"`
 	Status  string `json:"status"`
 	Message string `json:"message"`
+}
+
+//IsSuccess method
+func (r *ResponseBody) IsSuccess() bool {
+	return r.Code < http.StatusMultipleChoices
+}
+
+func unmarshalResponse(rsp http.Response, v interface{}) error {
+	defer rsp.Body.Close()
+	data, err := ioutil.ReadAll(rsp.Body)
+	if err != nil {
+		return fmt.Errorf("Response@Unmarshal read body: %v", err)
+	}
+	return json.Unmarshal(data, &v)
 }
 
 func isEmptyObjectResponseData(data []byte) bool {
