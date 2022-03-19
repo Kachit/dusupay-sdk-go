@@ -147,13 +147,15 @@ func (r *ResponseBody) IsSuccess() bool {
 	return r.Code < http.StatusMultipleChoices
 }
 
-func unmarshalResponse(rsp http.Response, v interface{}) error {
-	defer rsp.Body.Close()
-	data, err := ioutil.ReadAll(rsp.Body)
+func unmarshalResponse(resp *http.Response, v interface{}) error {
+	defer resp.Body.Close()
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("Response@Unmarshal read body: %v", err)
 	}
-	return json.Unmarshal(data, &v)
+	//reset the response body to the original unread state
+	resp.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+	return json.Unmarshal(bodyBytes, &v)
 }
 
 func isEmptyObjectResponseData(data []byte) bool {

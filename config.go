@@ -27,10 +27,20 @@ func (c *Config) IsValid() error {
 	return err
 }
 
-//NewConfig Create new config from credentials
+//NewConfig Create new config from credentials (Prod version)
 func NewConfig(publicKey string, secretKey string) *Config {
 	cfg := &Config{
 		Uri:       ProdAPIUrl,
+		PublicKey: publicKey,
+		SecretKey: secretKey,
+	}
+	return cfg
+}
+
+//NewConfig Create new config from credentials (Sandbox version)
+func NewConfigSandbox(publicKey string, secretKey string) *Config {
+	cfg := &Config{
+		Uri:       SandboxAPIUrl,
 		PublicKey: publicKey,
 		SecretKey: secretKey,
 	}

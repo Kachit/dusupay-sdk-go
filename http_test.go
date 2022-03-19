@@ -187,3 +187,12 @@ func Test_HTTP_Transport_Post(t *testing.T) {
 	bodyRsp, _ := ioutil.ReadAll(resp.Body)
 	assert.Equal(t, body, bodyRsp)
 }
+
+func Test_HTTP_ResponseBody_IsSuccess(t *testing.T) {
+	rsp := &ResponseBody{Code: http.StatusAccepted}
+	assert.True(t, rsp.IsSuccess())
+	rsp.Code = http.StatusMultipleChoices
+	assert.False(t, rsp.IsSuccess())
+	rsp.Code = http.StatusBadRequest
+	assert.False(t, rsp.IsSuccess())
+}

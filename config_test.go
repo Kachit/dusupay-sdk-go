@@ -12,6 +12,13 @@ func Test_Config_NewConfig(t *testing.T) {
 	assert.Equal(t, "bar", result.SecretKey)
 }
 
+func Test_Config_NewConfigSandbox(t *testing.T) {
+	result := NewConfigSandbox("foo", "bar")
+	assert.Equal(t, SandboxAPIUrl, result.Uri)
+	assert.Equal(t, "foo", result.PublicKey)
+	assert.Equal(t, "bar", result.SecretKey)
+}
+
 func Test_Config_IsSandbox(t *testing.T) {
 	result := NewConfig("foo", "bar")
 	assert.False(t, result.IsSandbox())
