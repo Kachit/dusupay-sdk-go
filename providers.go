@@ -3,7 +3,9 @@ package dusupay
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"net/http"
 )
 
 //Providers list filter
@@ -70,14 +72,22 @@ type ProvidersResource struct {
 }
 
 //Get providers list (see https://docs.dusupay.com/appendix/payment-options/payment-providers)
-func (r *ProvidersResource) GetList(ctx context.Context, filter *ProvidersFilter) (*Response, error) {
+func (r *ProvidersResource) GetList(ctx context.Context, filter *ProvidersFilter) (*ProvidersResponse, *http.Response, error) {
 	err := filter.isValid()
 	if err != nil {
-		return nil, fmt.Errorf("ProvidersResource@GetList error: %v", err)
+		return nil, nil, fmt.Errorf("ProvidersResource.GetList error: %v", err)
 	}
-	rsp, err := r.ResourceAbstract.get(ctx, "v1/payment-options/"+filter.buildPath(), nil)
+	rsp, err := r.ResourceAbstract.tr.Get(ctx, "v1/payment-options/"+filter.buildPath(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("ProvidersResource@GetList error: %v", err)
+		return nil, nil, fmt.Errorf("ProvidersResource.GetList error: %v", err)
 	}
-	return rsp, err
+	var result ProvidersResponse
+	err = unmarshalResponse(rsp, &result)
+	if err != nil {
+		return nil, nil, fmt.Errorf("ProvidersResource.GetList error: %v", err)
+	}
+	if !result.IsSuccess() {
+		err = errors.New(result.Message)
+	}
+	return &result, rsp, err
 }

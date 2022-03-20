@@ -3,7 +3,10 @@ package dusupay
 import (
 	"context"
 	"encoding/json"
+	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
+	"net/http"
 	"testing"
 )
 
@@ -56,7 +59,7 @@ func Test_Banks_BanksBranchesFilter_IsValidEmptyBankCode(t *testing.T) {
 func Test_Banks_BanksBranchesFilter_BuildPath(t *testing.T) {
 	filter := BanksBranchesFilter{Country: CountryCodeKenya, Bank: "qwerty"}
 	result := filter.buildPath()
-	assert.Equal(t, `bank/KE/branches/qwerty`, result)
+	assert.Equal(t, `KE/branches/qwerty`, result)
 }
 
 func Test_Banks_BanksResource_GetListInvalidFilter(t *testing.T) {
@@ -65,9 +68,73 @@ func Test_Banks_BanksResource_GetListInvalidFilter(t *testing.T) {
 	ctx := context.Background()
 	filter := &BanksFilter{}
 	resource := &BanksResource{ResourceAbstract: NewResourceAbstract(transport, config)}
-	rsp, err := resource.GetList(ctx, filter)
+	result, rsp, err := resource.GetList(ctx, filter)
+	assert.Nil(t, result)
 	assert.Nil(t, rsp)
 	assert.Error(t, err)
+}
+
+func Test_Banks_BanksResource_GetListSuccess(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	body, _ := LoadStubResponseData("stubs/banks/list/success.json")
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/payment-options/CARD/bank/KE", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+
+	filter := &BanksFilter{Country: CountryCodeKenya, Method: TransactionMethodCard}
+	resource := &BanksResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	result, resp, err := resource.GetList(ctx, filter)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
+	//result
+	assert.True(t, result.IsSuccess())
+	assert.Equal(t, 200, result.Code)
+	assert.Equal(t, "success", result.Status)
+	assert.Equal(t, "Request completed successfully.", result.Message)
+	assert.Equal(t, "GH030243", (*result.Data)[0].Code)
+	assert.Equal(t, "BARCLAYS BANK(GH) LTD-NKAWKAW", (*result.Data)[0].Name)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+}
+
+func Test_Banks_BanksResource_GetListError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	body, _ := LoadStubResponseData("stubs/errors/401.json")
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/payment-options/CARD/bank/KE", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+
+	filter := &BanksFilter{Country: CountryCodeKenya, Method: TransactionMethodCard}
+	resource := &BanksResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	result, resp, err := resource.GetList(ctx, filter)
+	assert.Error(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
+	//result
+	assert.False(t, result.IsSuccess())
+	assert.Equal(t, 401, result.Code)
+	assert.Equal(t, "error", result.Status)
+	assert.Equal(t, "Unauthorized API access. Unknown Merchant", result.Message)
+	assert.Empty(t, result.Data)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+	//error
+	assert.Equal(t, "Unauthorized API access. Unknown Merchant", err.Error())
 }
 
 func Test_Banks_BanksResource_GetBranchesListInvalidFilter(t *testing.T) {
@@ -76,9 +143,73 @@ func Test_Banks_BanksResource_GetBranchesListInvalidFilter(t *testing.T) {
 	ctx := context.Background()
 	filter := &BanksBranchesFilter{}
 	resource := &BanksResource{ResourceAbstract: NewResourceAbstract(transport, config)}
-	rsp, err := resource.GetBranchesList(ctx, filter)
+	result, rsp, err := resource.GetBranchesList(ctx, filter)
+	assert.Nil(t, result)
 	assert.Nil(t, rsp)
 	assert.Error(t, err)
+}
+
+func Test_Banks_BanksResource_GetBranchesListSuccess(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	body, _ := LoadStubResponseData("stubs/banks/branches/success.json")
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/bank/KE/branches/qwerty", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+
+	filter := &BanksBranchesFilter{Country: CountryCodeKenya, Bank: "qwerty"}
+	resource := &BanksResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	result, resp, err := resource.GetBranchesList(ctx, filter)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
+	//result
+	assert.True(t, result.IsSuccess())
+	assert.Equal(t, 200, result.Code)
+	assert.Equal(t, "success", result.Status)
+	assert.Equal(t, "Request completed successfully.", result.Message)
+	assert.Equal(t, "GH030243", (*result.Data)[0].Code)
+	assert.Equal(t, "BARCLAYS BANK(GH) LTD-NKAWKAW", (*result.Data)[0].Name)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+}
+
+func Test_Banks_BanksResource_GetBranchesListError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	body, _ := LoadStubResponseData("stubs/errors/401.json")
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/bank/KE/branches/qwerty", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+
+	filter := &BanksBranchesFilter{Country: CountryCodeKenya, Bank: "qwerty"}
+	resource := &BanksResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	result, resp, err := resource.GetBranchesList(ctx, filter)
+	assert.Error(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
+	//result
+	assert.False(t, result.IsSuccess())
+	assert.Equal(t, 401, result.Code)
+	assert.Equal(t, "error", result.Status)
+	assert.Equal(t, "Unauthorized API access. Unknown Merchant", result.Message)
+	assert.Empty(t, result.Data)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+	//error
+	assert.Equal(t, "Unauthorized API access. Unknown Merchant", err.Error())
 }
 
 func Test_Banks_BanksResponse_UnmarshalSuccess(t *testing.T) {

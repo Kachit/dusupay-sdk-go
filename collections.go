@@ -82,15 +82,15 @@ type CollectionsResource struct {
 func (r *CollectionsResource) Create(ctx context.Context, req *CollectionRequest) (*Response, error) {
 	err := req.isValid()
 	if err != nil {
-		return nil, fmt.Errorf("CollectionsResource@Create error: %v", err)
+		return nil, fmt.Errorf("CollectionsResource.Create error: %v", err)
 	}
 	post, err := transformStructToMap(req)
 	if err != nil {
-		return nil, fmt.Errorf("CollectionsResource@Create error: %v", err)
+		return nil, fmt.Errorf("CollectionsResource.Create error: %v", err)
 	}
 	rsp, err := r.ResourceAbstract.post(ctx, "v1/collections", post, nil)
 	if err != nil {
-		return nil, fmt.Errorf("CollectionsResource@Create error: %v", err)
+		return nil, fmt.Errorf("CollectionsResource.Create error: %v", err)
 	}
 	return rsp, err
 }

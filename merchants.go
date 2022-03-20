@@ -3,6 +3,7 @@ package dusupay
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 )
@@ -42,12 +43,15 @@ type MerchantsResource struct {
 func (r *MerchantsResource) GetBalances(ctx context.Context) (*BalancesResponse, *http.Response, error) {
 	rsp, err := r.ResourceAbstract.tr.Get(ctx, "v1/merchants/balance", nil)
 	if err != nil {
-		return nil, nil, fmt.Errorf("MerchantsResource@GetBalances error: %v", err)
+		return nil, nil, fmt.Errorf("MerchantsResource.GetBalances error: %v", err)
 	}
 	var balances BalancesResponse
 	err = unmarshalResponse(rsp, &balances)
 	if err != nil {
-		return nil, nil, fmt.Errorf("MerchantsResource@GetBalances error: %v", err)
+		return nil, nil, fmt.Errorf("MerchantsResource.GetBalances error: %v", err)
+	}
+	if !balances.IsSuccess() {
+		err = errors.New(balances.Message)
 	}
 	return &balances, rsp, err
 }

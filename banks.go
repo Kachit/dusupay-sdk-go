@@ -3,7 +3,9 @@ package dusupay
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"net/http"
 )
 
 //Banks list filter
@@ -49,7 +51,7 @@ func (bbf *BanksBranchesFilter) isValid() error {
 }
 
 func (bbf *BanksBranchesFilter) buildPath() string {
-	return "bank/" + string(bbf.Country) + "/branches/" + string(bbf.Bank)
+	return string(bbf.Country) + "/branches/" + string(bbf.Bank)
 }
 
 //BanksBranchesResponse struct
@@ -112,27 +114,43 @@ type BanksResource struct {
 }
 
 //Get banks list (see https://docs.dusupay.com/sending-money/payouts/bank-codes)
-func (r *BanksResource) GetList(ctx context.Context, filter *BanksFilter) (*Response, error) {
+func (r *BanksResource) GetList(ctx context.Context, filter *BanksFilter) (*BanksResponse, *http.Response, error) {
 	err := filter.isValid()
 	if err != nil {
-		return nil, err
+		return nil, nil, fmt.Errorf("BanksResource.GetList error: %v", err)
 	}
-	rsp, err := r.ResourceAbstract.get(ctx, "v1/payment-options/"+filter.buildPath(), nil)
+	rsp, err := r.ResourceAbstract.tr.Get(ctx, "v1/payment-options/"+filter.buildPath(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("BanksResource@GetList error: %v", err)
+		return nil, nil, fmt.Errorf("BanksResource.GetList error: %v", err)
 	}
-	return rsp, err
+	var result BanksResponse
+	err = unmarshalResponse(rsp, &result)
+	if err != nil {
+		return nil, nil, fmt.Errorf("BanksResource.GetList error: %v", err)
+	}
+	if !result.IsSuccess() {
+		err = errors.New(result.Message)
+	}
+	return &result, rsp, err
 }
 
 //Get banks branches list (see https://docs.dusupay.com/sending-money/payouts/bank-branches)
-func (r *BanksResource) GetBranchesList(ctx context.Context, filter *BanksBranchesFilter) (*Response, error) {
+func (r *BanksResource) GetBranchesList(ctx context.Context, filter *BanksBranchesFilter) (*BanksBranchesResponse, *http.Response, error) {
 	err := filter.isValid()
 	if err != nil {
-		return nil, err
+		return nil, nil, fmt.Errorf("BanksResource.GetBranchesList error: %v", err)
 	}
-	rsp, err := r.ResourceAbstract.get(ctx, "v1/bank/"+filter.buildPath(), nil)
+	rsp, err := r.ResourceAbstract.tr.Get(ctx, "v1/bank/"+filter.buildPath(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("BanksResource@GetBranchesList error: %v", err)
+		return nil, nil, fmt.Errorf("BanksResource.GetBranchesList error: %v", err)
 	}
-	return rsp, err
+	var result BanksBranchesResponse
+	err = unmarshalResponse(rsp, &result)
+	if err != nil {
+		return nil, nil, fmt.Errorf("BanksResource.GetBranchesList error: %v", err)
+	}
+	if !result.IsSuccess() {
+		err = errors.New(result.Message)
+	}
+	return &result, rsp, err
 }

@@ -3,7 +3,10 @@ package dusupay
 import (
 	"context"
 	"encoding/json"
+	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
+	"net/http"
 	"testing"
 )
 
@@ -86,13 +89,82 @@ func Test_Providers_ProvidersResponse_UnmarshalErrorUnauthorized(t *testing.T) {
 	assert.Empty(t, response.Data)
 }
 
+func Test_Providers_ProvidersResource_GetListSuccess(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	body, _ := LoadStubResponseData("stubs/providers/payment-options/success.json")
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/payment-options/COLLECTION/CARD/KE", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+
+	filter := &ProvidersFilter{Country: CountryCodeKenya, Method: TransactionMethodCard, TransactionType: TransactionTypeCollection}
+	resource := &ProvidersResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	result, resp, err := resource.GetList(ctx, filter)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
+	//result
+	assert.True(t, result.IsSuccess())
+	assert.Equal(t, 200, result.Code)
+	assert.Equal(t, "success", result.Status)
+	assert.Equal(t, "Request completed successfully.", result.Message)
+	assert.Equal(t, "mtn_ug", (*result.Data)[0].ID)
+	assert.Equal(t, "MTN Mobile Money", (*result.Data)[0].Name)
+	assert.Equal(t, "UGX", (*result.Data)[0].TransactionCurrency)
+	assert.Equal(t, float64(3000), (*result.Data)[0].MinAmount)
+	assert.Equal(t, float64(5000000), (*result.Data)[0].MaxAmount)
+	assert.Equal(t, true, (*result.Data)[0].Available)
+	assert.Empty(t, (*result.Data)[0].SandboxTestAccounts)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+}
+
+func Test_Providers_ProvidersResource_GetListError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	body, _ := LoadStubResponseData("stubs/errors/401.json")
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/payment-options/COLLECTION/CARD/KE", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+
+	filter := &ProvidersFilter{Country: CountryCodeKenya, Method: TransactionMethodCard, TransactionType: TransactionTypeCollection}
+	resource := &ProvidersResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	result, resp, err := resource.GetList(ctx, filter)
+	assert.Error(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
+	//result
+	assert.False(t, result.IsSuccess())
+	assert.Equal(t, 401, result.Code)
+	assert.Equal(t, "error", result.Status)
+	assert.Equal(t, "Unauthorized API access. Unknown Merchant", result.Message)
+	assert.Empty(t, result.Data)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+	//error
+	assert.Equal(t, "Unauthorized API access. Unknown Merchant", err.Error())
+}
+
 func Test_Providers_ProvidersResource_GetListInvalidFilter(t *testing.T) {
 	config := BuildStubConfig()
 	transport := NewHttpTransport(config, nil)
 	ctx := context.Background()
 	filter := &ProvidersFilter{}
 	resource := &ProvidersResource{ResourceAbstract: NewResourceAbstract(transport, config)}
-	rsp, err := resource.GetList(ctx, filter)
+	result, rsp, err := resource.GetList(ctx, filter)
 	assert.Nil(t, rsp)
+	assert.Nil(t, result)
 	assert.Error(t, err)
 }

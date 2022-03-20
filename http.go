@@ -28,7 +28,7 @@ type Transport struct {
 func (tr *Transport) SendRequest(ctx context.Context, method string, path string, query map[string]interface{}, body map[string]interface{}) (resp *http.Response, err error) {
 	req, err := tr.rb.BuildRequest(ctx, method, path, query, body)
 	if err != nil {
-		return nil, fmt.Errorf("transport@SendRequest: %v", err)
+		return nil, fmt.Errorf("transport.SendRequest: %v", err)
 	}
 	return tr.http.Do(req)
 }
@@ -52,7 +52,7 @@ type RequestBuilder struct {
 func (rb *RequestBuilder) buildUri(path string, query map[string]interface{}) (uri *url.URL, err error) {
 	u, err := url.Parse(rb.cfg.Uri)
 	if err != nil {
-		return nil, fmt.Errorf("RequestBuilder@buildUri parse: %v", err)
+		return nil, fmt.Errorf("RequestBuilder.buildUri parse: %v", err)
 	}
 	u.Path = "/" + path
 	u.RawQuery = rb.buildQueryParams(query)
@@ -91,7 +91,7 @@ func (rb *RequestBuilder) buildAuthParams(params map[string]interface{}) map[str
 func (rb *RequestBuilder) buildBody(data map[string]interface{}) (io.Reader, error) {
 	b, err := json.Marshal(data)
 	if err != nil {
-		return nil, fmt.Errorf("RequestBuilder@buildBody json convert: %v", err)
+		return nil, fmt.Errorf("RequestBuilder.buildBody json convert: %v", err)
 	}
 	return bytes.NewBuffer(b), nil
 }
@@ -105,7 +105,7 @@ func (rb *RequestBuilder) BuildRequest(ctx context.Context, method string, path 
 		body = rb.buildAuthParams(body)
 		bodyReader, err = rb.buildBody(body)
 		if err != nil {
-			return nil, fmt.Errorf("transport@request build request body: %v", err)
+			return nil, fmt.Errorf("transport.request build request body: %v", err)
 		}
 	} else {
 		query = rb.buildAuthParams(query)
@@ -113,12 +113,12 @@ func (rb *RequestBuilder) BuildRequest(ctx context.Context, method string, path 
 	//build uri
 	uri, err := rb.buildUri(path, query)
 	if err != nil {
-		return nil, fmt.Errorf("transport@request build uri: %v", err)
+		return nil, fmt.Errorf("transport.request build uri: %v", err)
 	}
 	//build request
 	req, err = http.NewRequestWithContext(ctx, method, uri.String(), bodyReader)
 	if err != nil {
-		return nil, fmt.Errorf("transport@request new request error: %v", err)
+		return nil, fmt.Errorf("transport.request new request error: %v", err)
 	}
 	//build headers
 	req.Header = rb.buildHeaders()
@@ -151,7 +151,7 @@ func unmarshalResponse(resp *http.Response, v interface{}) error {
 	defer resp.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("Response@Unmarshal read body: %v", err)
+		return fmt.Errorf("Response.Unmarshal read body: %v", err)
 	}
 	//reset the response body to the original unread state
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))

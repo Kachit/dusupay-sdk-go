@@ -51,15 +51,15 @@ type RefundsResource struct {
 func (r *RefundsResource) Create(ctx context.Context, req *RefundRequest) (*Response, error) {
 	err := req.isValid()
 	if err != nil {
-		return nil, fmt.Errorf("RefundsResource@Create error: %v", err)
+		return nil, fmt.Errorf("RefundsResource.Create error: %v", err)
 	}
 	post, err := transformStructToMap(req)
 	if err != nil {
-		return nil, fmt.Errorf("RefundsResource@Create error: %v", err)
+		return nil, fmt.Errorf("RefundsResource.Create error: %v", err)
 	}
 	rsp, err := r.ResourceAbstract.post(ctx, "v1/refund", post, nil)
 	if err != nil {
-		return nil, fmt.Errorf("RefundsResource@Create error: %v", err)
+		return nil, fmt.Errorf("RefundsResource.Create error: %v", err)
 	}
 	return rsp, err
 }

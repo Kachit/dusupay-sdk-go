@@ -15,7 +15,7 @@ type ResourceAbstract struct {
 func (r *ResourceAbstract) get(ctx context.Context, path string, query map[string]interface{}) (*Response, error) {
 	rsp, err := r.tr.Get(ctx, path, query)
 	if err != nil {
-		return nil, fmt.Errorf("ResourceAbstract@get request: %v", err)
+		return nil, fmt.Errorf("ResourceAbstract.get request: %v", err)
 	}
 	return NewResponse(rsp), nil
 }
@@ -24,7 +24,7 @@ func (r *ResourceAbstract) get(ctx context.Context, path string, query map[strin
 func (r *ResourceAbstract) post(ctx context.Context, path string, body map[string]interface{}, query map[string]interface{}) (*Response, error) {
 	rsp, err := r.tr.Post(ctx, path, body, query)
 	if err != nil {
-		return nil, fmt.Errorf("ResourceAbstract@post request: %v", err)
+		return nil, fmt.Errorf("ResourceAbstract.post request: %v", err)
 	}
 	return NewResponse(rsp), nil
 }
