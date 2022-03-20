@@ -77,8 +77,13 @@ func (rsp *BanksResponseData) UnmarshalJSON(data []byte) error {
 }
 
 type BanksResponseDataItem struct {
-	Code string `json:"code"`
-	Name string `json:"name"`
+	Id                  string  `json:"id"`
+	Name                string  `json:"name"`
+	TransactionCurrency string  `json:"transaction_currency"`
+	MinAmount           float64 `json:"min_amount"`
+	MaxAmount           float64 `json:"max_amount"`
+	BankCode            string  `json:"bank_code"`
+	Available           bool    `json:"available"`
 }
 
 //BanksBranchesResponse struct

@@ -97,8 +97,12 @@ func Test_Banks_BanksResource_GetListSuccess(t *testing.T) {
 	assert.Equal(t, 200, result.Code)
 	assert.Equal(t, "success", result.Status)
 	assert.Equal(t, "Request completed successfully.", result.Message)
-	assert.Equal(t, "GH030243", (*result.Data)[0].Code)
-	assert.Equal(t, "BARCLAYS BANK(GH) LTD-NKAWKAW", (*result.Data)[0].Name)
+	assert.Equal(t, "access_bank", (*result.Data)[0].BankCode)
+	assert.Equal(t, "Access Bank", (*result.Data)[0].Name)
+	assert.Equal(t, "NGN", (*result.Data)[0].TransactionCurrency)
+	assert.Equal(t, float64(1000), (*result.Data)[0].MinAmount)
+	assert.Equal(t, float64(380000), (*result.Data)[0].MaxAmount)
+	assert.Equal(t, true, (*result.Data)[0].Available)
 	//response
 	defer resp.Body.Close()
 	bodyRsp, _ := ioutil.ReadAll(resp.Body)
@@ -220,8 +224,12 @@ func Test_Banks_BanksResponse_UnmarshalSuccess(t *testing.T) {
 	assert.Equal(t, 200, response.Code)
 	assert.Equal(t, "success", response.Status)
 	assert.Equal(t, "Request completed successfully.", response.Message)
-	assert.Equal(t, "GH030243", (*response.Data)[0].Code)
-	assert.Equal(t, "BARCLAYS BANK(GH) LTD-NKAWKAW", (*response.Data)[0].Name)
+	assert.Equal(t, "access_bank", (*response.Data)[0].BankCode)
+	assert.Equal(t, "Access Bank", (*response.Data)[0].Name)
+	assert.Equal(t, "NGN", (*response.Data)[0].TransactionCurrency)
+	assert.Equal(t, float64(1000), (*response.Data)[0].MinAmount)
+	assert.Equal(t, float64(380000), (*response.Data)[0].MaxAmount)
+	assert.Equal(t, true, (*response.Data)[0].Available)
 }
 
 func Test_Banks_BanksResponse_UnmarshalErrorUnauthorized(t *testing.T) {

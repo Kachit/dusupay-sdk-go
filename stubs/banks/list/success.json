@@ -4,12 +4,58 @@
   "message": "Request completed successfully.",
   "data": [
     {
-      "code": "GH030243",
-      "name": "BARCLAYS BANK(GH) LTD-NKAWKAW"
+      "id": "bank_ng",
+      "name": "Access Bank",
+      "transaction_currency": "NGN",
+      "min_amount": 1000,
+      "max_amount": 380000,
+      "bank_code": "access_bank",
+      "available": true
     },
     {
-      "code": "GH030116",
-      "name": "BARCLAYS BANK (GH) LTD-BCM"
+      "id": "bank_ng",
+      "name": "Citi Bank",
+      "transaction_currency": "NGN",
+      "min_amount": 1000,
+      "max_amount": 380000,
+      "bank_code": "citi_bank",
+      "available": true
+    },
+    {
+      "id": "bank_ng",
+      "name": "Coronation Merchant Bank",
+      "transaction_currency": "NGN",
+      "min_amount": 1000,
+      "max_amount": 380000,
+      "bank_code": "coronation_merchant",
+      "available": true
+    },
+    {
+      "id": "bank_ng",
+      "name": "Diamond Bank",
+      "transaction_currency": "NGN",
+      "min_amount": 1000,
+      "max_amount": 380000,
+      "bank_code": "diamond_bank",
+      "available": true
+    },
+    {
+      "id": "bank_ng",
+      "name": "EcoBank PLC",
+      "transaction_currency": "NGN",
+      "min_amount": 1000,
+      "max_amount": 380000,
+      "bank_code": "eco_bank",
+      "available": true
+    },
+    {
+      "id": "bank_ng",
+      "name": "Enterprise Bank",
+      "transaction_currency": "NGN",
+      "min_amount": 1000,
+      "max_amount": 380000,
+      "bank_code": "enterprise_bank",
+      "available": true
     }
   ]
 }

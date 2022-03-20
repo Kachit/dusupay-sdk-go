@@ -32,9 +32,25 @@ func main(){
     client, err := dusupay.NewClientFromConfig(cfg, nil)
     if err != nil {
         fmt.Printf("config parameter error " + err.Error())
+        panic(err)
     }
 
     ctx := context.Background()
-    response, err := client.Merchants().GetBalances(ctx)   
+    balances, response, err := client.Merchants().GetBalances(ctx)
+
+    if err != nil {
+        fmt.Printf("Wrong API request " + err.Error())
+        panic(err)
+    }
+
+    //Dump raw response
+    fmt.Println(response)
+
+    //Dump result
+    fmt.Println(balances.Status)
+    fmt.Println(balances.Code)
+    fmt.Println(balances.Message)
+    fmt.Println((*balances.Data)[0].Currency)
+    fmt.Println((*balances.Data)[0].Balance)
 }
 ```
