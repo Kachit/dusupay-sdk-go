@@ -69,7 +69,7 @@ func Test_Merchants_MerchantsResource_GetBalancesSuccess(t *testing.T) {
 	assert.Equal(t, body, bodyRsp)
 }
 
-func Test_Merchants_MerchantsResource_GetBalancesError(t *testing.T) {
+func Test_Merchants_MerchantsResource_GetBalancesJsonError(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -98,4 +98,27 @@ func Test_Merchants_MerchantsResource_GetBalancesError(t *testing.T) {
 	assert.Equal(t, body, bodyRsp)
 	//error
 	assert.Equal(t, "Unauthorized API access. Unknown Merchant", err.Error())
+}
+
+func Test_Merchants_MerchantsResource_GetBalancesNonJsonError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	body, _ := LoadStubResponseData("stubs/errors/500.html")
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/merchants/balance", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+
+	resource := &MerchantsResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	result, resp, err := resource.GetBalances(ctx)
+	assert.Error(t, err)
+	assert.NotEmpty(t, resp)
+	assert.Empty(t, result)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
 }
