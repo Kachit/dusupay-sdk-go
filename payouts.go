@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+//PayoutRequest struct
 type PayoutRequest struct {
 	Currency          CurrencyCode          `json:"currency"`
 	Amount            float64               `json:"amount"`
@@ -69,7 +70,7 @@ type PayoutResponseData struct {
 	Message           string  `json:"message"`
 }
 
-//Payouts resource wrapper
+//PayoutsResource wrapper
 type PayoutsResource struct {
 	*ResourceAbstract
 }

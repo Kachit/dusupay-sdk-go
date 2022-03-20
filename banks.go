@@ -8,15 +8,14 @@ import (
 	"net/http"
 )
 
-//Banks list filter
-//see https://docs.dusupay.com/sending-money/payouts/bank-codes
+//BanksFilter (see https://docs.dusupay.com/sending-money/payouts/bank-codes)
 type BanksFilter struct {
 	Method TransactionMethodCode `json:"method"`
 	//ISO-2 country code from those supported
 	Country CountryCode `json:"country_code"`
 }
 
-//Check is valid BanksFilter parameters
+//isValid check is valid BanksFilter parameters
 func (bf *BanksFilter) isValid() error {
 	var err error
 	if bf.Country == "" {
@@ -27,12 +26,12 @@ func (bf *BanksFilter) isValid() error {
 	return err
 }
 
+//buildPath
 func (bf *BanksFilter) buildPath() string {
 	return string(bf.Method) + "/bank/" + string(bf.Country)
 }
 
-//Banks branches list filter
-//see https://docs.dusupay.com/sending-money/payouts/bank-branches
+//Banks branches list filter (see https://docs.dusupay.com/sending-money/payouts/bank-branches)
 type BanksBranchesFilter struct {
 	//ISO-2 country code from those supported
 	Country CountryCode `json:"country_code"`
@@ -50,6 +49,7 @@ func (bbf *BanksBranchesFilter) isValid() error {
 	return err
 }
 
+//buildPath
 func (bbf *BanksBranchesFilter) buildPath() string {
 	return string(bbf.Country) + "/branches/" + string(bbf.Bank)
 }
@@ -92,6 +92,7 @@ type BanksBranchesResponse struct {
 	Data *BanksBranchesResponseData `json:"data,omitempty"`
 }
 
+//BanksBranchesResponseData struct
 type BanksBranchesResponseData []*BanksBranchesResponseDataItem
 
 //UnmarshalJSON
@@ -108,6 +109,7 @@ func (rsp *BanksBranchesResponseData) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+//BanksBranchesResponseDataItem struct
 type BanksBranchesResponseDataItem struct {
 	Code string `json:"code"`
 	Name string `json:"name"`
@@ -118,7 +120,7 @@ type BanksResource struct {
 	*ResourceAbstract
 }
 
-//Get banks list (see https://docs.dusupay.com/sending-money/payouts/bank-codes)
+//GetList get banks list (see https://docs.dusupay.com/sending-money/payouts/bank-codes)
 func (r *BanksResource) GetList(ctx context.Context, filter *BanksFilter) (*BanksResponse, *http.Response, error) {
 	err := filter.isValid()
 	if err != nil {
@@ -139,7 +141,7 @@ func (r *BanksResource) GetList(ctx context.Context, filter *BanksFilter) (*Bank
 	return &result, rsp, err
 }
 
-//Get banks branches list (see https://docs.dusupay.com/sending-money/payouts/bank-branches)
+//GetBranchesList get banks branches list (see https://docs.dusupay.com/sending-money/payouts/bank-branches)
 func (r *BanksResource) GetBranchesList(ctx context.Context, filter *BanksBranchesFilter) (*BanksBranchesResponse, *http.Response, error) {
 	err := filter.isValid()
 	if err != nil {

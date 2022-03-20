@@ -9,12 +9,12 @@ type Config struct {
 	SecretKey string `json:"secret_key"`
 }
 
-//Check is sandbox environment
+//IsSandbox check is sandbox environment
 func (c *Config) IsSandbox() bool {
 	return c.Uri != ProdAPIUrl
 }
 
-//Check is valid Config parameters
+//IsValid check is valid config parameters
 func (c *Config) IsValid() error {
 	var err error
 	if c.Uri == "" {
@@ -37,7 +37,7 @@ func NewConfig(publicKey string, secretKey string) *Config {
 	return cfg
 }
 
-//NewConfig Create new config from credentials (Sandbox version)
+//NewConfigSandbox Create new config from credentials (Sandbox version)
 func NewConfigSandbox(publicKey string, secretKey string) *Config {
 	cfg := &Config{
 		Uri:       SandboxAPIUrl,

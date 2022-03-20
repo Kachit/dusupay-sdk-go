@@ -8,11 +8,13 @@ import (
 	"net/http"
 )
 
+//BalancesResponse struct
 type BalancesResponse struct {
 	*ResponseBody
 	Data *BalancesResponseData `json:"data,omitempty"`
 }
 
+//BalancesResponseData struct
 type BalancesResponseData []*BalancesResponseDataItem
 
 //UnmarshalJSON
@@ -29,17 +31,18 @@ func (brd *BalancesResponseData) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+//BalancesResponseDataItem struct
 type BalancesResponseDataItem struct {
 	Currency string  `json:"currency"`
 	Balance  float64 `json:"balance"`
 }
 
-//Merchants resource wrapper
+//MerchantsResource wrapper
 type MerchantsResource struct {
 	*ResourceAbstract
 }
 
-//Get balances list (see https://docs.dusupay.com/appendix/account-balance)
+//GetBalances get balances list (see https://docs.dusupay.com/appendix/account-balance)
 func (r *MerchantsResource) GetBalances(ctx context.Context) (*BalancesResponse, *http.Response, error) {
 	rsp, err := r.ResourceAbstract.tr.Get(ctx, "v1/merchants/balance", nil)
 	if err != nil {

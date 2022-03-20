@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-//Providers list filter
+//ProvidersFilter list of providers filter
 type ProvidersFilter struct {
 	TransactionType TransactionTypeCode   `json:"transaction_type"`
 	Method          TransactionMethodCode `json:"method"`
@@ -28,18 +28,21 @@ func (pf *ProvidersFilter) isValid() error {
 	return err
 }
 
+//buildPath method
 func (pf *ProvidersFilter) buildPath() string {
 	return string(pf.TransactionType) + "/" + string(pf.Method) + "/" + string(pf.Country)
 }
 
+//ProvidersResponse struct
 type ProvidersResponse struct {
 	*ResponseBody
 	Data *ProvidersResponseData `json:"data,omitempty"`
 }
 
+//ProvidersResponseData struct
 type ProvidersResponseData []*ProvidersResponseDataItem
 
-//UnmarshalJSON
+//UnmarshalJSON method
 func (rsp *ProvidersResponseData) UnmarshalJSON(data []byte) error {
 	if isEmptyObjectResponseData(data) {
 		return nil
@@ -53,6 +56,7 @@ func (rsp *ProvidersResponseData) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+//ProvidersResponseDataItem struct
 type ProvidersResponseDataItem struct {
 	ID                  string  `json:"id"`
 	Name                string  `json:"name"`
@@ -66,12 +70,12 @@ type ProvidersResponseDataItem struct {
 	} `json:"sandbox_test_accounts,omitempty"`
 }
 
-//Providers resource wrapper
+//ProvidersResource wrapper
 type ProvidersResource struct {
 	*ResourceAbstract
 }
 
-//Get providers list (see https://docs.dusupay.com/appendix/payment-options/payment-providers)
+//GetList Get providers list (see https://docs.dusupay.com/appendix/payment-options/payment-providers)
 func (r *ProvidersResource) GetList(ctx context.Context, filter *ProvidersFilter) (*ProvidersResponse, *http.Response, error) {
 	err := filter.isValid()
 	if err != nil {

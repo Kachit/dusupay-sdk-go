@@ -75,7 +75,7 @@ type CollectionResponseData struct {
 	} `json:"instructions"`
 }
 
-//Collections resource wrapper
+//CollectionsResource wrapper
 type CollectionsResource struct {
 	*ResourceAbstract
 }

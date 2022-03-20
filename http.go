@@ -24,7 +24,7 @@ type Transport struct {
 	rb   *RequestBuilder
 }
 
-//Send request method
+//SendRequest Send request method
 func (tr *Transport) SendRequest(ctx context.Context, method string, path string, query map[string]interface{}, body map[string]interface{}) (resp *http.Response, err error) {
 	req, err := tr.rb.BuildRequest(ctx, method, path, query, body)
 	if err != nil {
@@ -125,7 +125,7 @@ func (rb *RequestBuilder) BuildRequest(ctx context.Context, method string, path 
 	return req, nil
 }
 
-//Response body
+//ResponseBody struct
 type ResponseBody struct {
 	Code    int    `json:"code"`
 	Status  string `json:"status"`

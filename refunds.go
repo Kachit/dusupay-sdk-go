@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+//RefundRequest struct
 type RefundRequest struct {
 	Amount            float64 `json:"amount"`
 	InternalReference string  `json:"internal_reference"`
@@ -44,7 +45,7 @@ type RefundResponseData struct {
 	Message             string  `json:"message"`
 }
 
-//Refunds resource wrapper
+//RefundsResource wrapper
 type RefundsResource struct {
 	*ResourceAbstract
 }

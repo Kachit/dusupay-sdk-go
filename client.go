@@ -2,7 +2,7 @@ package dusupay
 
 import "net/http"
 
-//Base Client
+//Client struct
 type Client struct {
 	transport *Transport
 	config    *Config
