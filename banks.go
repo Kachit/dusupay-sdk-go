@@ -147,7 +147,7 @@ func (r *BanksResource) GetBranchesList(ctx context.Context, filter *BanksBranch
 	var result BanksBranchesResponse
 	err = unmarshalResponse(rsp, &result)
 	if err != nil {
-		return nil, nil, fmt.Errorf("BanksResource.GetBranchesList error: %v", err)
+		return nil, rsp, fmt.Errorf("BanksResource.GetBranchesList error: %v", err)
 	}
 	if !result.IsSuccess() {
 		err = errors.New(result.Message)

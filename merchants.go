@@ -48,7 +48,7 @@ func (r *MerchantsResource) GetBalances(ctx context.Context) (*BalancesResponse,
 	var balances BalancesResponse
 	err = unmarshalResponse(rsp, &balances)
 	if err != nil {
-		return nil, nil, fmt.Errorf("MerchantsResource.GetBalances error: %v", err)
+		return nil, rsp, fmt.Errorf("MerchantsResource.GetBalances error: %v", err)
 	}
 	if !balances.IsSuccess() {
 		err = errors.New(balances.Message)

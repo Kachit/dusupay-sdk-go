@@ -2,7 +2,9 @@ package dusupay
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
 )
 
 //CollectionRequest struct
@@ -79,18 +81,26 @@ type CollectionsResource struct {
 }
 
 //Create collection request (see https://docs.dusupay.com/receiving-money/collections/post-collection-request)
-func (r *CollectionsResource) Create(ctx context.Context, req *CollectionRequest) (*Response, error) {
+func (r *CollectionsResource) Create(ctx context.Context, req *CollectionRequest) (*CollectionResponse, *http.Response, error) {
 	err := req.isValid()
 	if err != nil {
-		return nil, fmt.Errorf("CollectionsResource.Create error: %v", err)
+		return nil, nil, fmt.Errorf("CollectionsResource.Create error: %v", err)
 	}
 	post, err := transformStructToMap(req)
 	if err != nil {
-		return nil, fmt.Errorf("CollectionsResource.Create error: %v", err)
+		return nil, nil, fmt.Errorf("CollectionsResource.Create error: %v", err)
 	}
-	rsp, err := r.ResourceAbstract.post(ctx, "v1/collections", post, nil)
+	rsp, err := r.ResourceAbstract.tr.Post(ctx, "v1/collections", post, nil)
 	if err != nil {
-		return nil, fmt.Errorf("CollectionsResource.Create error: %v", err)
+		return nil, nil, fmt.Errorf("CollectionsResource.Create error: %v", err)
 	}
-	return rsp, err
+	var result CollectionResponse
+	err = unmarshalResponse(rsp, &result)
+	if err != nil {
+		return nil, rsp, fmt.Errorf("CollectionsResource.Create error: %v", err)
+	}
+	if !result.IsSuccess() {
+		err = errors.New(result.Message)
+	}
+	return &result, rsp, err
 }

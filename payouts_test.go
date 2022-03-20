@@ -3,7 +3,10 @@ package dusupay
 import (
 	"context"
 	"encoding/json"
+	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
+	"net/http"
 	"testing"
 )
 
@@ -163,13 +166,106 @@ func Test_Payouts_PayoutResponse_UnmarshalErrorUnauthorized(t *testing.T) {
 	assert.Empty(t, response.Data)
 }
 
+func Test_Payouts_PayoutsResource_CreateSuccess(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	body, _ := LoadStubResponseData("stubs/payouts/create/success.json")
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri+"/v1/payouts", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+
+	request := &PayoutRequest{
+		Currency:          CurrencyCodeKES,
+		Amount:            100,
+		Method:            TransactionMethodBank,
+		ProviderId:        "provider_id",
+		MerchantReference: "merchant_reference",
+		Narration:         "narration",
+		AccountNumber:     "account_number",
+		AccountName:       "account_name",
+	}
+	resource := &PayoutsResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	result, resp, err := resource.Create(ctx, request)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
+	//result
+	assert.True(t, result.IsSuccess())
+	assert.Equal(t, 202, result.Code)
+	assert.Equal(t, "accepted", result.Status)
+	assert.Equal(t, "Transaction Initiated", result.Message)
+	assert.Equal(t, int64(124468), result.Data.ID)
+	assert.Equal(t, float64(700), result.Data.RequestAmount)
+	assert.Equal(t, "UGX", result.Data.RequestCurrency)
+	assert.Equal(t, float64(700), result.Data.AccountAmount)
+	assert.Equal(t, "UGX", result.Data.AccountCurrency)
+	assert.Equal(t, float64(1500), result.Data.TransactionFee)
+	assert.Equal(t, float64(2200), result.Data.TotalDebit)
+	assert.Equal(t, "mtn_ug", result.Data.ProviderID)
+	assert.Equal(t, "payout-1005", result.Data.MerchantReference)
+	assert.Equal(t, "DUSUPAY405GZMDVTKASJL8UQ", result.Data.InternalReference)
+	assert.Equal(t, "PENDING", result.Data.TransactionStatus)
+	assert.Equal(t, "payout", result.Data.TransactionType)
+	assert.Equal(t, "Transaction Initiated", result.Data.Message)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+}
+
+func Test_Payouts_PayoutsResource_CreateError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	body, _ := LoadStubResponseData("stubs/errors/401.json")
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri+"/v1/payouts", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+
+	request := &PayoutRequest{
+		Currency:          CurrencyCodeKES,
+		Amount:            100,
+		Method:            TransactionMethodBank,
+		ProviderId:        "provider_id",
+		MerchantReference: "merchant_reference",
+		Narration:         "narration",
+		AccountNumber:     "account_number",
+		AccountName:       "account_name",
+	}
+	resource := &PayoutsResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	result, resp, err := resource.Create(ctx, request)
+	assert.Error(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
+	//result
+	assert.False(t, result.IsSuccess())
+	assert.Equal(t, 401, result.Code)
+	assert.Equal(t, "error", result.Status)
+	assert.Equal(t, "Unauthorized API access. Unknown Merchant", result.Message)
+	assert.Empty(t, result.Data)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+	//error
+	assert.Equal(t, "Unauthorized API access. Unknown Merchant", err.Error())
+}
+
 func Test_Payouts_PayoutsResource_CreateInvalidRequest(t *testing.T) {
 	config := BuildStubConfig()
 	transport := NewHttpTransport(config, nil)
 	ctx := context.Background()
 	req := &PayoutRequest{}
 	resource := &PayoutsResource{ResourceAbstract: NewResourceAbstract(transport, config)}
-	rsp, err := resource.Create(ctx, req)
+	result, rsp, err := resource.Create(ctx, req)
 	assert.Nil(t, rsp)
+	assert.Nil(t, result)
 	assert.Error(t, err)
 }

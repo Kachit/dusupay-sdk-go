@@ -84,7 +84,7 @@ func (r *ProvidersResource) GetList(ctx context.Context, filter *ProvidersFilter
 	var result ProvidersResponse
 	err = unmarshalResponse(rsp, &result)
 	if err != nil {
-		return nil, nil, fmt.Errorf("ProvidersResource.GetList error: %v", err)
+		return nil, rsp, fmt.Errorf("ProvidersResource.GetList error: %v", err)
 	}
 	if !result.IsSuccess() {
 		err = errors.New(result.Message)

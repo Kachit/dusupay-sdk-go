@@ -2,7 +2,9 @@ package dusupay
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
 )
 
 type RefundRequest struct {
@@ -48,18 +50,26 @@ type RefundsResource struct {
 }
 
 //Create refund request (see https://docs.dusupay.com/appendix/refunds)
-func (r *RefundsResource) Create(ctx context.Context, req *RefundRequest) (*Response, error) {
+func (r *RefundsResource) Create(ctx context.Context, req *RefundRequest) (*RefundResponse, *http.Response, error) {
 	err := req.isValid()
 	if err != nil {
-		return nil, fmt.Errorf("RefundsResource.Create error: %v", err)
+		return nil, nil, fmt.Errorf("RefundsResource.Create error: %v", err)
 	}
 	post, err := transformStructToMap(req)
 	if err != nil {
-		return nil, fmt.Errorf("RefundsResource.Create error: %v", err)
+		return nil, nil, fmt.Errorf("RefundsResource.Create error: %v", err)
 	}
-	rsp, err := r.ResourceAbstract.post(ctx, "v1/refund", post, nil)
+	rsp, err := r.ResourceAbstract.tr.Post(ctx, "v1/refund", post, nil)
 	if err != nil {
-		return nil, fmt.Errorf("RefundsResource.Create error: %v", err)
+		return nil, nil, fmt.Errorf("RefundsResource.Create error: %v", err)
 	}
-	return rsp, err
+	var result RefundResponse
+	err = unmarshalResponse(rsp, &result)
+	if err != nil {
+		return nil, rsp, fmt.Errorf("RefundsResource.Create error: %v", err)
+	}
+	if !result.IsSuccess() {
+		err = errors.New(result.Message)
+	}
+	return &result, rsp, err
 }

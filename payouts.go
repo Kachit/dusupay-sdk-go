@@ -2,7 +2,9 @@ package dusupay
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
 )
 
 type PayoutRequest struct {
@@ -73,18 +75,26 @@ type PayoutsResource struct {
 }
 
 //Create payout request (see https://docs.dusupay.com/sending-money/payouts/post-payout-request)
-func (r *PayoutsResource) Create(ctx context.Context, req *PayoutRequest) (*Response, error) {
+func (r *PayoutsResource) Create(ctx context.Context, req *PayoutRequest) (*PayoutResponse, *http.Response, error) {
 	err := req.isValid()
 	if err != nil {
-		return nil, fmt.Errorf("PayoutsResource.Create error: %v", err)
+		return nil, nil, fmt.Errorf("PayoutsResource.Create error: %v", err)
 	}
 	post, err := transformStructToMap(req)
 	if err != nil {
-		return nil, fmt.Errorf("PayoutsResource.Create error: %v", err)
+		return nil, nil, fmt.Errorf("PayoutsResource.Create error: %v", err)
 	}
-	rsp, err := r.ResourceAbstract.post(ctx, "v1/payouts", post, nil)
+	rsp, err := r.ResourceAbstract.tr.Post(ctx, "v1/payouts", post, nil)
 	if err != nil {
-		return nil, fmt.Errorf("PayoutsResource.Create error: %v", err)
+		return nil, nil, fmt.Errorf("PayoutsResource.Create error: %v", err)
 	}
-	return rsp, err
+	var result PayoutResponse
+	err = unmarshalResponse(rsp, &result)
+	if err != nil {
+		return nil, rsp, fmt.Errorf("PayoutsResource.Create error: %v", err)
+	}
+	if !result.IsSuccess() {
+		err = errors.New(result.Message)
+	}
+	return &result, rsp, err
 }

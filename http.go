@@ -125,16 +125,6 @@ func (rb *RequestBuilder) BuildRequest(ctx context.Context, method string, path 
 	return req, nil
 }
 
-//Response wrapper
-type Response struct {
-	raw *http.Response
-}
-
-//NewResponse create new response
-func NewResponse(raw *http.Response) *Response {
-	return &Response{raw: raw}
-}
-
 //Response body
 type ResponseBody struct {
 	Code    int    `json:"code"`
