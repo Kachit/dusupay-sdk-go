@@ -1,5 +1,12 @@
 package dusupay
 
+import (
+	"context"
+	"errors"
+	"fmt"
+	"net/http"
+)
+
 //WebhookInterface
 type WebhookInterface interface {
 	GetPayloadString() string
@@ -62,7 +69,51 @@ type RefundWebhook struct {
 	Message             string  `json:"message"`
 }
 
+//WebhookResponse struct
+type WebhookResponse struct {
+	*ResponseBody
+	Data *WebhookResponseData `json:"data,omitempty"`
+}
+
+//WebhookResponseData struct
+type WebhookResponseData struct {
+	Payload *WebhookResponsePayload `json:"payload,omitempty"`
+}
+
+//WebhookResponsePayload struct
+type WebhookResponsePayload struct {
+	ID                int64   `json:"id"`
+	RequestAmount     float64 `json:"request_amount"`
+	RequestCurrency   string  `json:"request_currency"`
+	AccountAmount     float64 `json:"account_amount"`
+	AccountCurrency   string  `json:"account_currency"`
+	TransactionFee    float64 `json:"transaction_fee"`
+	ProviderID        string  `json:"provider_id"`
+	MerchantReference string  `json:"merchant_reference"`
+	InternalReference string  `json:"internal_reference"`
+	TransactionStatus string  `json:"transaction_status"`
+	TransactionType   string  `json:"transaction_type"`
+	Message           string  `json:"message"`
+}
+
 //WebhooksResource wrapper
 type WebhooksResource struct {
 	*ResourceAbstract
+}
+
+//SendCallback (see https://docs.dusupay.com/appendix/webhooks/webhook-trigger)
+func (r *WebhooksResource) SendCallback(ctx context.Context, internalReference string) (*WebhookResponse, *http.Response, error) {
+	rsp, err := r.ResourceAbstract.tr.Get(ctx, "v1/send-callback/"+internalReference, nil)
+	if err != nil {
+		return nil, nil, fmt.Errorf("WebhooksResource.SendCallback error: %v", err)
+	}
+	var response WebhookResponse
+	err = unmarshalResponse(rsp, &response)
+	if err != nil {
+		return nil, rsp, fmt.Errorf("WebhooksResource.SendCallback error: %v", err)
+	}
+	if !response.IsSuccess() {
+		err = errors.New(response.Message)
+	}
+	return &response, rsp, err
 }

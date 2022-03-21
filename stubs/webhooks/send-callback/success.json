@@ -1,6 +1,26 @@
 {
   "code": 200,
   "status": "success",
-  "message": "Request completed successfully.",
-  "data": {}
+  "message": "Callback Initiated Successfully",
+  "data": {
+    "payload": {
+      "id": 613589,
+      "request_amount": 520000,
+      "request_currency": "XAF",
+      "account_amount": 791.44,
+      "account_currency": "EUR",
+      "transaction_fee": 38.7806,
+      "total_credit": 752.6594,
+      "customer_charged": false,
+      "provider_id": "international_eur",
+      "merchant_reference": "123456789",
+      "internal_reference": "DUSUPAY5FNZCVUKZ8C0KZE",
+      "transaction_status": "COMPLETED",
+      "transaction_type": "collection",
+      "message": "Transaction Completed Successfully",
+      "account_number": "482100******1234",
+      "account_name": "GORDON ALF SHAMUEL",
+      "institution_name": "Visa - 3D"
+    }
+  }
 }
