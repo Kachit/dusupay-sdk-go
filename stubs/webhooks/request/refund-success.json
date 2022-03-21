@@ -1,0 +1,14 @@
+{
+  "id": 65205,
+  "refund_amount": 1054,
+  "refund_currency": "UGX",
+  "transaction_fee": 0,
+  "total_debit": 1054,
+  "provider_id": "international_ugx",
+  "collection_reference": "DUSUPAYXYXYXYXYXYXYXYXYX",
+  "internal_reference": "RFD-DUSUPAYXYXYXYXYXYXYXYXYX-3486003",
+  "transaction_type": "refund",
+  "transaction_status": "COMPLETED",
+  "account_number": "4860610032773134",
+  "message": "Refund Processed Successfully"
+}
