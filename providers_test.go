@@ -2,7 +2,6 @@ package dusupay
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -40,53 +39,7 @@ func Test_Providers_ProvidersFilter_IsValidEmptyTransactionType(t *testing.T) {
 func Test_Providers_ProvidersFilter_BuildPath(t *testing.T) {
 	filter := ProvidersFilter{Country: CountryCodeKenya, Method: TransactionMethodCard, TransactionType: TransactionTypeCollection}
 	result := filter.buildPath()
-	assert.Equal(t, `COLLECTION/CARD/KE`, result)
-}
-
-func Test_Providers_ProvidersResponse_UnmarshalSuccessSandbox(t *testing.T) {
-	var response ProvidersResponse
-	body, _ := LoadStubResponseData("stubs/providers/payment-options/success-sandbox.json")
-	err := json.Unmarshal(body, &response)
-	assert.NoError(t, err)
-	assert.Equal(t, 200, response.Code)
-	assert.Equal(t, "success", response.Status)
-	assert.Equal(t, "Request completed successfully.", response.Message)
-	assert.Equal(t, "mtn_ug", (*response.Data)[0].ID)
-	assert.Equal(t, "MTN Mobile Money", (*response.Data)[0].Name)
-	assert.Equal(t, "UGX", (*response.Data)[0].TransactionCurrency)
-	assert.Equal(t, float64(3000), (*response.Data)[0].MinAmount)
-	assert.Equal(t, float64(5000000), (*response.Data)[0].MaxAmount)
-	assert.Equal(t, true, (*response.Data)[0].Available)
-	assert.Equal(t, "256777000456", (*response.Data)[0].SandboxTestAccounts.Failure)
-	assert.Equal(t, "256777000123", (*response.Data)[0].SandboxTestAccounts.Success)
-}
-
-func Test_Providers_ProvidersResponse_UnmarshalSuccess(t *testing.T) {
-	var response ProvidersResponse
-	body, _ := LoadStubResponseData("stubs/providers/payment-options/success.json")
-	err := json.Unmarshal(body, &response)
-	assert.NoError(t, err)
-	assert.Equal(t, 200, response.Code)
-	assert.Equal(t, "success", response.Status)
-	assert.Equal(t, "Request completed successfully.", response.Message)
-	assert.Equal(t, "mtn_ug", (*response.Data)[0].ID)
-	assert.Equal(t, "MTN Mobile Money", (*response.Data)[0].Name)
-	assert.Equal(t, "UGX", (*response.Data)[0].TransactionCurrency)
-	assert.Equal(t, float64(3000), (*response.Data)[0].MinAmount)
-	assert.Equal(t, float64(5000000), (*response.Data)[0].MaxAmount)
-	assert.Equal(t, true, (*response.Data)[0].Available)
-	assert.Empty(t, (*response.Data)[0].SandboxTestAccounts)
-}
-
-func Test_Providers_ProvidersResponse_UnmarshalErrorUnauthorized(t *testing.T) {
-	var response ProvidersResponse
-	body, _ := LoadStubResponseData("stubs/errors/401.json")
-	err := json.Unmarshal(body, &response)
-	assert.NoError(t, err)
-	assert.Equal(t, 401, response.Code)
-	assert.Equal(t, "error", response.Status)
-	assert.Equal(t, "Unauthorized API access. Unknown Merchant", response.Message)
-	assert.Empty(t, response.Data)
+	assert.Equal(t, `collection/card/ke`, result)
 }
 
 func Test_Providers_ProvidersResource_GetListSuccess(t *testing.T) {
@@ -97,7 +50,7 @@ func Test_Providers_ProvidersResource_GetListSuccess(t *testing.T) {
 	transport := BuildStubHttpTransport()
 
 	body, _ := LoadStubResponseData("stubs/providers/payment-options/success.json")
-	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/payment-options/COLLECTION/CARD/KE", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/payment-options/collection/card/ke", httpmock.NewBytesResponder(http.StatusOK, body))
 
 	ctx := context.Background()
 
@@ -125,6 +78,43 @@ func Test_Providers_ProvidersResource_GetListSuccess(t *testing.T) {
 	assert.Equal(t, body, bodyRsp)
 }
 
+func Test_Providers_ProvidersResource_GetListSuccessSandbox(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	body, _ := LoadStubResponseData("stubs/providers/payment-options/success-sandbox.json")
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/payment-options/collection/card/ke", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+
+	filter := &ProvidersFilter{Country: CountryCodeKenya, Method: TransactionMethodCard, TransactionType: TransactionTypeCollection}
+	resource := &ProvidersResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	result, resp, err := resource.GetList(ctx, filter)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
+	//result
+	assert.True(t, result.IsSuccess())
+	assert.Equal(t, 200, result.Code)
+	assert.Equal(t, "success", result.Status)
+	assert.Equal(t, "Request completed successfully.", result.Message)
+	assert.Equal(t, "mtn_ug", (*result.Data)[0].ID)
+	assert.Equal(t, "MTN Mobile Money", (*result.Data)[0].Name)
+	assert.Equal(t, "UGX", (*result.Data)[0].TransactionCurrency)
+	assert.Equal(t, float64(3000), (*result.Data)[0].MinAmount)
+	assert.Equal(t, float64(5000000), (*result.Data)[0].MaxAmount)
+	assert.Equal(t, true, (*result.Data)[0].Available)
+	assert.Equal(t, "256777000456", (*result.Data)[0].SandboxTestAccounts.Failure)
+	assert.Equal(t, "256777000123", (*result.Data)[0].SandboxTestAccounts.Success)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+}
+
 func Test_Providers_ProvidersResource_GetListJsonError(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
@@ -133,7 +123,7 @@ func Test_Providers_ProvidersResource_GetListJsonError(t *testing.T) {
 	transport := BuildStubHttpTransport()
 
 	body, _ := LoadStubResponseData("stubs/errors/401.json")
-	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/payment-options/COLLECTION/CARD/KE", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/payment-options/collection/card/ke", httpmock.NewBytesResponder(http.StatusOK, body))
 
 	ctx := context.Background()
 
@@ -165,7 +155,7 @@ func Test_Providers_ProvidersResource_GetListNonError(t *testing.T) {
 	transport := BuildStubHttpTransport()
 
 	body, _ := LoadStubResponseData("stubs/errors/500.html")
-	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/payment-options/COLLECTION/CARD/KE", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/payment-options/collection/card/ke", httpmock.NewBytesResponder(http.StatusOK, body))
 
 	ctx := context.Background()
 

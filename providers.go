@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 //ProvidersFilter list of providers filter
@@ -30,7 +31,7 @@ func (pf *ProvidersFilter) isValid() error {
 
 //buildPath method
 func (pf *ProvidersFilter) buildPath() string {
-	return string(pf.TransactionType) + "/" + string(pf.Method) + "/" + string(pf.Country)
+	return strings.ToLower(string(pf.TransactionType) + "/" + string(pf.Method) + "/" + string(pf.Country))
 }
 
 //ProvidersResponse struct

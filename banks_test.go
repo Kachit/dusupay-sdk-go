@@ -2,7 +2,6 @@ package dusupay
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -11,13 +10,13 @@ import (
 )
 
 func Test_Banks_BanksFilter_IsValidSuccess(t *testing.T) {
-	filter := BanksFilter{Country: CountryCodeKenya, Method: TransactionMethodCard}
+	filter := BanksFilter{Country: CountryCodeKenya, TransactionType: TransactionTypeCollection}
 	assert.Nil(t, filter.isValid())
 	assert.NoError(t, filter.isValid())
 }
 
 func Test_Banks_BanksFilter_IsValidEmptyCountryCode(t *testing.T) {
-	filter := BanksFilter{Method: "qwerty"}
+	filter := BanksFilter{TransactionType: "qwerty"}
 	result := filter.isValid()
 	assert.Error(t, result)
 	assert.Equal(t, `parameter "country_code" is empty`, result.Error())
@@ -27,13 +26,13 @@ func Test_Banks_BanksFilter_IsValidEmptyMethod(t *testing.T) {
 	filter := BanksFilter{Country: CountryCodeKenya}
 	result := filter.isValid()
 	assert.Error(t, result)
-	assert.Equal(t, `parameter "method" is empty`, result.Error())
+	assert.Equal(t, `parameter "transaction_type" is empty`, result.Error())
 }
 
 func Test_Banks_BanksFilter_BuildPath(t *testing.T) {
-	filter := BanksFilter{Country: CountryCodeKenya, Method: TransactionMethodCard}
+	filter := BanksFilter{Country: CountryCodeKenya, TransactionType: TransactionTypeCollection}
 	result := filter.buildPath()
-	assert.Equal(t, `CARD/bank/KE`, result)
+	assert.Equal(t, `collection/bank/ke`, result)
 }
 
 func Test_Banks_BanksBranchesFilter_IsValidSuccess(t *testing.T) {
@@ -59,7 +58,7 @@ func Test_Banks_BanksBranchesFilter_IsValidEmptyBankCode(t *testing.T) {
 func Test_Banks_BanksBranchesFilter_BuildPath(t *testing.T) {
 	filter := BanksBranchesFilter{Country: CountryCodeKenya, Bank: "qwerty"}
 	result := filter.buildPath()
-	assert.Equal(t, `KE/branches/qwerty`, result)
+	assert.Equal(t, `ke/branches/qwerty`, result)
 }
 
 func Test_Banks_BanksResource_GetListInvalidFilter(t *testing.T) {
@@ -82,11 +81,11 @@ func Test_Banks_BanksResource_GetListSuccess(t *testing.T) {
 	transport := BuildStubHttpTransport()
 
 	body, _ := LoadStubResponseData("stubs/banks/list/success.json")
-	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/payment-options/CARD/bank/KE", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/payment-options/payout/bank/ke", httpmock.NewBytesResponder(http.StatusOK, body))
 
 	ctx := context.Background()
 
-	filter := &BanksFilter{Country: CountryCodeKenya, Method: TransactionMethodCard}
+	filter := &BanksFilter{Country: CountryCodeKenya, TransactionType: TransactionTypePayout}
 	resource := &BanksResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
 	result, resp, err := resource.GetList(ctx, filter)
 	assert.NoError(t, err)
@@ -103,6 +102,44 @@ func Test_Banks_BanksResource_GetListSuccess(t *testing.T) {
 	assert.Equal(t, float64(1000), (*result.Data)[0].MinAmount)
 	assert.Equal(t, float64(380000), (*result.Data)[0].MaxAmount)
 	assert.Equal(t, true, (*result.Data)[0].Available)
+	assert.Empty(t, (*result.Data)[0].SandboxTestAccounts)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
+}
+
+func Test_Banks_BanksResource_GetListSuccessSandbox(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	body, _ := LoadStubResponseData("stubs/banks/list/success-sandbox.json")
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/payment-options/payout/bank/ke", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+
+	filter := &BanksFilter{Country: CountryCodeKenya, TransactionType: TransactionTypePayout}
+	resource := &BanksResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	result, resp, err := resource.GetList(ctx, filter)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, resp)
+	assert.NotEmpty(t, result)
+	//result
+	assert.True(t, result.IsSuccess())
+	assert.Equal(t, 200, result.Code)
+	assert.Equal(t, "success", result.Status)
+	assert.Equal(t, "Request completed successfully.", result.Message)
+	assert.Equal(t, "access_bank", (*result.Data)[0].BankCode)
+	assert.Equal(t, "Access Bank", (*result.Data)[0].Name)
+	assert.Equal(t, "NGN", (*result.Data)[0].TransactionCurrency)
+	assert.Equal(t, float64(1000), (*result.Data)[0].MinAmount)
+	assert.Equal(t, float64(380000), (*result.Data)[0].MaxAmount)
+	assert.Equal(t, true, (*result.Data)[0].Available)
+	assert.Equal(t, "256777000456", (*result.Data)[0].SandboxTestAccounts.Failure)
+	assert.Equal(t, "256777000123", (*result.Data)[0].SandboxTestAccounts.Success)
 	//response
 	defer resp.Body.Close()
 	bodyRsp, _ := ioutil.ReadAll(resp.Body)
@@ -117,11 +154,11 @@ func Test_Banks_BanksResource_GetListJsonError(t *testing.T) {
 	transport := BuildStubHttpTransport()
 
 	body, _ := LoadStubResponseData("stubs/errors/401.json")
-	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/payment-options/CARD/bank/KE", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/payment-options/payout/bank/ke", httpmock.NewBytesResponder(http.StatusOK, body))
 
 	ctx := context.Background()
 
-	filter := &BanksFilter{Country: CountryCodeKenya, Method: TransactionMethodCard}
+	filter := &BanksFilter{Country: CountryCodeKenya, TransactionType: TransactionTypePayout}
 	resource := &BanksResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
 	result, resp, err := resource.GetList(ctx, filter)
 	assert.Error(t, err)
@@ -149,11 +186,11 @@ func Test_Banks_BanksResource_GetListNonJsonError(t *testing.T) {
 	transport := BuildStubHttpTransport()
 
 	body, _ := LoadStubResponseData("stubs/errors/500.html")
-	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/payment-options/CARD/bank/KE", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/payment-options/payout/bank/ke", httpmock.NewBytesResponder(http.StatusOK, body))
 
 	ctx := context.Background()
 
-	filter := &BanksFilter{Country: CountryCodeKenya, Method: TransactionMethodCard}
+	filter := &BanksFilter{Country: CountryCodeKenya, TransactionType: TransactionTypePayout}
 	resource := &BanksResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
 	result, resp, err := resource.GetList(ctx, filter)
 	assert.Error(t, err)
@@ -185,7 +222,7 @@ func Test_Banks_BanksResource_GetBranchesListSuccess(t *testing.T) {
 	transport := BuildStubHttpTransport()
 
 	body, _ := LoadStubResponseData("stubs/banks/branches/success.json")
-	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/bank/KE/branches/qwerty", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/bank/ke/branches/qwerty", httpmock.NewBytesResponder(http.StatusOK, body))
 
 	ctx := context.Background()
 
@@ -216,7 +253,7 @@ func Test_Banks_BanksResource_GetBranchesListJsonError(t *testing.T) {
 	transport := BuildStubHttpTransport()
 
 	body, _ := LoadStubResponseData("stubs/errors/401.json")
-	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/bank/KE/branches/qwerty", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/bank/ke/branches/qwerty", httpmock.NewBytesResponder(http.StatusOK, body))
 
 	ctx := context.Background()
 
@@ -248,7 +285,7 @@ func Test_Banks_BanksResource_GetBranchesListNonJsonError(t *testing.T) {
 	transport := BuildStubHttpTransport()
 
 	body, _ := LoadStubResponseData("stubs/errors/500.html")
-	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/bank/KE/branches/qwerty", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/bank/ke/branches/qwerty", httpmock.NewBytesResponder(http.StatusOK, body))
 
 	ctx := context.Background()
 
@@ -262,54 +299,4 @@ func Test_Banks_BanksResource_GetBranchesListNonJsonError(t *testing.T) {
 	defer resp.Body.Close()
 	bodyRsp, _ := ioutil.ReadAll(resp.Body)
 	assert.Equal(t, body, bodyRsp)
-}
-
-func Test_Banks_BanksResponse_UnmarshalSuccess(t *testing.T) {
-	var response BanksResponse
-	body, _ := LoadStubResponseData("stubs/banks/list/success.json")
-	err := json.Unmarshal(body, &response)
-	assert.NoError(t, err)
-	assert.Equal(t, 200, response.Code)
-	assert.Equal(t, "success", response.Status)
-	assert.Equal(t, "Request completed successfully.", response.Message)
-	assert.Equal(t, "access_bank", (*response.Data)[0].BankCode)
-	assert.Equal(t, "Access Bank", (*response.Data)[0].Name)
-	assert.Equal(t, "NGN", (*response.Data)[0].TransactionCurrency)
-	assert.Equal(t, float64(1000), (*response.Data)[0].MinAmount)
-	assert.Equal(t, float64(380000), (*response.Data)[0].MaxAmount)
-	assert.Equal(t, true, (*response.Data)[0].Available)
-}
-
-func Test_Banks_BanksResponse_UnmarshalErrorUnauthorized(t *testing.T) {
-	var response BanksResponse
-	body, _ := LoadStubResponseData("stubs/errors/401.json")
-	err := json.Unmarshal(body, &response)
-	assert.NoError(t, err)
-	assert.Equal(t, 401, response.Code)
-	assert.Equal(t, "error", response.Status)
-	assert.Equal(t, "Unauthorized API access. Unknown Merchant", response.Message)
-	assert.Empty(t, response.Data)
-}
-
-func Test_Banks_BanksBranchesResponse_UnmarshalSuccess(t *testing.T) {
-	var response BanksBranchesResponse
-	body, _ := LoadStubResponseData("stubs/banks/branches/success.json")
-	err := json.Unmarshal(body, &response)
-	assert.NoError(t, err)
-	assert.Equal(t, 200, response.Code)
-	assert.Equal(t, "success", response.Status)
-	assert.Equal(t, "Request completed successfully.", response.Message)
-	assert.Equal(t, "GH030243", (*response.Data)[0].Code)
-	assert.Equal(t, "BARCLAYS BANK(GH) LTD-NKAWKAW", (*response.Data)[0].Name)
-}
-
-func Test_Banks_BanksBranchesResponse_UnmarshalErrorUnauthorized(t *testing.T) {
-	var response BanksBranchesResponse
-	body, _ := LoadStubResponseData("stubs/errors/401.json")
-	err := json.Unmarshal(body, &response)
-	assert.NoError(t, err)
-	assert.Equal(t, 401, response.Code)
-	assert.Equal(t, "error", response.Status)
-	assert.Equal(t, "Unauthorized API access. Unknown Merchant", response.Message)
-	assert.Empty(t, response.Data)
 }

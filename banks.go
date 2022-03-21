@@ -6,11 +6,12 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 //BanksFilter (see https://docs.dusupay.com/sending-money/payouts/bank-codes)
 type BanksFilter struct {
-	Method TransactionMethodCode `json:"method"`
+	TransactionType TransactionTypeCode `json:"transaction_type"`
 	//ISO-2 country code from those supported
 	Country CountryCode `json:"country_code"`
 }
@@ -20,15 +21,15 @@ func (bf *BanksFilter) isValid() error {
 	var err error
 	if bf.Country == "" {
 		err = fmt.Errorf(`parameter "country_code" is empty`)
-	} else if bf.Method == "" {
-		err = fmt.Errorf(`parameter "method" is empty`)
+	} else if bf.TransactionType == "" {
+		err = fmt.Errorf(`parameter "transaction_type" is empty`)
 	}
 	return err
 }
 
 //buildPath
 func (bf *BanksFilter) buildPath() string {
-	return string(bf.Method) + "/bank/" + string(bf.Country)
+	return strings.ToLower(string(bf.TransactionType) + "/bank/" + string(bf.Country))
 }
 
 //BanksBranchesFilter branches list filter (see https://docs.dusupay.com/sending-money/payouts/bank-branches)
@@ -51,7 +52,7 @@ func (bbf *BanksBranchesFilter) isValid() error {
 
 //buildPath
 func (bbf *BanksBranchesFilter) buildPath() string {
-	return string(bbf.Country) + "/branches/" + string(bbf.Bank)
+	return strings.ToLower(string(bbf.Country) + "/branches/" + string(bbf.Bank))
 }
 
 //BanksBranchesResponse struct
@@ -86,6 +87,10 @@ type BanksResponseDataItem struct {
 	MaxAmount           float64 `json:"max_amount"`
 	BankCode            string  `json:"bank_code"`
 	Available           bool    `json:"available"`
+	SandboxTestAccounts struct {
+		Success string `json:"success"`
+		Failure string `json:"failure"`
+	} `json:"sandbox_test_accounts,omitempty"`
 }
 
 //BanksBranchesResponse struct
