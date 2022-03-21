@@ -50,3 +50,8 @@ func (c *Client) Refunds() *RefundsResource {
 func (c *Client) Banks() *BanksResource {
 	return &BanksResource{ResourceAbstract: NewResourceAbstract(c.transport, c.config)}
 }
+
+//Webhooks resource
+func (c *Client) Webhooks() *WebhooksResource {
+	return &WebhooksResource{ResourceAbstract: NewResourceAbstract(c.transport, c.config)}
+}

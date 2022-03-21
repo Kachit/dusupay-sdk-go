@@ -55,3 +55,9 @@ func Test_Client_GetBanksResource(t *testing.T) {
 	result := client.Banks()
 	assert.NotEmpty(t, result)
 }
+
+func Test_Client_GetWebhooksResource(t *testing.T) {
+	client, _ := NewClientFromConfig(BuildStubConfig(), nil)
+	result := client.Webhooks()
+	assert.NotEmpty(t, result)
+}

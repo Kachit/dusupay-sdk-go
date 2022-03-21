@@ -107,7 +107,7 @@ func Test_Refunds_RefundsResource_CreateSuccess(t *testing.T) {
 	assert.Equal(t, body, bodyRsp)
 }
 
-func Test_Refunds_RefundsResource_CreateError(t *testing.T) {
+func Test_Refunds_RefundsResource_CreateJsonError(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -140,6 +140,33 @@ func Test_Refunds_RefundsResource_CreateError(t *testing.T) {
 	assert.Equal(t, body, bodyRsp)
 	//error
 	assert.Equal(t, "Unauthorized API access. Unknown Merchant", err.Error())
+}
+
+func Test_Refunds_RefundsResource_CreateNonJsonError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	body, _ := LoadStubResponseData("stubs/errors/500.html")
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri+"/v1/refund", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+
+	request := &RefundRequest{
+		Amount:            100,
+		InternalReference: "internal_reference",
+	}
+	resource := &RefundsResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	result, resp, err := resource.Create(ctx, request)
+	assert.Error(t, err)
+	assert.NotEmpty(t, resp)
+	assert.Empty(t, result)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
 }
 
 func Test_Refunds_RefundsResource_CreateInvalidRequest(t *testing.T) {

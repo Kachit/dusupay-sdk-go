@@ -217,7 +217,7 @@ func Test_Payouts_PayoutsResource_CreateSuccess(t *testing.T) {
 	assert.Equal(t, body, bodyRsp)
 }
 
-func Test_Payouts_PayoutsResource_CreateError(t *testing.T) {
+func Test_Payouts_PayoutsResource_CreateJsonError(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -256,6 +256,39 @@ func Test_Payouts_PayoutsResource_CreateError(t *testing.T) {
 	assert.Equal(t, body, bodyRsp)
 	//error
 	assert.Equal(t, "Unauthorized API access. Unknown Merchant", err.Error())
+}
+
+func Test_Payouts_PayoutsResource_CreateNonJsonError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	body, _ := LoadStubResponseData("stubs/errors/500.html")
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri+"/v1/payouts", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+
+	request := &PayoutRequest{
+		Currency:          CurrencyCodeKES,
+		Amount:            100,
+		Method:            TransactionMethodBank,
+		ProviderId:        "provider_id",
+		MerchantReference: "merchant_reference",
+		Narration:         "narration",
+		AccountNumber:     "account_number",
+		AccountName:       "account_name",
+	}
+	resource := &PayoutsResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	result, resp, err := resource.Create(ctx, request)
+	assert.Error(t, err)
+	assert.NotEmpty(t, resp)
+	assert.Empty(t, result)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
 }
 
 func Test_Payouts_PayoutsResource_CreateInvalidRequest(t *testing.T) {

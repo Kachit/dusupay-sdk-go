@@ -4,9 +4,10 @@ import "fmt"
 
 //Config structure
 type Config struct {
-	Uri       string `json:"uri"`
-	PublicKey string `json:"public_key"`
-	SecretKey string `json:"secret_key"`
+	Uri         string `json:"uri"`
+	PublicKey   string `json:"public_key"`
+	SecretKey   string `json:"secret_key"`
+	WebhookHash string `json:"webhook_hash"`
 }
 
 //IsSandbox check is sandbox environment

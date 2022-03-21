@@ -243,7 +243,7 @@ func Test_Collections_CollectionsResource_CreateSuccess(t *testing.T) {
 	assert.Equal(t, body, bodyRsp)
 }
 
-func Test_Collections_CollectionsResource_CreateError(t *testing.T) {
+func Test_Collections_CollectionsResource_CreateJsonError(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -281,6 +281,38 @@ func Test_Collections_CollectionsResource_CreateError(t *testing.T) {
 	assert.Equal(t, body, bodyRsp)
 	//error
 	assert.Equal(t, "Unauthorized API access. Unknown Merchant", err.Error())
+}
+
+func Test_Collections_CollectionsResource_CreateNonJsonError(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	cfg := BuildStubConfig()
+	transport := BuildStubHttpTransport()
+
+	body, _ := LoadStubResponseData("stubs/errors/500.html")
+	httpmock.RegisterResponder(http.MethodPost, cfg.Uri+"/v1/collections", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	ctx := context.Background()
+
+	request := &CollectionRequest{
+		Currency:          CurrencyCodeKES,
+		Amount:            100,
+		Method:            TransactionMethodBank,
+		ProviderId:        "provider_id",
+		MerchantReference: "merchant_reference",
+		RedirectUrl:       "redirect_url",
+		Narration:         "narration",
+	}
+	resource := &CollectionsResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
+	result, resp, err := resource.Create(ctx, request)
+	assert.Error(t, err)
+	assert.NotEmpty(t, resp)
+	assert.Empty(t, result)
+	//response
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(t, body, bodyRsp)
 }
 
 func Test_Collections_CollectionsResource_CreateInvalidRequest(t *testing.T) {

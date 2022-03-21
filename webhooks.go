@@ -1,9 +1,11 @@
 package dusupay
 
+//WebhookInterface
 type WebhookInterface interface {
 	GetPayloadString() string
 }
 
+//CollectionWebhook struct
 type CollectionWebhook struct {
 	ID                int64   `json:"id"`
 	RequestAmount     float64 `json:"request_amount"`
@@ -24,6 +26,7 @@ type CollectionWebhook struct {
 	InstitutionName   string  `json:"institution_name"`
 }
 
+//PayoutWebhook struct
 type PayoutWebhook struct {
 	ID                int64   `json:"id"`
 	RequestAmount     float64 `json:"request_amount"`
@@ -42,6 +45,8 @@ type PayoutWebhook struct {
 	AccountName       string  `json:"account_name"`
 	InstitutionName   string  `json:"institution_name"`
 }
+
+//RefundWebhook struct
 type RefundWebhook struct {
 	ID                  int64   `json:"id"`
 	RefundAmount        float64 `json:"refund_amount"`
@@ -55,4 +60,9 @@ type RefundWebhook struct {
 	TransactionStatus   string  `json:"transaction_status"`
 	AccountNumber       string  `json:"account_number"`
 	Message             string  `json:"message"`
+}
+
+//WebhooksResource wrapper
+type WebhooksResource struct {
+	*ResourceAbstract
 }

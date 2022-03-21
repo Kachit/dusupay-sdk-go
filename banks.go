@@ -31,14 +31,14 @@ func (bf *BanksFilter) buildPath() string {
 	return string(bf.Method) + "/bank/" + string(bf.Country)
 }
 
-//Banks branches list filter (see https://docs.dusupay.com/sending-money/payouts/bank-branches)
+//BanksBranchesFilter branches list filter (see https://docs.dusupay.com/sending-money/payouts/bank-branches)
 type BanksBranchesFilter struct {
 	//ISO-2 country code from those supported
 	Country CountryCode `json:"country_code"`
 	Bank    string      `json:"bank_code"`
 }
 
-//Check is valid BanksBranchesFilter parameters
+//isValid check is valid BanksBranchesFilter parameters
 func (bbf *BanksBranchesFilter) isValid() error {
 	var err error
 	if bbf.Country == "" {
@@ -60,9 +60,10 @@ type BanksResponse struct {
 	Data *BanksResponseData `json:"data,omitempty"`
 }
 
+//BanksResponseData struct
 type BanksResponseData []*BanksResponseDataItem
 
-//UnmarshalJSON
+//UnmarshalJSON unmarshal json data
 func (rsp *BanksResponseData) UnmarshalJSON(data []byte) error {
 	if isEmptyObjectResponseData(data) {
 		return nil
@@ -76,6 +77,7 @@ func (rsp *BanksResponseData) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+//BanksResponseDataItem struct
 type BanksResponseDataItem struct {
 	Id                  string  `json:"id"`
 	Name                string  `json:"name"`
@@ -95,7 +97,7 @@ type BanksBranchesResponse struct {
 //BanksBranchesResponseData struct
 type BanksBranchesResponseData []*BanksBranchesResponseDataItem
 
-//UnmarshalJSON
+//UnmarshalJSON unmarshal json data
 func (rsp *BanksBranchesResponseData) UnmarshalJSON(data []byte) error {
 	if isEmptyObjectResponseData(data) {
 		return nil
@@ -115,7 +117,7 @@ type BanksBranchesResponseDataItem struct {
 	Name string `json:"name"`
 }
 
-//Banks resource wrapper
+//BanksResource wrapper
 type BanksResource struct {
 	*ResourceAbstract
 }
@@ -133,7 +135,7 @@ func (r *BanksResource) GetList(ctx context.Context, filter *BanksFilter) (*Bank
 	var result BanksResponse
 	err = unmarshalResponse(rsp, &result)
 	if err != nil {
-		return nil, nil, fmt.Errorf("BanksResource.GetList error: %v", err)
+		return nil, rsp, fmt.Errorf("BanksResource.GetList error: %v", err)
 	}
 	if !result.IsSuccess() {
 		err = errors.New(result.Message)

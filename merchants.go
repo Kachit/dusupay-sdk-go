@@ -17,7 +17,7 @@ type BalancesResponse struct {
 //BalancesResponseData struct
 type BalancesResponseData []*BalancesResponseDataItem
 
-//UnmarshalJSON
+//UnmarshalJSON unmarshal json data
 func (brd *BalancesResponseData) UnmarshalJSON(data []byte) error {
 	if isEmptyObjectResponseData(data) {
 		return nil
