@@ -55,7 +55,7 @@ func (bbf *BanksBranchesFilter) buildPath() string {
 	return strings.ToLower(string(bbf.Country) + "/branches/" + string(bbf.Bank))
 }
 
-//BanksBranchesResponse struct
+//BanksResponse struct
 type BanksResponse struct {
 	*ResponseBody
 	Data *BanksResponseData `json:"data,omitempty"`

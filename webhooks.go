@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-//WebhookInterface
+//WebhookInterface interface
 type WebhookInterface interface {
 	GetPayloadString() string
 }
