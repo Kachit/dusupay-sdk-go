@@ -5,6 +5,7 @@
 [![Release](https://img.shields.io/github/v/release/Kachit/dusupay-sdk-go.svg)](https://github.com/Kachit/dusupay-sdk-go/releases)
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/kachit/dusupay-sdk-go/blob/master/LICENSE)
 [![GoDoc](https://pkg.go.dev/badge/github.com/kachit/dusupay-sdk-go)](https://pkg.go.dev/github.com/kachit/dusupay-sdk-go)
+[![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go#third-party-apis)
 
 ## Description
 Unofficial Dusupay payment gateway API Client for Go
