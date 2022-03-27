@@ -137,6 +137,7 @@ func (r *ResponseBody) IsSuccess() bool {
 	return r.Code < http.StatusMultipleChoices
 }
 
+//UnmarshalResponse func
 func unmarshalResponse(resp *http.Response, v interface{}) error {
 	defer resp.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
@@ -148,6 +149,7 @@ func unmarshalResponse(resp *http.Response, v interface{}) error {
 	return json.Unmarshal(bodyBytes, &v)
 }
 
+//IsEmptyObjectResponseData func
 func isEmptyObjectResponseData(data []byte) bool {
 	return data[0] == 123 && data[1] == 125
 }
