@@ -62,7 +62,7 @@ func Test_Providers_ProvidersResource_GetListSuccess(t *testing.T) {
 	assert.NotEmpty(t, result)
 	//result
 	assert.True(t, result.IsSuccess())
-	assert.Equal(t, 200, result.Code)
+	assert.Equal(t, http.StatusOK, result.Code)
 	assert.Equal(t, "success", result.Status)
 	assert.Equal(t, "Request completed successfully.", result.Message)
 	assert.Equal(t, "mtn_ug", (*result.Data)[0].ID)
@@ -98,7 +98,7 @@ func Test_Providers_ProvidersResource_GetListSuccessSandbox(t *testing.T) {
 	assert.NotEmpty(t, result)
 	//result
 	assert.True(t, result.IsSuccess())
-	assert.Equal(t, 200, result.Code)
+	assert.Equal(t, http.StatusOK, result.Code)
 	assert.Equal(t, "success", result.Status)
 	assert.Equal(t, "Request completed successfully.", result.Message)
 	assert.Equal(t, "mtn_ug", (*result.Data)[0].ID)
@@ -135,7 +135,7 @@ func Test_Providers_ProvidersResource_GetListJsonError(t *testing.T) {
 	assert.NotEmpty(t, result)
 	//result
 	assert.False(t, result.IsSuccess())
-	assert.Equal(t, 401, result.Code)
+	assert.Equal(t, http.StatusUnauthorized, result.Code)
 	assert.Equal(t, "error", result.Status)
 	assert.Equal(t, "Unauthorized API access. Unknown Merchant", result.Message)
 	assert.Empty(t, result.Data)

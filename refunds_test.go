@@ -50,7 +50,7 @@ func Test_Refunds_RefundsResource_CreateSuccess(t *testing.T) {
 	assert.NotEmpty(t, result)
 	//result
 	assert.True(t, result.IsSuccess())
-	assert.Equal(t, 202, result.Code)
+	assert.Equal(t, http.StatusAccepted, result.Code)
 	assert.Equal(t, "accepted", result.Status)
 	assert.Equal(t, "Refund Initiated Successfully", result.Message)
 	assert.Equal(t, int64(65205), result.Data.ID)
@@ -95,7 +95,7 @@ func Test_Refunds_RefundsResource_CreateJsonError(t *testing.T) {
 	assert.NotEmpty(t, result)
 	//result
 	assert.False(t, result.IsSuccess())
-	assert.Equal(t, 401, result.Code)
+	assert.Equal(t, http.StatusUnauthorized, result.Code)
 	assert.Equal(t, "error", result.Status)
 	assert.Equal(t, "Unauthorized API access. Unknown Merchant", result.Message)
 	assert.Empty(t, result.Data)

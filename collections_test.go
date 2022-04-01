@@ -178,7 +178,7 @@ func Test_Collections_CollectionsResource_CreateSuccess(t *testing.T) {
 	assert.NotEmpty(t, result)
 	//result
 	assert.True(t, result.IsSuccess())
-	assert.Equal(t, 202, result.Code)
+	assert.Equal(t, http.StatusAccepted, result.Code)
 	assert.Equal(t, "accepted", result.Status)
 	assert.Equal(t, "Transaction Initiated", result.Message)
 	assert.Equal(t, int64(226), result.Data.ID)
@@ -232,7 +232,7 @@ func Test_Collections_CollectionsResource_CreateJsonError(t *testing.T) {
 	assert.NotEmpty(t, result)
 	//result
 	assert.False(t, result.IsSuccess())
-	assert.Equal(t, 401, result.Code)
+	assert.Equal(t, http.StatusUnauthorized, result.Code)
 	assert.Equal(t, "error", result.Status)
 	assert.Equal(t, "Unauthorized API access. Unknown Merchant", result.Message)
 	assert.Empty(t, result.Data)
