@@ -1,6 +1,6 @@
 module github.com/kachit/dusupay-sdk-go
 
-go 1.16
+go 1.14
 
 require (
 	github.com/jarcoal/httpmock v1.1.0
