@@ -2,6 +2,7 @@
 [![Build Status](https://app.travis-ci.com/Kachit/dusupay-sdk-go.svg?branch=master)](https://app.travis-ci.com/github/Kachit/dusupay-sdk-go)
 [![Codecov](https://codecov.io/gh/Kachit/dusupay-sdk-go/branch/master/graph/badge.svg)](https://codecov.io/gh/Kachit/dusupay-sdk-go)
 [![Go Report Card](https://goreportcard.com/badge/github.com/kachit/dusupay-sdk-go)](https://goreportcard.com/report/github.com/kachit/dusupay-sdk-go)
+[![Version](https://img.shields.io/github/go-mod/go-version/Kachit/dusupay-sdk-go)](https://go.dev/doc/go1.14)
 [![Release](https://img.shields.io/github/v/release/Kachit/dusupay-sdk-go.svg)](https://github.com/Kachit/dusupay-sdk-go/releases)
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/kachit/dusupay-sdk-go/blob/master/LICENSE)
 [![GoDoc](https://pkg.go.dev/badge/github.com/kachit/dusupay-sdk-go)](https://pkg.go.dev/github.com/kachit/dusupay-sdk-go)
