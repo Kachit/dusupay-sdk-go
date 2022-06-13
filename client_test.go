@@ -2,62 +2,78 @@ package dusupay
 
 import (
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 	"testing"
 )
 
-func Test_Client_NewClientFromConfigValid(t *testing.T) {
-	cfg := BuildStubConfig()
-	client, err := NewClientFromConfig(cfg, nil)
-	assert.NoError(t, err)
-	assert.NotEmpty(t, client)
+type ClientTestSuite struct {
+	suite.Suite
 }
 
-func Test_Client_NewClientFromConfigInvalid(t *testing.T) {
+func (suite *ClientTestSuite) TestNewClientFromConfigValid() {
+	cfg := BuildStubConfig()
+	client, err := NewClientFromConfig(cfg, nil)
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), client)
+}
+
+func (suite *ClientTestSuite) TestNewClientFromConfigInvalid() {
 	cfg := BuildStubConfig()
 	cfg.Uri = ""
 	client, err := NewClientFromConfig(cfg, nil)
-	assert.Error(t, err)
-	assert.Empty(t, client)
+	assert.Error(suite.T(), err)
+	assert.Empty(suite.T(), client)
 }
 
-func Test_Client_GetCollectionsResource(t *testing.T) {
-	client, _ := NewClientFromConfig(BuildStubConfig(), nil)
+func (suite *ClientTestSuite) TestGetCollectionsResource() {
+	client, err := NewClientFromConfig(BuildStubConfig(), nil)
 	result := client.Collections()
-	assert.NotEmpty(t, result)
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), result)
 }
 
-func Test_Client_GetPayoutsResource(t *testing.T) {
-	client, _ := NewClientFromConfig(BuildStubConfig(), nil)
+func (suite *ClientTestSuite) TestGetPayoutsResource() {
+	client, err := NewClientFromConfig(BuildStubConfig(), nil)
 	result := client.Payouts()
-	assert.NotEmpty(t, result)
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), result)
 }
 
-func Test_Client_GetProvidersResource(t *testing.T) {
-	client, _ := NewClientFromConfig(BuildStubConfig(), nil)
+func (suite *ClientTestSuite) TestGetProvidersResource() {
+	client, err := NewClientFromConfig(BuildStubConfig(), nil)
 	result := client.Providers()
-	assert.NotEmpty(t, result)
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), result)
 }
 
-func Test_Client_GetMerchantsResource(t *testing.T) {
-	client, _ := NewClientFromConfig(BuildStubConfig(), nil)
+func (suite *ClientTestSuite) TestGetMerchantsResource() {
+	client, err := NewClientFromConfig(BuildStubConfig(), nil)
 	result := client.Merchants()
-	assert.NotEmpty(t, result)
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), result)
 }
 
-func Test_Client_GetRefundsResource(t *testing.T) {
-	client, _ := NewClientFromConfig(BuildStubConfig(), nil)
+func (suite *ClientTestSuite) TestGetRefundsResource() {
+	client, err := NewClientFromConfig(BuildStubConfig(), nil)
 	result := client.Refunds()
-	assert.NotEmpty(t, result)
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), result)
 }
 
-func Test_Client_GetBanksResource(t *testing.T) {
-	client, _ := NewClientFromConfig(BuildStubConfig(), nil)
+func (suite *ClientTestSuite) TestGetBanksResource() {
+	client, err := NewClientFromConfig(BuildStubConfig(), nil)
 	result := client.Banks()
-	assert.NotEmpty(t, result)
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), result)
 }
 
-func Test_Client_GetWebhooksResource(t *testing.T) {
-	client, _ := NewClientFromConfig(BuildStubConfig(), nil)
+func (suite *ClientTestSuite) TestGetWebhooksResource() {
+	client, err := NewClientFromConfig(BuildStubConfig(), nil)
 	result := client.Webhooks()
-	assert.NotEmpty(t, result)
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), result)
+}
+
+func TestClientTestSuite(t *testing.T) {
+	suite.Run(t, new(ClientTestSuite))
 }

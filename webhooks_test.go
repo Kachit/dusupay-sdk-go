@@ -5,167 +5,173 @@ import (
 	"encoding/json"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 	"io/ioutil"
 	"net/http"
 	"testing"
 )
 
-func Test_Webhooks_CollectionWebhook_UnmarshalSuccess(t *testing.T) {
+type WebhooksTestSuite struct {
+	suite.Suite
+}
+
+func (suite *WebhooksTestSuite) TestCollectionWebhook_UnmarshalSuccess() {
 	var webhook CollectionWebhook
 	body, _ := LoadStubResponseData("stubs/webhooks/request/collection-success.json")
 	err := json.Unmarshal(body, &webhook)
-	assert.NoError(t, err)
-	assert.Equal(t, int64(226), webhook.ID)
-	assert.Equal(t, 0.2, webhook.RequestAmount)
-	assert.Equal(t, "USD", webhook.RequestCurrency)
-	assert.Equal(t, 737.9934, webhook.AccountAmount)
-	assert.Equal(t, "UGX", webhook.AccountCurrency)
-	assert.Equal(t, 21.4018, webhook.TransactionFee)
-	assert.Equal(t, 716.5916, webhook.TotalCredit)
-	assert.Equal(t, false, webhook.CustomerCharged)
-	assert.Equal(t, "mtn_ug", webhook.ProviderID)
-	assert.Equal(t, "76859aae-f148-48c5-9901-2e474cf19b71", webhook.MerchantReference)
-	assert.Equal(t, "DUSUPAY405GZM1G5JXGA71IK", webhook.InternalReference)
-	assert.Equal(t, "COMPLETED", webhook.TransactionStatus)
-	assert.Equal(t, "collection", webhook.TransactionType)
-	assert.Equal(t, "Transaction Completed Successfully", webhook.Message)
-	assert.Equal(t, "256777111786 - Optional", webhook.AccountNumber)
-	assert.Equal(t, "- Optional", webhook.AccountName)
-	assert.Equal(t, "MTN Mobile Money - Optional", webhook.InstitutionName)
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), int64(226), webhook.ID)
+	assert.Equal(suite.T(), 0.2, webhook.RequestAmount)
+	assert.Equal(suite.T(), "USD", webhook.RequestCurrency)
+	assert.Equal(suite.T(), 737.9934, webhook.AccountAmount)
+	assert.Equal(suite.T(), "UGX", webhook.AccountCurrency)
+	assert.Equal(suite.T(), 21.4018, webhook.TransactionFee)
+	assert.Equal(suite.T(), 716.5916, webhook.TotalCredit)
+	assert.Equal(suite.T(), false, webhook.CustomerCharged)
+	assert.Equal(suite.T(), "mtn_ug", webhook.ProviderID)
+	assert.Equal(suite.T(), "76859aae-f148-48c5-9901-2e474cf19b71", webhook.MerchantReference)
+	assert.Equal(suite.T(), "DUSUPAY405GZM1G5JXGA71IK", webhook.InternalReference)
+	assert.Equal(suite.T(), "COMPLETED", webhook.TransactionStatus)
+	assert.Equal(suite.T(), "collection", webhook.TransactionType)
+	assert.Equal(suite.T(), "Transaction Completed Successfully", webhook.Message)
+	assert.Equal(suite.T(), "256777111786 - Optional", webhook.AccountNumber)
+	assert.Equal(suite.T(), "- Optional", webhook.AccountName)
+	assert.Equal(suite.T(), "MTN Mobile Money - Optional", webhook.InstitutionName)
 }
 
-func Test_Webhooks_PayoutWebhook_UnmarshalSuccess(t *testing.T) {
+func (suite *WebhooksTestSuite) TestPayoutWebhook_UnmarshalSuccess() {
 	var webhook PayoutWebhook
 	body, _ := LoadStubResponseData("stubs/webhooks/request/payout-success.json")
 	err := json.Unmarshal(body, &webhook)
-	assert.NoError(t, err)
-	assert.Equal(t, int64(226), webhook.ID)
-	assert.Equal(t, 0.2, webhook.RequestAmount)
-	assert.Equal(t, "USD", webhook.RequestCurrency)
-	assert.Equal(t, 737.9934, webhook.AccountAmount)
-	assert.Equal(t, "UGX", webhook.AccountCurrency)
-	assert.Equal(t, 21.4018, webhook.TransactionFee)
-	assert.Equal(t, 716.5916, webhook.TotalDebit)
-	assert.Equal(t, "mtn_ug", webhook.ProviderID)
-	assert.Equal(t, "76859aae-f148-48c5-9901-2e474cf19b71", webhook.MerchantReference)
-	assert.Equal(t, "DUSUPAY405GZM1G5JXGA71IK", webhook.InternalReference)
-	assert.Equal(t, "COMPLETED", webhook.TransactionStatus)
-	assert.Equal(t, "payout", webhook.TransactionType)
-	assert.Equal(t, "Transaction Completed Successfully", webhook.Message)
-	assert.Equal(t, "256777111786 - Optional", webhook.AccountNumber)
-	assert.Equal(t, "- Optional", webhook.AccountName)
-	assert.Equal(t, "MTN Mobile Money - Optional", webhook.InstitutionName)
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), int64(226), webhook.ID)
+	assert.Equal(suite.T(), 0.2, webhook.RequestAmount)
+	assert.Equal(suite.T(), "USD", webhook.RequestCurrency)
+	assert.Equal(suite.T(), 737.9934, webhook.AccountAmount)
+	assert.Equal(suite.T(), "UGX", webhook.AccountCurrency)
+	assert.Equal(suite.T(), 21.4018, webhook.TransactionFee)
+	assert.Equal(suite.T(), 716.5916, webhook.TotalDebit)
+	assert.Equal(suite.T(), "mtn_ug", webhook.ProviderID)
+	assert.Equal(suite.T(), "76859aae-f148-48c5-9901-2e474cf19b71", webhook.MerchantReference)
+	assert.Equal(suite.T(), "DUSUPAY405GZM1G5JXGA71IK", webhook.InternalReference)
+	assert.Equal(suite.T(), "COMPLETED", webhook.TransactionStatus)
+	assert.Equal(suite.T(), "payout", webhook.TransactionType)
+	assert.Equal(suite.T(), "Transaction Completed Successfully", webhook.Message)
+	assert.Equal(suite.T(), "256777111786 - Optional", webhook.AccountNumber)
+	assert.Equal(suite.T(), "- Optional", webhook.AccountName)
+	assert.Equal(suite.T(), "MTN Mobile Money - Optional", webhook.InstitutionName)
 }
 
-func Test_Webhooks_RefundWebhook_UnmarshalSuccess(t *testing.T) {
+func (suite *WebhooksTestSuite) TestRefundWebhook_UnmarshalSuccess() {
 	var webhook RefundWebhook
 	body, _ := LoadStubResponseData("stubs/webhooks/request/refund-success.json")
 	err := json.Unmarshal(body, &webhook)
-	assert.NoError(t, err)
-	assert.Equal(t, int64(65205), webhook.ID)
-	assert.Equal(t, float64(1054), webhook.RefundAmount)
-	assert.Equal(t, "UGX", webhook.RefundCurrency)
-	assert.Equal(t, float64(0), webhook.TransactionFee)
-	assert.Equal(t, float64(1054), webhook.TotalDebit)
-	assert.Equal(t, "international_ugx", webhook.ProviderID)
-	assert.Equal(t, "DUSUPAYXYXYXYXYXYXYXYXYX", webhook.CollectionReference)
-	assert.Equal(t, "RFD-DUSUPAYXYXYXYXYXYXYXYXYX-3486003", webhook.InternalReference)
-	assert.Equal(t, "COMPLETED", webhook.TransactionStatus)
-	assert.Equal(t, "refund", webhook.TransactionType)
-	assert.Equal(t, "Refund Processed Successfully", webhook.Message)
-	assert.Equal(t, "4860610032773134", webhook.AccountNumber)
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), int64(65205), webhook.ID)
+	assert.Equal(suite.T(), float64(1054), webhook.RefundAmount)
+	assert.Equal(suite.T(), "UGX", webhook.RefundCurrency)
+	assert.Equal(suite.T(), float64(0), webhook.TransactionFee)
+	assert.Equal(suite.T(), float64(1054), webhook.TotalDebit)
+	assert.Equal(suite.T(), "international_ugx", webhook.ProviderID)
+	assert.Equal(suite.T(), "DUSUPAYXYXYXYXYXYXYXYXYX", webhook.CollectionReference)
+	assert.Equal(suite.T(), "RFD-DUSUPAYXYXYXYXYXYXYXYXYX-3486003", webhook.InternalReference)
+	assert.Equal(suite.T(), "COMPLETED", webhook.TransactionStatus)
+	assert.Equal(suite.T(), "refund", webhook.TransactionType)
+	assert.Equal(suite.T(), "Refund Processed Successfully", webhook.Message)
+	assert.Equal(suite.T(), "4860610032773134", webhook.AccountNumber)
 }
 
-func Test_Webhooks_WebhooksResource_SendCallbackSuccess(t *testing.T) {
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
+func TestWebhooksTestSuite(t *testing.T) {
+	suite.Run(t, new(WebhooksTestSuite))
+}
 
+type WebhooksResourceTestSuite struct {
+	suite.Suite
+	cfg      *Config
+	ctx      context.Context
+	testable *WebhooksResource
+}
+
+func (suite *WebhooksResourceTestSuite) SetupTest() {
 	cfg := BuildStubConfig()
 	transport := BuildStubHttpTransport()
+	suite.cfg = cfg
+	suite.ctx = context.Background()
+	suite.testable = &WebhooksResource{NewResourceAbstract(transport, cfg)}
+	httpmock.Activate()
+}
 
+func (suite *WebhooksResourceTestSuite) TearDownTest() {
+	httpmock.DeactivateAndReset()
+}
+
+func (suite *WebhooksResourceTestSuite) TestSendCallbackSuccess() {
 	body, _ := LoadStubResponseData("stubs/webhooks/send-callback/success.json")
-	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/send-callback/qwerty", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodGet, suite.cfg.Uri+"/v1/send-callback/qwerty", httpmock.NewBytesResponder(http.StatusOK, body))
 
-	ctx := context.Background()
-
-	resource := &WebhooksResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
-	result, resp, err := resource.SendCallback(ctx, "qwerty")
-	assert.NoError(t, err)
-	assert.NotEmpty(t, resp)
-	assert.NotEmpty(t, result)
+	result, resp, err := suite.testable.SendCallback(suite.ctx, "qwerty")
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), resp)
+	assert.NotEmpty(suite.T(), result)
 	//result
-	assert.True(t, result.IsSuccess())
-	assert.Equal(t, 200, result.Code)
-	assert.Equal(t, "success", result.Status)
-	assert.Equal(t, "Callback Initiated Successfully", result.Message)
-	assert.Equal(t, int64(613589), result.Data.Payload.ID)
-	assert.Equal(t, float64(520000), result.Data.Payload.RequestAmount)
-	assert.Equal(t, "XAF", result.Data.Payload.RequestCurrency)
-	assert.Equal(t, 791.44, result.Data.Payload.AccountAmount)
-	assert.Equal(t, "EUR", result.Data.Payload.AccountCurrency)
-	assert.Equal(t, 38.7806, result.Data.Payload.TransactionFee)
-	assert.Equal(t, "international_eur", result.Data.Payload.ProviderID)
-	assert.Equal(t, "123456789", result.Data.Payload.MerchantReference)
-	assert.Equal(t, "DUSUPAY5FNZCVUKZ8C0KZE", result.Data.Payload.InternalReference)
-	assert.Equal(t, "COMPLETED", result.Data.Payload.TransactionStatus)
-	assert.Equal(t, "collection", result.Data.Payload.TransactionType)
-	assert.Equal(t, "Transaction Completed Successfully", result.Data.Payload.Message)
+	assert.True(suite.T(), result.IsSuccess())
+	assert.Equal(suite.T(), 200, result.Code)
+	assert.Equal(suite.T(), "success", result.Status)
+	assert.Equal(suite.T(), "Callback Initiated Successfully", result.Message)
+	assert.Equal(suite.T(), int64(613589), result.Data.Payload.ID)
+	assert.Equal(suite.T(), float64(520000), result.Data.Payload.RequestAmount)
+	assert.Equal(suite.T(), "XAF", result.Data.Payload.RequestCurrency)
+	assert.Equal(suite.T(), 791.44, result.Data.Payload.AccountAmount)
+	assert.Equal(suite.T(), "EUR", result.Data.Payload.AccountCurrency)
+	assert.Equal(suite.T(), 38.7806, result.Data.Payload.TransactionFee)
+	assert.Equal(suite.T(), "international_eur", result.Data.Payload.ProviderID)
+	assert.Equal(suite.T(), "123456789", result.Data.Payload.MerchantReference)
+	assert.Equal(suite.T(), "DUSUPAY5FNZCVUKZ8C0KZE", result.Data.Payload.InternalReference)
+	assert.Equal(suite.T(), "COMPLETED", result.Data.Payload.TransactionStatus)
+	assert.Equal(suite.T(), "collection", result.Data.Payload.TransactionType)
+	assert.Equal(suite.T(), "Transaction Completed Successfully", result.Data.Payload.Message)
 	//response
 	defer resp.Body.Close()
 	bodyRsp, _ := ioutil.ReadAll(resp.Body)
-	assert.Equal(t, body, bodyRsp)
+	assert.Equal(suite.T(), body, bodyRsp)
 }
 
-func Test_Webhooks_WebhooksResource_SendCallbackJsonError(t *testing.T) {
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
-
-	cfg := BuildStubConfig()
-	transport := BuildStubHttpTransport()
-
+func (suite *WebhooksResourceTestSuite) TestSendCallbackJsonError() {
 	body, _ := LoadStubResponseData("stubs/errors/401.json")
-	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/send-callback/qwerty", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodGet, suite.cfg.Uri+"/v1/send-callback/qwerty", httpmock.NewBytesResponder(http.StatusOK, body))
 
-	ctx := context.Background()
-
-	resource := &WebhooksResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
-	result, resp, err := resource.SendCallback(ctx, "qwerty")
-	assert.Error(t, err)
-	assert.NotEmpty(t, resp)
-	assert.NotEmpty(t, result)
+	result, resp, err := suite.testable.SendCallback(suite.ctx, "qwerty")
+	assert.Error(suite.T(), err)
+	assert.NotEmpty(suite.T(), resp)
+	assert.NotEmpty(suite.T(), result)
 	//result
-	assert.False(t, result.IsSuccess())
-	assert.Equal(t, 401, result.Code)
-	assert.Equal(t, "error", result.Status)
-	assert.Equal(t, "Unauthorized API access. Unknown Merchant", result.Message)
-	assert.Empty(t, result.Data)
+	assert.False(suite.T(), result.IsSuccess())
+	assert.Equal(suite.T(), 401, result.Code)
+	assert.Equal(suite.T(), "error", result.Status)
+	assert.Equal(suite.T(), "Unauthorized API access. Unknown Merchant", result.Message)
+	assert.Empty(suite.T(), result.Data)
 	//response
 	defer resp.Body.Close()
 	bodyRsp, _ := ioutil.ReadAll(resp.Body)
-	assert.Equal(t, body, bodyRsp)
+	assert.Equal(suite.T(), body, bodyRsp)
 	//error
-	assert.Equal(t, "Unauthorized API access. Unknown Merchant", err.Error())
+	assert.Equal(suite.T(), "Unauthorized API access. Unknown Merchant", err.Error())
 }
 
-func Test_Webhooks_WebhooksResource_SendCallbackNonJsonError(t *testing.T) {
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
-
-	cfg := BuildStubConfig()
-	transport := BuildStubHttpTransport()
-
+func (suite *WebhooksResourceTestSuite) TestSendCallbackNonJsonError() {
 	body, _ := LoadStubResponseData("stubs/errors/500.html")
-	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/v1/send-callback/qwerty", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodGet, suite.cfg.Uri+"/v1/send-callback/qwerty", httpmock.NewBytesResponder(http.StatusOK, body))
 
-	ctx := context.Background()
-
-	resource := &WebhooksResource{ResourceAbstract: NewResourceAbstract(transport, cfg)}
-	result, resp, err := resource.SendCallback(ctx, "qwerty")
-	assert.Error(t, err)
-	assert.NotEmpty(t, resp)
-	assert.Empty(t, result)
+	result, resp, err := suite.testable.SendCallback(suite.ctx, "qwerty")
+	assert.Error(suite.T(), err)
+	assert.NotEmpty(suite.T(), resp)
+	assert.Empty(suite.T(), result)
 	//response
 	defer resp.Body.Close()
 	bodyRsp, _ := ioutil.ReadAll(resp.Body)
-	assert.Equal(t, body, bodyRsp)
+	assert.Equal(suite.T(), body, bodyRsp)
+}
+
+func TestWebhooksResourceTestSuite(t *testing.T) {
+	suite.Run(t, new(WebhooksResourceTestSuite))
 }
