@@ -4,195 +4,191 @@ import (
 	"context"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 	"io/ioutil"
 	"net/http"
 	"testing"
 )
 
-func Test_HTTP_RequestBuilder_BuildUriWithoutQueryParams(t *testing.T) {
-	cfg := BuildStubConfig()
-	builder := RequestBuilder{cfg: cfg}
-	uri, err := builder.buildUri("qwerty", nil)
-	assert.NotEmpty(t, uri)
-	assert.Nil(t, err)
-	assert.Equal(t, SandboxAPIUrl+"/qwerty", uri.String())
+type HttpRequestBuilderTestSuite struct {
+	suite.Suite
+	cfg      *Config
+	ctx      context.Context
+	testable *RequestBuilder
 }
 
-func Test_HTTP_RequestBuilder_BuildUriWithQueryParams(t *testing.T) {
-	cfg := BuildStubConfig()
-	builder := RequestBuilder{cfg: cfg}
+func (suite *HttpRequestBuilderTestSuite) SetupTest() {
+	suite.cfg = BuildStubConfig()
+	suite.ctx = context.Background()
+	suite.testable = &RequestBuilder{cfg: suite.cfg}
+}
 
+func (suite *HttpRequestBuilderTestSuite) TestBuildUriWithoutQueryParams() {
+	uri, err := suite.testable.buildUri("qwerty", nil)
+	assert.NotEmpty(suite.T(), uri)
+	assert.Nil(suite.T(), err)
+	assert.Equal(suite.T(), SandboxAPIUrl+"/qwerty", uri.String())
+}
+
+func (suite *HttpRequestBuilderTestSuite) TestBuildUriWithQueryParams() {
 	data := make(map[string]interface{})
 	data["foo"] = "bar"
 	data["bar"] = "baz"
 
-	uri, err := builder.buildUri("qwerty", data)
-	assert.NotEmpty(t, uri)
-	assert.Nil(t, err)
-	assert.Equal(t, SandboxAPIUrl+"/qwerty?bar=baz&foo=bar", uri.String())
+	uri, err := suite.testable.buildUri("qwerty", data)
+	assert.NotEmpty(suite.T(), uri)
+	assert.Nil(suite.T(), err)
+	assert.Equal(suite.T(), SandboxAPIUrl+"/qwerty?bar=baz&foo=bar", uri.String())
 }
 
-func Test_HTTP_RequestBuilder_BuildHeaders(t *testing.T) {
-	cfg := BuildStubConfig()
-	builder := RequestBuilder{cfg: cfg}
-
-	headers := builder.buildHeaders()
-	assert.NotEmpty(t, headers)
-	assert.Equal(t, "application/json", headers.Get("Content-Type"))
-	assert.Equal(t, cfg.SecretKey, headers.Get("secret-key"))
+func (suite *HttpRequestBuilderTestSuite) TestBuildHeaders() {
+	headers := suite.testable.buildHeaders()
+	assert.NotEmpty(suite.T(), headers)
+	assert.Equal(suite.T(), "application/json", headers.Get("Content-Type"))
+	assert.Equal(suite.T(), suite.cfg.SecretKey, headers.Get("secret-key"))
 }
 
-func Test_HTTP_RequestBuilder_BuildBody(t *testing.T) {
-	cfg := BuildStubConfig()
-	builder := RequestBuilder{cfg: cfg}
-
+func (suite *HttpRequestBuilderTestSuite) TestBuildBody() {
 	data := make(map[string]interface{})
 	data["foo"] = "bar"
 	data["bar"] = "baz"
 
-	body, _ := builder.buildBody(data)
-	assert.NotEmpty(t, body)
+	body, _ := suite.testable.buildBody(data)
+	assert.NotEmpty(suite.T(), body)
 }
 
-func Test_HTTP_RequestBuilder_BuildAuthParams(t *testing.T) {
-	cfg := BuildStubConfig()
-	builder := RequestBuilder{cfg: cfg}
-
+func (suite *HttpRequestBuilderTestSuite) TestBuildAuthParams() {
 	data := make(map[string]interface{})
 	data["foo"] = "bar"
 	data["bar"] = "baz"
 
-	result := builder.buildAuthParams(data)
-	assert.Equal(t, data["foo"], result["foo"])
-	assert.Equal(t, data["bar"], result["bar"])
-	assert.Equal(t, cfg.PublicKey, result["api_key"])
+	result := suite.testable.buildAuthParams(data)
+	assert.Equal(suite.T(), data["foo"], result["foo"])
+	assert.Equal(suite.T(), data["bar"], result["bar"])
+	assert.Equal(suite.T(), suite.cfg.PublicKey, result["api_key"])
 }
 
-func Test_HTTP_RequestBuilder_BuildAuthParamsEmpty(t *testing.T) {
-	cfg := BuildStubConfig()
-	builder := RequestBuilder{cfg: cfg}
-
-	result := builder.buildAuthParams(nil)
-	assert.Equal(t, cfg.PublicKey, result["api_key"])
+func (suite *HttpRequestBuilderTestSuite) TestBuildAuthParamsEmpty() {
+	result := suite.testable.buildAuthParams(nil)
+	assert.Equal(suite.T(), suite.cfg.PublicKey, result["api_key"])
 }
 
-func Test_HTTP_RequestBuilder_BuildRequestGET(t *testing.T) {
-	cfg := BuildStubConfig()
-	builder := RequestBuilder{cfg: cfg}
-
-	ctx := context.Background()
-	result, err := builder.BuildRequest(ctx, "get", "foo", map[string]interface{}{"foo": "bar"}, map[string]interface{}{"foo": "bar"})
-	assert.NoError(t, err)
-	assert.Equal(t, http.MethodGet, result.Method)
-	assert.Equal(t, "https://sandbox.dusupay.com/foo?api_key=PublicKey&foo=bar", result.URL.String())
-	assert.Equal(t, "application/json", result.Header.Get("Content-Type"))
-	assert.Equal(t, cfg.SecretKey, result.Header.Get("secret-key"))
-	assert.Nil(t, result.Body)
+func (suite *HttpRequestBuilderTestSuite) TestBuildRequestGET() {
+	result, err := suite.testable.BuildRequest(suite.ctx, "get", "foo", map[string]interface{}{"foo": "bar"}, map[string]interface{}{"foo": "bar"})
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), http.MethodGet, result.Method)
+	assert.Equal(suite.T(), "https://sandbox.dusupay.com/foo?api_key=PublicKey&foo=bar", result.URL.String())
+	assert.Equal(suite.T(), "application/json", result.Header.Get("Content-Type"))
+	assert.Equal(suite.T(), suite.cfg.SecretKey, result.Header.Get("secret-key"))
+	assert.Nil(suite.T(), result.Body)
 }
 
-func Test_HTTP_RequestBuilder_BuildRequestPOST(t *testing.T) {
-	cfg := BuildStubConfig()
-	builder := RequestBuilder{cfg: cfg}
-
-	ctx := context.Background()
-	result, err := builder.BuildRequest(ctx, "post", "foo", map[string]interface{}{"foo": "bar"}, map[string]interface{}{"foo": "bar"})
-	assert.NoError(t, err)
-	assert.Equal(t, http.MethodPost, result.Method)
-	assert.Equal(t, "https://sandbox.dusupay.com/foo?foo=bar", result.URL.String())
-	assert.Equal(t, "application/json", result.Header.Get("Content-Type"))
-	assert.Equal(t, cfg.SecretKey, result.Header.Get("secret-key"))
-	assert.NotEmpty(t, result.Body)
+func (suite *HttpRequestBuilderTestSuite) TestBuildRequestPOST() {
+	result, err := suite.testable.BuildRequest(suite.ctx, "post", "foo", map[string]interface{}{"foo": "bar"}, map[string]interface{}{"foo": "bar"})
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), http.MethodPost, result.Method)
+	assert.Equal(suite.T(), "https://sandbox.dusupay.com/foo?foo=bar", result.URL.String())
+	assert.Equal(suite.T(), "application/json", result.Header.Get("Content-Type"))
+	assert.Equal(suite.T(), suite.cfg.SecretKey, result.Header.Get("secret-key"))
+	assert.NotEmpty(suite.T(), result.Body)
 }
 
-func Test_HTTP_IsEmptyObjectResponseDataEmptyObject(t *testing.T) {
+func TestHttpRequestBuilderTestSuite(t *testing.T) {
+	suite.Run(t, new(HttpRequestBuilderTestSuite))
+}
+
+type HttpTestSuite struct {
+	suite.Suite
+}
+
+func (suite *HttpTestSuite) TestIsEmptyObjectResponseDataEmptyObject() {
 	data := "{}"
-	assert.True(t, isEmptyObjectResponseData([]byte(data)))
+	assert.True(suite.T(), isEmptyObjectResponseData([]byte(data)))
 }
 
-func Test_HTTP_IsEmptyObjectResponseDataFilledObject(t *testing.T) {
+func (suite *HttpTestSuite) TestIsEmptyObjectResponseDataFilledObject() {
 	data := `{"foo":"bar"}`
-	assert.False(t, isEmptyObjectResponseData([]byte(data)))
+	assert.False(suite.T(), isEmptyObjectResponseData([]byte(data)))
 }
 
-func Test_HTTP_IsEmptyObjectResponseDataEmptyArray(t *testing.T) {
+func (suite *HttpTestSuite) TestIsEmptyObjectResponseDataEmptyArray() {
 	data := "[]"
-	assert.False(t, isEmptyObjectResponseData([]byte(data)))
+	assert.False(suite.T(), isEmptyObjectResponseData([]byte(data)))
 }
 
-func Test_HTTP_NewHttpTransport(t *testing.T) {
-	cfg := BuildStubConfig()
-	transport := NewHttpTransport(cfg, nil)
-	assert.NotEmpty(t, transport)
-}
-
-func Test_HTTP_Transport_SendRequestSuccess(t *testing.T) {
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
-
-	cfg := BuildStubConfig()
-	transport := BuildStubHttpTransport()
-
-	body, _ := LoadStubResponseData("stubs/merchants/balance/success.json")
-	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/foo?api_key=PublicKey", httpmock.NewBytesResponder(http.StatusOK, body))
-
-	ctx := context.Background()
-	resp, err := transport.SendRequest(ctx, http.MethodGet, "foo", nil, nil)
-
-	assert.NoError(t, err)
-	assert.NotEmpty(t, resp)
-
-	defer resp.Body.Close()
-	bodyRsp, _ := ioutil.ReadAll(resp.Body)
-	assert.Equal(t, body, bodyRsp)
-}
-
-func Test_HTTP_Transport_Get(t *testing.T) {
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
-
-	cfg := BuildStubConfig()
-	transport := BuildStubHttpTransport()
-
-	body, _ := LoadStubResponseData("stubs/merchants/balance/success.json")
-	httpmock.RegisterResponder(http.MethodGet, cfg.Uri+"/foo?api_key=PublicKey", httpmock.NewBytesResponder(http.StatusOK, body))
-
-	ctx := context.Background()
-	resp, err := transport.Get(ctx, "foo", nil)
-
-	assert.NoError(t, err)
-	assert.NotEmpty(t, resp)
-
-	defer resp.Body.Close()
-	bodyRsp, _ := ioutil.ReadAll(resp.Body)
-	assert.Equal(t, body, bodyRsp)
-}
-
-func Test_HTTP_Transport_Post(t *testing.T) {
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
-
-	cfg := BuildStubConfig()
-	transport := BuildStubHttpTransport()
-
-	body, _ := LoadStubResponseData("stubs/merchants/balance/success.json")
-	httpmock.RegisterResponder(http.MethodPost, cfg.Uri+"/foo", httpmock.NewBytesResponder(http.StatusOK, body))
-
-	ctx := context.Background()
-	resp, err := transport.Post(ctx, "foo", nil, nil)
-
-	assert.NoError(t, err)
-	assert.NotEmpty(t, resp)
-
-	defer resp.Body.Close()
-	bodyRsp, _ := ioutil.ReadAll(resp.Body)
-	assert.Equal(t, body, bodyRsp)
-}
-
-func Test_HTTP_ResponseBody_IsSuccess(t *testing.T) {
+func (suite *HttpTestSuite) TestResponseBodyIsSuccess() {
 	rsp := &ResponseBody{Code: http.StatusAccepted}
-	assert.True(t, rsp.IsSuccess())
+	assert.True(suite.T(), rsp.IsSuccess())
 	rsp.Code = http.StatusMultipleChoices
-	assert.False(t, rsp.IsSuccess())
+	assert.False(suite.T(), rsp.IsSuccess())
 	rsp.Code = http.StatusBadRequest
-	assert.False(t, rsp.IsSuccess())
+	assert.False(suite.T(), rsp.IsSuccess())
+}
+
+func TestHttpTestSuite(t *testing.T) {
+	suite.Run(t, new(HttpTestSuite))
+}
+
+type HttpTransportTestSuite struct {
+	suite.Suite
+	cfg      *Config
+	ctx      context.Context
+	testable *Transport
+}
+
+func (suite *HttpTransportTestSuite) SetupTest() {
+	suite.cfg = BuildStubConfig()
+	suite.ctx = context.Background()
+	suite.testable = NewHttpTransport(suite.cfg, &http.Client{})
+	httpmock.Activate()
+}
+
+func (suite *HttpTransportTestSuite) TearDownTest() {
+	httpmock.DeactivateAndReset()
+}
+
+func (suite *HttpTransportTestSuite) TestSendRequestSuccess() {
+	body, _ := LoadStubResponseData("stubs/merchants/balance/success.json")
+	httpmock.RegisterResponder(http.MethodGet, suite.cfg.Uri+"/foo?api_key=PublicKey", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	resp, err := suite.testable.SendRequest(suite.ctx, http.MethodGet, "foo", nil, nil)
+
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), resp)
+
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(suite.T(), body, bodyRsp)
+}
+
+func (suite *HttpTransportTestSuite) TestGet() {
+	body, _ := LoadStubResponseData("stubs/merchants/balance/success.json")
+	httpmock.RegisterResponder(http.MethodGet, suite.cfg.Uri+"/foo?api_key=PublicKey", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	resp, err := suite.testable.Get(suite.ctx, "foo", nil)
+
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), resp)
+
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(suite.T(), body, bodyRsp)
+}
+
+func (suite *HttpTransportTestSuite) TestPost() {
+	body, _ := LoadStubResponseData("stubs/merchants/balance/success.json")
+	httpmock.RegisterResponder(http.MethodPost, suite.cfg.Uri+"/foo", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	resp, err := suite.testable.Post(suite.ctx, "foo", nil, nil)
+
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), resp)
+
+	defer resp.Body.Close()
+	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(suite.T(), body, bodyRsp)
+}
+
+func TestHttpTransportTestSuite(t *testing.T) {
+	suite.Run(t, new(HttpTransportTestSuite))
 }

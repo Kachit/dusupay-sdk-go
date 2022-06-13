@@ -14,7 +14,7 @@ type PayoutsTestSuite struct {
 	suite.Suite
 }
 
-func (suite *PayoutsTestSuite) TestPayoutsRequest_IsValidSuccess() {
+func (suite *PayoutsTestSuite) TestPayoutsRequestIsValidSuccess() {
 	request := PayoutRequest{
 		Currency:          CurrencyCodeKES,
 		Amount:            100,
@@ -29,7 +29,7 @@ func (suite *PayoutsTestSuite) TestPayoutsRequest_IsValidSuccess() {
 	assert.NoError(suite.T(), request.isValid())
 }
 
-func (suite *PayoutsTestSuite) TestPayoutsRequest_IsValidEmptyCurrency() {
+func (suite *PayoutsTestSuite) TestPayoutsRequestIsValidEmptyCurrency() {
 	request := PayoutRequest{
 		Amount:            100,
 		Method:            TransactionMethodBank,
@@ -42,7 +42,7 @@ func (suite *PayoutsTestSuite) TestPayoutsRequest_IsValidEmptyCurrency() {
 	assert.Equal(suite.T(), `parameter "currency" is empty`, result.Error())
 }
 
-func (suite *PayoutsTestSuite) TestPayoutsRequest_IsValidEmptyAmount() {
+func (suite *PayoutsTestSuite) TestPayoutsRequestIsValidEmptyAmount() {
 	request := PayoutRequest{
 		Currency:          CurrencyCodeKES,
 		Method:            TransactionMethodBank,
@@ -55,7 +55,7 @@ func (suite *PayoutsTestSuite) TestPayoutsRequest_IsValidEmptyAmount() {
 	assert.Equal(suite.T(), `parameter "amount" is empty`, result.Error())
 }
 
-func (suite *PayoutsTestSuite) TestPayoutsRequest_IsValidEmptyMethod() {
+func (suite *PayoutsTestSuite) TestPayoutsRequestIsValidEmptyMethod() {
 	request := PayoutRequest{
 		Currency:          CurrencyCodeKES,
 		Amount:            100,
@@ -68,7 +68,7 @@ func (suite *PayoutsTestSuite) TestPayoutsRequest_IsValidEmptyMethod() {
 	assert.Equal(suite.T(), `parameter "method" is empty`, result.Error())
 }
 
-func (suite *PayoutsTestSuite) TestPayoutsRequest_IsValidEmptyProviderId() {
+func (suite *PayoutsTestSuite) TestPayoutsRequestIsValidEmptyProviderId() {
 	request := PayoutRequest{
 		Currency:          CurrencyCodeKES,
 		Amount:            100,
@@ -81,7 +81,7 @@ func (suite *PayoutsTestSuite) TestPayoutsRequest_IsValidEmptyProviderId() {
 	assert.Equal(suite.T(), `parameter "provider_id" is empty`, result.Error())
 }
 
-func (suite *PayoutsTestSuite) TestPayoutsRequest_IsValidEmptyMerchantReference() {
+func (suite *PayoutsTestSuite) TestPayoutsRequestIsValidEmptyMerchantReference() {
 	request := PayoutRequest{
 		Currency:   CurrencyCodeKES,
 		Amount:     100,
@@ -94,7 +94,7 @@ func (suite *PayoutsTestSuite) TestPayoutsRequest_IsValidEmptyMerchantReference(
 	assert.Equal(suite.T(), `parameter "merchant_reference" is empty`, result.Error())
 }
 
-func (suite *PayoutsTestSuite) TestPayoutsRequest_IsValidEmptyNarration() {
+func (suite *PayoutsTestSuite) TestPayoutsRequestIsValidEmptyNarration() {
 	request := PayoutRequest{
 		Currency:          CurrencyCodeKES,
 		Amount:            100,
@@ -107,7 +107,7 @@ func (suite *PayoutsTestSuite) TestPayoutsRequest_IsValidEmptyNarration() {
 	assert.Equal(suite.T(), `parameter "narration" is empty`, result.Error())
 }
 
-func (suite *PayoutsTestSuite) TestPayoutsRequest_IsValidEmptyAccountNumber() {
+func (suite *PayoutsTestSuite) TestPayoutsRequestIsValidEmptyAccountNumber() {
 	request := PayoutRequest{
 		Currency:          CurrencyCodeKES,
 		Amount:            100,
@@ -121,7 +121,7 @@ func (suite *PayoutsTestSuite) TestPayoutsRequest_IsValidEmptyAccountNumber() {
 	assert.Equal(suite.T(), `parameter "account_number" is empty`, result.Error())
 }
 
-func (suite *PayoutsTestSuite) TestPayoutsRequest_IsValidEmptyAccountName() {
+func (suite *PayoutsTestSuite) TestPayoutsRequestIsValidEmptyAccountName() {
 	request := PayoutRequest{
 		Currency:          CurrencyCodeKES,
 		Amount:            100,
