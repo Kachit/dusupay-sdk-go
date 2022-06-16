@@ -10,7 +10,7 @@ import (
 
 //BalancesResponse struct
 type BalancesResponse struct {
-	*ResponseBody
+	ResponseBody
 	Data *BalancesResponseData `json:"data,omitempty"`
 }
 
@@ -39,7 +39,7 @@ type BalancesResponseDataItem struct {
 
 //MerchantsResource wrapper
 type MerchantsResource struct {
-	*ResourceAbstract
+	ResourceAbstract
 }
 
 //GetBalances get balances list (see https://docs.dusupay.com/appendix/account-balance)

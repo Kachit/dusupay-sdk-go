@@ -15,7 +15,7 @@ type WebhooksTestSuite struct {
 	suite.Suite
 }
 
-func (suite *WebhooksTestSuite) TestCollectionWebhook_UnmarshalSuccess() {
+func (suite *WebhooksTestSuite) TestCollectionWebhookUnmarshalSuccess() {
 	var webhook CollectionWebhook
 	body, _ := LoadStubResponseData("stubs/webhooks/request/collection-success.json")
 	err := json.Unmarshal(body, &webhook)
@@ -39,7 +39,7 @@ func (suite *WebhooksTestSuite) TestCollectionWebhook_UnmarshalSuccess() {
 	assert.Equal(suite.T(), "MTN Mobile Money - Optional", webhook.InstitutionName)
 }
 
-func (suite *WebhooksTestSuite) TestPayoutWebhook_UnmarshalSuccess() {
+func (suite *WebhooksTestSuite) TestPayoutWebhookUnmarshalSuccess() {
 	var webhook PayoutWebhook
 	body, _ := LoadStubResponseData("stubs/webhooks/request/payout-success.json")
 	err := json.Unmarshal(body, &webhook)
@@ -62,7 +62,7 @@ func (suite *WebhooksTestSuite) TestPayoutWebhook_UnmarshalSuccess() {
 	assert.Equal(suite.T(), "MTN Mobile Money - Optional", webhook.InstitutionName)
 }
 
-func (suite *WebhooksTestSuite) TestRefundWebhook_UnmarshalSuccess() {
+func (suite *WebhooksTestSuite) TestRefundWebhookUnmarshalSuccess() {
 	var webhook RefundWebhook
 	body, _ := LoadStubResponseData("stubs/webhooks/request/refund-success.json")
 	err := json.Unmarshal(body, &webhook)

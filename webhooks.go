@@ -71,7 +71,7 @@ type RefundWebhook struct {
 
 //WebhookResponse struct
 type WebhookResponse struct {
-	*ResponseBody
+	ResponseBody
 	Data *WebhookResponseData `json:"data,omitempty"`
 }
 
@@ -98,7 +98,7 @@ type WebhookResponsePayload struct {
 
 //WebhooksResource wrapper
 type WebhooksResource struct {
-	*ResourceAbstract
+	ResourceAbstract
 }
 
 //SendCallback (see https://docs.dusupay.com/appendix/webhooks/webhook-trigger)

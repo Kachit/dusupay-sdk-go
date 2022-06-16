@@ -23,35 +23,35 @@ func NewClientFromConfig(config *Config, cl *http.Client) (*Client, error) {
 
 //Collections resource
 func (c *Client) Collections() *CollectionsResource {
-	return &CollectionsResource{ResourceAbstract: NewResourceAbstract(c.transport, c.config)}
+	return &CollectionsResource{NewResourceAbstract(c.transport, c.config)}
 }
 
 //Payouts resource
 func (c *Client) Payouts() *PayoutsResource {
-	return &PayoutsResource{ResourceAbstract: NewResourceAbstract(c.transport, c.config)}
+	return &PayoutsResource{NewResourceAbstract(c.transport, c.config)}
 }
 
 //Providers resource
 func (c *Client) Providers() *ProvidersResource {
-	return &ProvidersResource{ResourceAbstract: NewResourceAbstract(c.transport, c.config)}
+	return &ProvidersResource{NewResourceAbstract(c.transport, c.config)}
 }
 
 //Merchants resource
 func (c *Client) Merchants() *MerchantsResource {
-	return &MerchantsResource{ResourceAbstract: NewResourceAbstract(c.transport, c.config)}
+	return &MerchantsResource{NewResourceAbstract(c.transport, c.config)}
 }
 
 //Refunds resource
 func (c *Client) Refunds() *RefundsResource {
-	return &RefundsResource{ResourceAbstract: NewResourceAbstract(c.transport, c.config)}
+	return &RefundsResource{NewResourceAbstract(c.transport, c.config)}
 }
 
 //Banks resource
 func (c *Client) Banks() *BanksResource {
-	return &BanksResource{ResourceAbstract: NewResourceAbstract(c.transport, c.config)}
+	return &BanksResource{NewResourceAbstract(c.transport, c.config)}
 }
 
 //Webhooks resource
 func (c *Client) Webhooks() *WebhooksResource {
-	return &WebhooksResource{ResourceAbstract: NewResourceAbstract(c.transport, c.config)}
+	return &WebhooksResource{NewResourceAbstract(c.transport, c.config)}
 }

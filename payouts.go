@@ -49,7 +49,7 @@ func (pr *PayoutRequest) isValid() error {
 
 //PayoutResponse struct
 type PayoutResponse struct {
-	*ResponseBody
+	ResponseBody
 	Data *PayoutResponseData `json:"data,omitempty"`
 }
 
@@ -72,7 +72,7 @@ type PayoutResponseData struct {
 
 //PayoutsResource wrapper
 type PayoutsResource struct {
-	*ResourceAbstract
+	ResourceAbstract
 }
 
 //Create payout request (see https://docs.dusupay.com/sending-money/payouts/post-payout-request)

@@ -36,7 +36,7 @@ func (pf *ProvidersFilter) buildPath() string {
 
 //ProvidersResponse struct
 type ProvidersResponse struct {
-	*ResponseBody
+	ResponseBody
 	Data *ProvidersResponseData `json:"data,omitempty"`
 }
 
@@ -73,7 +73,7 @@ type ProvidersResponseDataItem struct {
 
 //ProvidersResource wrapper
 type ProvidersResource struct {
-	*ResourceAbstract
+	ResourceAbstract
 }
 
 //GetList Get providers list (see https://docs.dusupay.com/appendix/payment-options/payment-providers)

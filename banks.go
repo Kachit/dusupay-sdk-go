@@ -57,7 +57,7 @@ func (bbf *BanksBranchesFilter) buildPath() string {
 
 //BanksResponse struct
 type BanksResponse struct {
-	*ResponseBody
+	ResponseBody
 	Data *BanksResponseData `json:"data,omitempty"`
 }
 
@@ -95,7 +95,7 @@ type BanksResponseDataItem struct {
 
 //BanksBranchesResponse struct
 type BanksBranchesResponse struct {
-	*ResponseBody
+	ResponseBody
 	Data *BanksBranchesResponseData `json:"data,omitempty"`
 }
 
@@ -124,7 +124,7 @@ type BanksBranchesResponseDataItem struct {
 
 //BanksResource wrapper
 type BanksResource struct {
-	*ResourceAbstract
+	ResourceAbstract
 }
 
 //GetList get banks list (see https://docs.dusupay.com/sending-money/payouts/bank-codes)

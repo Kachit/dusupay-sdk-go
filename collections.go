@@ -48,7 +48,7 @@ func (cr *CollectionRequest) isValid() error {
 
 //CollectionResponse struct
 type CollectionResponse struct {
-	*ResponseBody
+	ResponseBody
 	Data *CollectionResponseData `json:"data,omitempty"`
 }
 
@@ -77,7 +77,7 @@ type CollectionResponseData struct {
 
 //CollectionsResource wrapper
 type CollectionsResource struct {
-	*ResourceAbstract
+	ResourceAbstract
 }
 
 //Create collection request (see https://docs.dusupay.com/receiving-money/collections/post-collection-request)

@@ -7,6 +7,6 @@ type ResourceAbstract struct {
 }
 
 //NewResourceAbstract Create new resource abstract
-func NewResourceAbstract(transport *Transport, config *Config) *ResourceAbstract {
-	return &ResourceAbstract{tr: transport, cfg: config}
+func NewResourceAbstract(transport *Transport, config *Config) ResourceAbstract {
+	return ResourceAbstract{tr: transport, cfg: config}
 }

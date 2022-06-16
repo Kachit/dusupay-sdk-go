@@ -24,7 +24,7 @@ func (rr *RefundRequest) isValid() error {
 
 //RefundResponse struct
 type RefundResponse struct {
-	*ResponseBody
+	ResponseBody
 	Data *RefundResponseData `json:"data,omitempty"`
 }
 
@@ -47,7 +47,7 @@ type RefundResponseData struct {
 
 //RefundsResource wrapper
 type RefundsResource struct {
-	*ResourceAbstract
+	ResourceAbstract
 }
 
 //Create refund request (see https://docs.dusupay.com/appendix/refunds)
