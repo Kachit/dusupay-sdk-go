@@ -19,6 +19,9 @@ type IncomingWebhookInterface interface {
 
 func NewSignatureValidator(publicKeyBytes []byte) (*SignatureValidator, error) {
 	block, _ := pem.Decode(publicKeyBytes)
+	if block == nil {
+		return nil, errors.New("wrong public key data")
+	}
 	publicKey, err := parsePublicKey(block.Bytes)
 	if err != nil {
 		return nil, err
