@@ -7,11 +7,6 @@ import (
 	"net/http"
 )
 
-//WebhookInterface interface
-type WebhookInterface interface {
-	GetPayloadString() string
-}
-
 //CollectionWebhook struct
 type CollectionWebhook struct {
 	ID                int64   `json:"id"`
@@ -31,6 +26,10 @@ type CollectionWebhook struct {
 	AccountNumber     string  `json:"account_number"`
 	AccountName       string  `json:"account_name"`
 	InstitutionName   string  `json:"institution_name"`
+}
+
+func (cw *CollectionWebhook) BuildPayloadString(url string) string {
+	return fmt.Sprintf("%d:%s:%s:%s", cw.ID, cw.InternalReference, cw.TransactionStatus, url)
 }
 
 //PayoutWebhook struct
@@ -53,6 +52,10 @@ type PayoutWebhook struct {
 	InstitutionName   string  `json:"institution_name"`
 }
 
+func (pw *PayoutWebhook) BuildPayloadString(url string) string {
+	return fmt.Sprintf("%d:%s:%s:%s", pw.ID, pw.InternalReference, pw.TransactionStatus, url)
+}
+
 //RefundWebhook struct
 type RefundWebhook struct {
 	ID                  int64   `json:"id"`
@@ -67,6 +70,10 @@ type RefundWebhook struct {
 	TransactionStatus   string  `json:"transaction_status"`
 	AccountNumber       string  `json:"account_number"`
 	Message             string  `json:"message"`
+}
+
+func (rw *RefundWebhook) BuildPayloadString(url string) string {
+	return fmt.Sprintf("%d:%s:%s:%s", rw.ID, rw.InternalReference, rw.TransactionStatus, url)
 }
 
 //WebhookResponse struct

@@ -7,6 +7,12 @@ import (
 	"strings"
 )
 
+const stubSignature = `gYC3u1wUtk6UFpOVvCx+AyCnE3LXkS9Sg74fiRUQxRDDlllPu5vuRUrEbEqq/TEO90fYr76KGAWC6YSo
+J9joYwk8RVftDQ1pNhROdfRkXL/yaQbrAvuT2gM2sO+HJhShCBLWbBcfXPOcjGcCedPCHSNFc5bq/Mk/
+DszqlFEoH0dUN8hmqXQr673zyFivaKT76CpJTcmn5nvJi8r6IGoOJXb5uN8CdMTXbT6J08OmsbILPlfX
+qe8PS/IlvXz11oy5xUaLXt+whhZL8rBrwQUsi9aNVf8Gd5m93D2ls1z03zDSOjSlb26Rvnvk97+XSM13
+KuGbYjc3eJ6CUlQuIbTC1A==`
+
 func BuildStubConfig() *Config {
 	return &Config{
 		Uri:       SandboxAPIUrl,
