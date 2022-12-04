@@ -17,6 +17,7 @@ type IncomingWebhookInterface interface {
 	BuildPayloadString(url string) string
 }
 
+//NewSignatureValidator method
 func NewSignatureValidator(publicKeyBytes []byte) (*SignatureValidator, error) {
 	block, _ := pem.Decode(publicKeyBytes)
 	if block == nil {
@@ -29,10 +30,12 @@ func NewSignatureValidator(publicKeyBytes []byte) (*SignatureValidator, error) {
 	return &SignatureValidator{publicKey}, nil
 }
 
+//SignatureValidator struct
 type SignatureValidator struct {
 	publicKey *rsa.PublicKey
 }
 
+//ValidateSignature method (see https://docs.dusupay.com/webhooks-and-redirects/webhooks/signature-verification)
 func (sv *SignatureValidator) ValidateSignature(webhook IncomingWebhookInterface, webhookUrl string, signature string) error {
 	messageBytes := bytes.NewBufferString(webhook.BuildPayloadString(webhookUrl))
 	hash := sha512.New()
@@ -46,6 +49,7 @@ func (sv *SignatureValidator) ValidateSignature(webhook IncomingWebhookInterface
 	return rsa.VerifyPKCS1v15(sv.publicKey, crypto.SHA512, digest, data)
 }
 
+//parsePublicKey method
 func parsePublicKey(rawBytes []byte) (*rsa.PublicKey, error) {
 	key, err := x509.ParsePKIXPublicKey(rawBytes)
 	if err != nil {
