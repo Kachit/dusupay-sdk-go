@@ -212,3 +212,35 @@ fmt.Println(result.Code)
 fmt.Println(result.Message)
 fmt.Println((*result.Data).ID)
 ```
+
+### Verify webhook signature
+```go
+requestPayload := `
+{
+    "id": 226,
+    "request_amount": 10,
+    "request_currency": "USD",
+    "account_amount": 737.9934,
+    "account_currency": "UGX",
+    "transaction_fee": 21.4018,
+    "total_credit": 716.5916,
+    "customer_charged": false,
+    "provider_id": "mtn_ug",
+    "merchant_reference": "76859aae-f148-48c5-9901-2e474cf19b71",
+    "internal_reference": "DUSUPAY405GZM1G5JXGA71IK",
+    "transaction_status": "COMPLETED",
+    "transaction_type": "collection",
+    "message": "Transaction Completed Successfully"
+}
+`
+requestUri := "https://www.sample-url.com/callback"
+signature := "value from 'dusupay-signature' http header"
+
+var webhook dusupay.CollectionWebhook
+_ = json.Unmarshal(requestPayload, &webhook)
+
+rawBytes, _ := ioutil.ReadFile("path/to/dusupay-public-key.pem")
+
+validator, _ := dusupay.NewSignatureValidator(rawBytes)
+err := validator.ValidateSignature(webhook, requestUri, signature)
+```
