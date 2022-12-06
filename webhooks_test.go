@@ -39,6 +39,14 @@ func (suite *WebhooksTestSuite) TestCollectionWebhookUnmarshalSuccess() {
 	assert.Equal(suite.T(), "MTN Mobile Money - Optional", webhook.InstitutionName)
 }
 
+func (suite *WebhooksTestSuite) TestCollectionWebhookBuildPayloadString() {
+	var webhook CollectionWebhook
+	body, _ := LoadStubResponseData("stubs/webhooks/request/collection-success.json")
+	_ = json.Unmarshal(body, &webhook)
+	result := webhook.BuildPayloadString("https://www.sample-url.com/callback")
+	assert.Equal(suite.T(), "226:DUSUPAY405GZM1G5JXGA71IK:COMPLETED:https://www.sample-url.com/callback", result)
+}
+
 func (suite *WebhooksTestSuite) TestPayoutWebhookUnmarshalSuccess() {
 	var webhook PayoutWebhook
 	body, _ := LoadStubResponseData("stubs/webhooks/request/payout-success.json")
@@ -62,6 +70,14 @@ func (suite *WebhooksTestSuite) TestPayoutWebhookUnmarshalSuccess() {
 	assert.Equal(suite.T(), "MTN Mobile Money - Optional", webhook.InstitutionName)
 }
 
+func (suite *WebhooksTestSuite) TestPayoutWebhookBuildPayloadString() {
+	var webhook PayoutWebhook
+	body, _ := LoadStubResponseData("stubs/webhooks/request/payout-success.json")
+	_ = json.Unmarshal(body, &webhook)
+	result := webhook.BuildPayloadString("https://www.sample-url.com/callback")
+	assert.Equal(suite.T(), "226:DUSUPAY405GZM1G5JXGA71IK:COMPLETED:https://www.sample-url.com/callback", result)
+}
+
 func (suite *WebhooksTestSuite) TestRefundWebhookUnmarshalSuccess() {
 	var webhook RefundWebhook
 	body, _ := LoadStubResponseData("stubs/webhooks/request/refund-success.json")
@@ -79,6 +95,14 @@ func (suite *WebhooksTestSuite) TestRefundWebhookUnmarshalSuccess() {
 	assert.Equal(suite.T(), "refund", webhook.TransactionType)
 	assert.Equal(suite.T(), "Refund Processed Successfully", webhook.Message)
 	assert.Equal(suite.T(), "4860610032773134", webhook.AccountNumber)
+}
+
+func (suite *WebhooksTestSuite) TestRefundWebhookBuildPayloadString() {
+	var webhook RefundWebhook
+	body, _ := LoadStubResponseData("stubs/webhooks/request/refund-success.json")
+	_ = json.Unmarshal(body, &webhook)
+	result := webhook.BuildPayloadString("https://www.sample-url.com/callback")
+	assert.Equal(suite.T(), "65205:RFD-DUSUPAYXYXYXYXYXYXYXYXYX-3486003:COMPLETED:https://www.sample-url.com/callback", result)
 }
 
 func TestWebhooksTestSuite(t *testing.T) {
