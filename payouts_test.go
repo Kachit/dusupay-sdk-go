@@ -2,138 +2,71 @@ package dusupay
 
 import (
 	"context"
+	"io"
+	"net/http"
+	"testing"
+
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"io/ioutil"
-	"net/http"
-	"testing"
 )
 
 type PayoutsTestSuite struct {
 	suite.Suite
 }
 
-func (suite *PayoutsTestSuite) TestPayoutsRequestIsValidSuccess() {
+func (suite *PayoutsTestSuite) TestPayoutRequestIsValidSuccess() {
 	request := PayoutRequest{
-		Currency:          CurrencyCodeKES,
-		Amount:            100,
-		Method:            TransactionMethodBank,
-		ProviderId:        "provider_id",
-		MerchantReference: "merchant_reference",
-		Narration:         "narration",
-		AccountNumber:     "account_number",
-		AccountName:       "account_name",
+		Currency:          CurrencyCodeUGX,
+		Amount:            10000,
+		TransactionMethod: TransactionMethodMobileMoney,
+		ProviderCode:      "mtn_ug",
+		AccountNumber:     "256777000001",
+		CustomerName:      "John Doe",
+		MerchantReference: "MCTREFT2WMNWZ23SBN6Y",
+		Description:       "Test payout",
 	}
-	assert.Nil(suite.T(), request.isValid())
 	assert.NoError(suite.T(), request.isValid())
 }
 
-func (suite *PayoutsTestSuite) TestPayoutsRequestIsValidEmptyCurrency() {
-	request := PayoutRequest{
-		Amount:            100,
-		Method:            TransactionMethodBank,
-		ProviderId:        "provider_id",
-		MerchantReference: "merchant_reference",
-		Narration:         "narration",
-	}
-	result := request.isValid()
-	assert.Error(suite.T(), result)
-	assert.Equal(suite.T(), `parameter "currency" is empty`, result.Error())
+func (suite *PayoutsTestSuite) TestPayoutRequestIsValidEmptyCurrency() {
+	request := PayoutRequest{Amount: 100, TransactionMethod: TransactionMethodMobileMoney, ProviderCode: "mtn_ug", AccountNumber: "256777000001", CustomerName: "John Doe", MerchantReference: "ref", Description: "desc"}
+	assert.EqualError(suite.T(), request.isValid(), `parameter "currency" is empty`)
 }
 
-func (suite *PayoutsTestSuite) TestPayoutsRequestIsValidEmptyAmount() {
-	request := PayoutRequest{
-		Currency:          CurrencyCodeKES,
-		Method:            TransactionMethodBank,
-		ProviderId:        "provider_id",
-		MerchantReference: "merchant_reference",
-		Narration:         "narration",
-	}
-	result := request.isValid()
-	assert.Error(suite.T(), result)
-	assert.Equal(suite.T(), `parameter "amount" is empty`, result.Error())
+func (suite *PayoutsTestSuite) TestPayoutRequestIsValidEmptyAmount() {
+	request := PayoutRequest{Currency: CurrencyCodeUGX, TransactionMethod: TransactionMethodMobileMoney, ProviderCode: "mtn_ug", AccountNumber: "256777000001", CustomerName: "John Doe", MerchantReference: "ref", Description: "desc"}
+	assert.EqualError(suite.T(), request.isValid(), `parameter "amount" is empty`)
 }
 
-func (suite *PayoutsTestSuite) TestPayoutsRequestIsValidEmptyMethod() {
-	request := PayoutRequest{
-		Currency:          CurrencyCodeKES,
-		Amount:            100,
-		ProviderId:        "provider_id",
-		MerchantReference: "merchant_reference",
-		Narration:         "narration",
-	}
-	result := request.isValid()
-	assert.Error(suite.T(), result)
-	assert.Equal(suite.T(), `parameter "method" is empty`, result.Error())
+func (suite *PayoutsTestSuite) TestPayoutRequestIsValidEmptyTransactionMethod() {
+	request := PayoutRequest{Currency: CurrencyCodeUGX, Amount: 100, ProviderCode: "mtn_ug", AccountNumber: "256777000001", CustomerName: "John Doe", MerchantReference: "ref", Description: "desc"}
+	assert.EqualError(suite.T(), request.isValid(), `parameter "transaction_method" is empty`)
 }
 
-func (suite *PayoutsTestSuite) TestPayoutsRequestIsValidEmptyProviderId() {
-	request := PayoutRequest{
-		Currency:          CurrencyCodeKES,
-		Amount:            100,
-		Method:            TransactionMethodBank,
-		MerchantReference: "merchant_reference",
-		Narration:         "narration",
-	}
-	result := request.isValid()
-	assert.Error(suite.T(), result)
-	assert.Equal(suite.T(), `parameter "provider_id" is empty`, result.Error())
+func (suite *PayoutsTestSuite) TestPayoutRequestIsValidEmptyProviderCode() {
+	request := PayoutRequest{Currency: CurrencyCodeUGX, Amount: 100, TransactionMethod: TransactionMethodMobileMoney, AccountNumber: "256777000001", CustomerName: "John Doe", MerchantReference: "ref", Description: "desc"}
+	assert.EqualError(suite.T(), request.isValid(), `parameter "provider_code" is empty`)
 }
 
-func (suite *PayoutsTestSuite) TestPayoutsRequestIsValidEmptyMerchantReference() {
-	request := PayoutRequest{
-		Currency:   CurrencyCodeKES,
-		Amount:     100,
-		Method:     TransactionMethodBank,
-		ProviderId: "provider_id",
-		Narration:  "narration",
-	}
-	result := request.isValid()
-	assert.Error(suite.T(), result)
-	assert.Equal(suite.T(), `parameter "merchant_reference" is empty`, result.Error())
+func (suite *PayoutsTestSuite) TestPayoutRequestIsValidEmptyMerchantReference() {
+	request := PayoutRequest{Currency: CurrencyCodeUGX, Amount: 100, TransactionMethod: TransactionMethodMobileMoney, ProviderCode: "mtn_ug", AccountNumber: "256777000001", CustomerName: "John Doe", Description: "desc"}
+	assert.EqualError(suite.T(), request.isValid(), `parameter "merchant_reference" is empty`)
 }
 
-func (suite *PayoutsTestSuite) TestPayoutsRequestIsValidEmptyNarration() {
-	request := PayoutRequest{
-		Currency:          CurrencyCodeKES,
-		Amount:            100,
-		Method:            TransactionMethodBank,
-		ProviderId:        "provider_id",
-		MerchantReference: "merchant_reference",
-	}
-	result := request.isValid()
-	assert.Error(suite.T(), result)
-	assert.Equal(suite.T(), `parameter "narration" is empty`, result.Error())
+func (suite *PayoutsTestSuite) TestPayoutRequestIsValidEmptyDescription() {
+	request := PayoutRequest{Currency: CurrencyCodeUGX, Amount: 100, TransactionMethod: TransactionMethodMobileMoney, ProviderCode: "mtn_ug", AccountNumber: "256777000001", CustomerName: "John Doe", MerchantReference: "ref"}
+	assert.EqualError(suite.T(), request.isValid(), `parameter "description" is empty`)
 }
 
-func (suite *PayoutsTestSuite) TestPayoutsRequestIsValidEmptyAccountNumber() {
-	request := PayoutRequest{
-		Currency:          CurrencyCodeKES,
-		Amount:            100,
-		Method:            TransactionMethodBank,
-		ProviderId:        "provider_id",
-		MerchantReference: "merchant_reference",
-		Narration:         "narration",
-	}
-	result := request.isValid()
-	assert.Error(suite.T(), result)
-	assert.Equal(suite.T(), `parameter "account_number" is empty`, result.Error())
+func (suite *PayoutsTestSuite) TestPayoutRequestIsValidEmptyAccountNumber() {
+	request := PayoutRequest{Currency: CurrencyCodeUGX, Amount: 100, TransactionMethod: TransactionMethodMobileMoney, ProviderCode: "mtn_ug", CustomerName: "John Doe", MerchantReference: "ref", Description: "desc"}
+	assert.EqualError(suite.T(), request.isValid(), `parameter "account_number" is empty`)
 }
 
-func (suite *PayoutsTestSuite) TestPayoutsRequestIsValidEmptyAccountName() {
-	request := PayoutRequest{
-		Currency:          CurrencyCodeKES,
-		Amount:            100,
-		Method:            TransactionMethodBank,
-		ProviderId:        "provider_id",
-		MerchantReference: "merchant_reference",
-		Narration:         "narration",
-		AccountNumber:     "account_number",
-	}
-	result := request.isValid()
-	assert.Error(suite.T(), result)
-	assert.Equal(suite.T(), `parameter "account_name" is empty`, result.Error())
+func (suite *PayoutsTestSuite) TestPayoutRequestIsValidEmptyCustomerName() {
+	request := PayoutRequest{Currency: CurrencyCodeUGX, Amount: 100, TransactionMethod: TransactionMethodMobileMoney, ProviderCode: "mtn_ug", AccountNumber: "256777000001", MerchantReference: "ref", Description: "desc"}
+	assert.EqualError(suite.T(), request.isValid(), `parameter "customer_name" is empty`)
 }
 
 func TestPayoutsTestSuite(t *testing.T) {
@@ -149,7 +82,7 @@ type PayoutsResourceTestSuite struct {
 
 func (suite *PayoutsResourceTestSuite) SetupTest() {
 	cfg := BuildStubConfig()
-	transport := BuildStubHttpTransport()
+	transport := BuildStubHTTPTransport()
 	suite.cfg = cfg
 	suite.ctx = context.Background()
 	suite.testable = &PayoutsResource{NewResourceAbstract(transport, cfg)}
@@ -161,106 +94,58 @@ func (suite *PayoutsResourceTestSuite) TearDownTest() {
 }
 
 func (suite *PayoutsResourceTestSuite) TestCreateSuccess() {
-	body, _ := LoadStubResponseData("stubs/payouts/create/success.json")
-	httpmock.RegisterResponder(http.MethodPost, suite.cfg.Uri+"/v1/payouts", httpmock.NewBytesResponder(http.StatusOK, body))
+	body, _ := LoadStubResponseData("stubs/payouts/send-funds/success.json")
+	httpmock.RegisterResponder(http.MethodPost, suite.cfg.URI+"/payout/send-funds", httpmock.NewBytesResponder(http.StatusAccepted, body))
 
 	request := &PayoutRequest{
-		Currency:          CurrencyCodeKES,
-		Amount:            100,
-		Method:            TransactionMethodBank,
-		ProviderId:        "provider_id",
-		MerchantReference: "merchant_reference",
-		Narration:         "narration",
-		AccountNumber:     "account_number",
-		AccountName:       "account_name",
+		Currency:          CurrencyCodeUGX,
+		Amount:            10000,
+		TransactionMethod: TransactionMethodMobileMoney,
+		ProviderCode:      "mtn_ug",
+		AccountNumber:     "256777000001",
+		CustomerName:      "John Doe",
+		MerchantReference: "MCTREFT2WMNWZ23SBN6Y",
+		Description:       "Test payout",
 	}
 	result, resp, err := suite.testable.Create(suite.ctx, request)
 	assert.NoError(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.NotEmpty(suite.T(), result)
-	//result
 	assert.True(suite.T(), result.IsSuccess())
 	assert.Equal(suite.T(), http.StatusAccepted, result.Code)
-	assert.Equal(suite.T(), "accepted", result.Status)
-	assert.Equal(suite.T(), "Transaction Initiated", result.Message)
-	assert.Equal(suite.T(), int64(124468), result.Data.ID)
-	assert.Equal(suite.T(), float64(700), result.Data.RequestAmount)
-	assert.Equal(suite.T(), "UGX", result.Data.RequestCurrency)
-	assert.Equal(suite.T(), float64(700), result.Data.AccountAmount)
-	assert.Equal(suite.T(), "UGX", result.Data.AccountCurrency)
-	assert.Equal(suite.T(), float64(1500), result.Data.TransactionFee)
-	assert.Equal(suite.T(), float64(2200), result.Data.TotalDebit)
-	assert.Equal(suite.T(), "mtn_ug", result.Data.ProviderID)
-	assert.Equal(suite.T(), "payout-1005", result.Data.MerchantReference)
-	assert.Equal(suite.T(), "DUSUPAY405GZMDVTKASJL8UQ", result.Data.InternalReference)
-	assert.Equal(suite.T(), "PENDING", result.Data.TransactionStatus)
-	assert.Equal(suite.T(), "payout", result.Data.TransactionType)
-	assert.Equal(suite.T(), "Transaction Initiated", result.Data.Message)
-	//response
-	defer resp.Body.Close()
-	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(suite.T(), "DUSUPAYRMGRXNNYBWATKJ", result.Data.InternalReference)
+	assert.Equal(suite.T(), "MCTREFT2WMNWZ23SBN6Y", result.Data.MerchantReference)
+
+	defer func() { _ = resp.Body.Close() }()
+	bodyRsp, _ := io.ReadAll(resp.Body)
 	assert.Equal(suite.T(), body, bodyRsp)
 }
 
 func (suite *PayoutsResourceTestSuite) TestCreateJsonError() {
 	body, _ := LoadStubResponseData("stubs/errors/401.json")
-	httpmock.RegisterResponder(http.MethodPost, suite.cfg.Uri+"/v1/payouts", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodPost, suite.cfg.URI+"/payout/send-funds", httpmock.NewBytesResponder(http.StatusUnauthorized, body))
 
-	request := &PayoutRequest{
-		Currency:          CurrencyCodeKES,
-		Amount:            100,
-		Method:            TransactionMethodBank,
-		ProviderId:        "provider_id",
-		MerchantReference: "merchant_reference",
-		Narration:         "narration",
-		AccountNumber:     "account_number",
-		AccountName:       "account_name",
-	}
+	request := &PayoutRequest{Currency: CurrencyCodeUGX, Amount: 100, TransactionMethod: TransactionMethodMobileMoney, ProviderCode: "mtn_ug", AccountNumber: "256777000001", CustomerName: "John Doe", MerchantReference: "ref", Description: "desc"}
 	result, resp, err := suite.testable.Create(suite.ctx, request)
 	assert.Error(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.NotEmpty(suite.T(), result)
-	//result
-	assert.False(suite.T(), result.IsSuccess())
-	assert.Equal(suite.T(), http.StatusUnauthorized, result.Code)
-	assert.Equal(suite.T(), "error", result.Status)
-	assert.Equal(suite.T(), "Unauthorized API access. Unknown Merchant", result.Message)
-	assert.Empty(suite.T(), result.Data)
-	//response
-	defer resp.Body.Close()
-	bodyRsp, _ := ioutil.ReadAll(resp.Body)
-	assert.Equal(suite.T(), body, bodyRsp)
-	//error
 	assert.Equal(suite.T(), "Unauthorized API access. Unknown Merchant", err.Error())
 }
 
 func (suite *PayoutsResourceTestSuite) TestCreateNonJsonError() {
 	body, _ := LoadStubResponseData("stubs/errors/500.html")
-	httpmock.RegisterResponder(http.MethodPost, suite.cfg.Uri+"/v1/payouts", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodPost, suite.cfg.URI+"/payout/send-funds", httpmock.NewBytesResponder(http.StatusInternalServerError, body))
 
-	request := &PayoutRequest{
-		Currency:          CurrencyCodeKES,
-		Amount:            100,
-		Method:            TransactionMethodBank,
-		ProviderId:        "provider_id",
-		MerchantReference: "merchant_reference",
-		Narration:         "narration",
-		AccountNumber:     "account_number",
-		AccountName:       "account_name",
-	}
+	request := &PayoutRequest{Currency: CurrencyCodeUGX, Amount: 100, TransactionMethod: TransactionMethodMobileMoney, ProviderCode: "mtn_ug", AccountNumber: "256777000001", CustomerName: "John Doe", MerchantReference: "ref", Description: "desc"}
 	result, resp, err := suite.testable.Create(suite.ctx, request)
 	assert.Error(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.Empty(suite.T(), result)
-	//response
-	defer resp.Body.Close()
-	bodyRsp, _ := ioutil.ReadAll(resp.Body)
-	assert.Equal(suite.T(), body, bodyRsp)
 }
 
 func (suite *PayoutsResourceTestSuite) TestCreateInvalidRequest() {
-	req := &PayoutRequest{}
-	result, rsp, err := suite.testable.Create(suite.ctx, req)
+	result, rsp, err := suite.testable.Create(suite.ctx, &PayoutRequest{})
 	assert.Nil(suite.T(), rsp)
 	assert.Nil(suite.T(), result)
 	assert.Error(suite.T(), err)

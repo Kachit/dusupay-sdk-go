@@ -1,0 +1,17 @@
+{
+  "code": 200,
+  "status": "success",
+  "message": "Request completed successfully.",
+  "data": {
+    "id": 226,
+    "merchant_reference": "MCTREFT2WMNWZ23SBN6Y",
+    "internal_reference": "DUSUPAYRMGRXNNYBWATKJ",
+    "transaction_status": "COMPLETED",
+    "transaction_amount": 10000,
+    "transaction_charge": 300,
+    "total_credit": 9700,
+    "provider_code": "mtn_ug",
+    "customer_name": "JOHN DOE",
+    "status_message": "Transaction Completed Successfully"
+  }
+}

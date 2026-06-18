@@ -2,12 +2,13 @@ package dusupay
 
 import (
 	"context"
+	"io"
+	"net/http"
+	"testing"
+
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"io/ioutil"
-	"net/http"
-	"testing"
 )
 
 type CollectionsTestSuite struct {
@@ -18,141 +19,103 @@ func (suite *CollectionsTestSuite) TestCollectionRequestIsValidSuccess() {
 	request := CollectionRequest{
 		Currency:          CurrencyCodeKES,
 		Amount:            100,
-		Method:            TransactionMethodBank,
-		ProviderId:        "provider_id",
+		TransactionMethod: TransactionMethodBank,
+		ProviderCode:      "provider_code",
 		MerchantReference: "merchant_reference",
-		RedirectUrl:       "redirect_url",
-		Narration:         "narration",
+		Description:       "test description",
 	}
-	assert.Nil(suite.T(), request.isValid())
 	assert.NoError(suite.T(), request.isValid())
 }
 
 func (suite *CollectionsTestSuite) TestCollectionRequestIsValidEmptyCurrency() {
 	request := CollectionRequest{
 		Amount:            100,
-		Method:            TransactionMethodBank,
-		ProviderId:        "provider_id",
+		TransactionMethod: TransactionMethodBank,
+		ProviderCode:      "provider_code",
 		MerchantReference: "merchant_reference",
-		RedirectUrl:       "redirect_url",
-		Narration:         "narration",
+		Description:       "test description",
 	}
-	result := request.isValid()
-	assert.Error(suite.T(), result)
-	assert.Equal(suite.T(), `parameter "currency" is empty`, result.Error())
+	assert.EqualError(suite.T(), request.isValid(), `parameter "currency" is empty`)
 }
 
 func (suite *CollectionsTestSuite) TestCollectionRequestIsValidEmptyAmount() {
 	request := CollectionRequest{
 		Currency:          CurrencyCodeKES,
-		Method:            TransactionMethodBank,
-		ProviderId:        "provider_id",
+		TransactionMethod: TransactionMethodBank,
+		ProviderCode:      "provider_code",
 		MerchantReference: "merchant_reference",
-		RedirectUrl:       "redirect_url",
-		Narration:         "narration",
+		Description:       "test description",
 	}
-	result := request.isValid()
-	assert.Error(suite.T(), result)
-	assert.Equal(suite.T(), `parameter "amount" is empty`, result.Error())
+	assert.EqualError(suite.T(), request.isValid(), `parameter "amount" is empty`)
 }
 
-func (suite *CollectionsTestSuite) TestCollectionRequestIsValidEmptyMethod() {
+func (suite *CollectionsTestSuite) TestCollectionRequestIsValidEmptyTransactionMethod() {
 	request := CollectionRequest{
 		Currency:          CurrencyCodeKES,
 		Amount:            100,
-		ProviderId:        "provider_id",
+		ProviderCode:      "provider_code",
 		MerchantReference: "merchant_reference",
-		RedirectUrl:       "redirect_url",
-		Narration:         "narration",
+		Description:       "test description",
 	}
-	result := request.isValid()
-	assert.Error(suite.T(), result)
-	assert.Equal(suite.T(), `parameter "method" is empty`, result.Error())
+	assert.EqualError(suite.T(), request.isValid(), `parameter "transaction_method" is empty`)
 }
 
-func (suite *CollectionsTestSuite) TestCollectionRequestIsValidEmptyProviderId() {
+func (suite *CollectionsTestSuite) TestCollectionRequestIsValidEmptyProviderCode() {
 	request := CollectionRequest{
 		Currency:          CurrencyCodeKES,
 		Amount:            100,
-		Method:            TransactionMethodBank,
+		TransactionMethod: TransactionMethodBank,
 		MerchantReference: "merchant_reference",
-		RedirectUrl:       "redirect_url",
-		Narration:         "narration",
+		Description:       "test description",
 	}
-	result := request.isValid()
-	assert.Error(suite.T(), result)
-	assert.Equal(suite.T(), `parameter "provider_id" is empty`, result.Error())
+	assert.EqualError(suite.T(), request.isValid(), `parameter "provider_code" is empty`)
 }
 
 func (suite *CollectionsTestSuite) TestCollectionRequestIsValidEmptyMerchantReference() {
 	request := CollectionRequest{
-		Currency:    CurrencyCodeKES,
-		Amount:      100,
-		Method:      TransactionMethodBank,
-		ProviderId:  "provider_id",
-		RedirectUrl: "redirect_url",
-		Narration:   "narration",
+		Currency:          CurrencyCodeKES,
+		Amount:            100,
+		TransactionMethod: TransactionMethodBank,
+		ProviderCode:      "provider_code",
+		Description:       "test description",
 	}
-	result := request.isValid()
-	assert.Error(suite.T(), result)
-	assert.Equal(suite.T(), `parameter "merchant_reference" is empty`, result.Error())
+	assert.EqualError(suite.T(), request.isValid(), `parameter "merchant_reference" is empty`)
 }
 
-func (suite *CollectionsTestSuite) TestCollectionRequestIsValidEmptyNarration() {
+func (suite *CollectionsTestSuite) TestCollectionRequestIsValidEmptyDescription() {
 	request := CollectionRequest{
 		Currency:          CurrencyCodeKES,
 		Amount:            100,
-		Method:            TransactionMethodBank,
-		ProviderId:        "provider_id",
+		TransactionMethod: TransactionMethodBank,
+		ProviderCode:      "provider_code",
 		MerchantReference: "merchant_reference",
-		RedirectUrl:       "redirect_url",
 	}
-	result := request.isValid()
-	assert.Error(suite.T(), result)
-	assert.Equal(suite.T(), `parameter "narration" is empty`, result.Error())
+	assert.EqualError(suite.T(), request.isValid(), `parameter "description" is empty`)
 }
 
-func (suite *CollectionsTestSuite) TestCollectionRequestIsValidEmptyRedirectUrlByDefault() {
+func (suite *CollectionsTestSuite) TestCollectionRequestIsValidEmptyMsisdnMobileMoney() {
 	request := CollectionRequest{
 		Currency:          CurrencyCodeKES,
 		Amount:            100,
-		Method:            TransactionMethodBank,
-		ProviderId:        "provider_id",
+		TransactionMethod: TransactionMethodMobileMoney,
+		ProviderCode:      "provider_code",
 		MerchantReference: "merchant_reference",
-		Narration:         "narration",
+		Description:       "test description",
 	}
-	result := request.isValid()
-	assert.Error(suite.T(), result)
-	assert.Equal(suite.T(), `parameter "redirect_url" is empty`, result.Error())
+	assert.EqualError(suite.T(), request.isValid(), `parameter "msisdn" is empty`)
 }
 
-func (suite *CollectionsTestSuite) TestCollectionRequestIsValidEmptyRedirectUrlMobileMoney() {
+func (suite *CollectionsTestSuite) TestCollectionRequestIsValidMobileMoneyWithMsisdn() {
 	request := CollectionRequest{
 		Currency:          CurrencyCodeKES,
 		Amount:            100,
-		Method:            TransactionMethodMobileMoney,
-		ProviderId:        "provider_id",
+		TransactionMethod: TransactionMethodMobileMoney,
+		ProviderCode:      "provider_code",
 		MerchantReference: "merchant_reference",
-		Narration:         "narration",
-		AccountNumber:     "account_number",
+		Description:       "test description",
+		Msisdn:            "256777000001",
 	}
-	result := request.isValid()
-	assert.Nil(suite.T(), result)
-	assert.NoError(suite.T(), result)
-}
-
-func (suite *CollectionsTestSuite) TestCollectionRequestIsValidEmptyRedirectUrlMobileMoneyWithoutAccountNumber() {
-	request := CollectionRequest{
-		Currency:          CurrencyCodeKES,
-		Amount:            100,
-		Method:            TransactionMethodMobileMoney,
-		ProviderId:        "provider_id",
-		MerchantReference: "merchant_reference",
-		Narration:         "narration",
-	}
-	result := request.isValid()
-	assert.Error(suite.T(), result)
-	assert.Equal(suite.T(), `parameter "account_number" is empty`, result.Error())
+	assert.NoError(suite.T(), request.isValid())
 }
 
 func TestCollectionsTestSuite(t *testing.T) {
@@ -168,7 +131,7 @@ type CollectionsResourceTestSuite struct {
 
 func (suite *CollectionsResourceTestSuite) SetupTest() {
 	cfg := BuildStubConfig()
-	transport := BuildStubHttpTransport()
+	transport := BuildStubHTTPTransport()
 	suite.cfg = cfg
 	suite.ctx = context.Background()
 	suite.testable = &CollectionsResource{NewResourceAbstract(transport, cfg)}
@@ -180,107 +143,98 @@ func (suite *CollectionsResourceTestSuite) TearDownTest() {
 }
 
 func (suite *CollectionsResourceTestSuite) TestCreateSuccess() {
-	body, _ := LoadStubResponseData("stubs/collections/create/success.json")
-	httpmock.RegisterResponder(http.MethodPost, suite.cfg.Uri+"/v1/collections", httpmock.NewBytesResponder(http.StatusOK, body))
+	body, _ := LoadStubResponseData("stubs/collections/initialize/success.json")
+	httpmock.RegisterResponder(http.MethodPost, suite.cfg.URI+"/collections/initialize", httpmock.NewBytesResponder(http.StatusAccepted, body))
 
 	request := &CollectionRequest{
 		Currency:          CurrencyCodeKES,
 		Amount:            100,
-		Method:            TransactionMethodBank,
-		ProviderId:        "provider_id",
-		MerchantReference: "merchant_reference",
-		RedirectUrl:       "redirect_url",
-		Narration:         "narration",
+		TransactionMethod: TransactionMethodBank,
+		ProviderCode:      "bank_ke",
+		MerchantReference: "MCTREF9WVCPGFRHYCWSK",
+		Description:       "Test collection",
 	}
 	result, resp, err := suite.testable.Create(suite.ctx, request)
 	assert.NoError(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.NotEmpty(suite.T(), result)
-	//result
 	assert.True(suite.T(), result.IsSuccess())
 	assert.Equal(suite.T(), http.StatusAccepted, result.Code)
 	assert.Equal(suite.T(), "accepted", result.Status)
-	assert.Equal(suite.T(), "Transaction Initiated", result.Message)
-	assert.Equal(suite.T(), int64(226), result.Data.ID)
-	assert.Equal(suite.T(), 0.2, result.Data.RequestAmount)
-	assert.Equal(suite.T(), "USD", result.Data.RequestCurrency)
-	assert.Equal(suite.T(), 737.9934, result.Data.AccountAmount)
-	assert.Equal(suite.T(), "UGX", result.Data.AccountCurrency)
-	assert.Equal(suite.T(), 21.4018, result.Data.TransactionFee)
-	assert.Equal(suite.T(), 716.5916, result.Data.TotalCredit)
-	assert.Equal(suite.T(), "mtn_ug", result.Data.ProviderID)
-	assert.Equal(suite.T(), "76859aae-f148-48c5-9901-2e474cf19b71", result.Data.MerchantReference)
-	assert.Equal(suite.T(), "DUSUPAY405GZM1G5JXGA71IK", result.Data.InternalReference)
-	assert.Equal(suite.T(), "PENDING", result.Data.TransactionStatus)
-	assert.Equal(suite.T(), "collection", result.Data.TransactionType)
-	assert.Equal(suite.T(), "Transaction Initiated", result.Data.Message)
-	assert.Equal(suite.T(), false, result.Data.CustomerCharged)
-	assert.Equal(suite.T(), "https://sandbox.dusupay.com/v1/complete-payment/DUSUPAY405GZM1G5JXGA71IK", result.Data.PaymentURL)
-	assert.Equal(suite.T(), "Ensure that you have sufficient balance on your MTN Mobile Money account", result.Data.Instructions[0].Description)
-	assert.Equal(suite.T(), "1", result.Data.Instructions[0].StepNo)
-	//response
-	defer resp.Body.Close()
-	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(suite.T(), "Request Accepted", result.Message)
+	assert.Equal(suite.T(), "DUSUPAYSTPDKZ6MLY5WPQ", result.Data.InternalReference)
+	assert.Equal(suite.T(), "MCTREF9WVCPGFRHYCWSK", result.Data.MerchantReference)
+	assert.Equal(suite.T(), "https://sandboxapi.dusupay.com/checkout/DUSUPAYSTPDKZ6MLY5WPQ", result.Data.PaymentURL)
+
+	defer func() { _ = resp.Body.Close() }()
+	bodyRsp, _ := io.ReadAll(resp.Body)
 	assert.Equal(suite.T(), body, bodyRsp)
 }
 
 func (suite *CollectionsResourceTestSuite) TestCreateJsonError() {
 	body, _ := LoadStubResponseData("stubs/errors/401.json")
-	httpmock.RegisterResponder(http.MethodPost, suite.cfg.Uri+"/v1/collections", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodPost, suite.cfg.URI+"/collections/initialize", httpmock.NewBytesResponder(http.StatusUnauthorized, body))
 
 	request := &CollectionRequest{
 		Currency:          CurrencyCodeKES,
 		Amount:            100,
-		Method:            TransactionMethodBank,
-		ProviderId:        "provider_id",
-		MerchantReference: "merchant_reference",
-		RedirectUrl:       "redirect_url",
-		Narration:         "narration",
+		TransactionMethod: TransactionMethodBank,
+		ProviderCode:      "bank_ke",
+		MerchantReference: "MCTREF9WVCPGFRHYCWSK",
+		Description:       "Test collection",
 	}
 	result, resp, err := suite.testable.Create(suite.ctx, request)
 	assert.Error(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.NotEmpty(suite.T(), result)
-	//result
 	assert.False(suite.T(), result.IsSuccess())
-	assert.Equal(suite.T(), http.StatusUnauthorized, result.Code)
-	assert.Equal(suite.T(), "error", result.Status)
-	assert.Equal(suite.T(), "Unauthorized API access. Unknown Merchant", result.Message)
-	assert.Empty(suite.T(), result.Data)
-	//response
-	defer resp.Body.Close()
-	bodyRsp, _ := ioutil.ReadAll(resp.Body)
-	assert.Equal(suite.T(), body, bodyRsp)
-	//error
 	assert.Equal(suite.T(), "Unauthorized API access. Unknown Merchant", err.Error())
 }
 
 func (suite *CollectionsResourceTestSuite) TestCreateNonJsonError() {
 	body, _ := LoadStubResponseData("stubs/errors/500.html")
-	httpmock.RegisterResponder(http.MethodPost, suite.cfg.Uri+"/v1/collections", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodPost, suite.cfg.URI+"/collections/initialize", httpmock.NewBytesResponder(http.StatusInternalServerError, body))
 
 	request := &CollectionRequest{
 		Currency:          CurrencyCodeKES,
 		Amount:            100,
-		Method:            TransactionMethodBank,
-		ProviderId:        "provider_id",
-		MerchantReference: "merchant_reference",
-		RedirectUrl:       "redirect_url",
-		Narration:         "narration",
+		TransactionMethod: TransactionMethodBank,
+		ProviderCode:      "bank_ke",
+		MerchantReference: "MCTREF9WVCPGFRHYCWSK",
+		Description:       "Test collection",
 	}
 	result, resp, err := suite.testable.Create(suite.ctx, request)
 	assert.Error(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.Empty(suite.T(), result)
-	//response
-	defer resp.Body.Close()
-	bodyRsp, _ := ioutil.ReadAll(resp.Body)
-	assert.Equal(suite.T(), body, bodyRsp)
 }
 
 func (suite *CollectionsResourceTestSuite) TestCreateInvalidRequest() {
-	req := &CollectionRequest{}
-	result, rsp, err := suite.testable.Create(suite.ctx, req)
+	result, rsp, err := suite.testable.Create(suite.ctx, &CollectionRequest{})
+	assert.Nil(suite.T(), rsp)
+	assert.Nil(suite.T(), result)
+	assert.Error(suite.T(), err)
+}
+
+func (suite *CollectionsResourceTestSuite) TestAuthorizeSuccess() {
+	body, _ := LoadStubResponseData("stubs/collections/authorize/success.json")
+	httpmock.RegisterResponder(http.MethodPost, suite.cfg.URI+"/collections/authorize", httpmock.NewBytesResponder(http.StatusAccepted, body))
+
+	request := &CollectionAuthorizeRequest{
+		InternalReference: "DUSUPAYSTPDKZ6MLY5WPQ",
+		OTP:               "123456",
+	}
+	result, resp, err := suite.testable.Authorize(suite.ctx, request)
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), resp)
+	assert.NotEmpty(suite.T(), result)
+	assert.True(suite.T(), result.IsSuccess())
+	assert.Equal(suite.T(), "DUSUPAYSTPDKZ6MLY5WPQ", result.Data.InternalReference)
+	assert.Equal(suite.T(), "MCTREF9WVCPGFRHYCWSK", result.Data.MerchantReference)
+}
+
+func (suite *CollectionsResourceTestSuite) TestAuthorizeInvalidRequest() {
+	result, rsp, err := suite.testable.Authorize(suite.ctx, &CollectionAuthorizeRequest{})
 	assert.Nil(suite.T(), rsp)
 	assert.Nil(suite.T(), result)
 	assert.Error(suite.T(), err)

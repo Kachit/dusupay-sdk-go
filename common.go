@@ -2,133 +2,133 @@ package dusupay
 
 import "encoding/json"
 
-//TransactionTypeCode type
+// TransactionTypeCode type
 type TransactionTypeCode string
 
-//TransactionTypeCollection const
+// TransactionTypeCollection const
 const TransactionTypeCollection TransactionTypeCode = "COLLECTION"
 
-//TransactionTypePayout const
+// TransactionTypePayout const
 const TransactionTypePayout TransactionTypeCode = "PAYOUT"
 
-//TransactionTypeRefund const
+// TransactionTypeRefund const
 const TransactionTypeRefund TransactionTypeCode = "REFUND"
 
-//TransactionStatusCode type
+// TransactionStatusCode type
 type TransactionStatusCode string
 
-//TransactionStatusPending const
+// TransactionStatusPending const
 const TransactionStatusPending TransactionStatusCode = "PENDING"
 
-//TransactionStatusFailed const
+// TransactionStatusFailed const
 const TransactionStatusFailed TransactionStatusCode = "FAILED"
 
-//TransactionStatusCompleted const
+// TransactionStatusCompleted const
 const TransactionStatusCompleted TransactionStatusCode = "COMPLETED"
 
-//TransactionStatusCancelled const
+// TransactionStatusCancelled const
 const TransactionStatusCancelled TransactionStatusCode = "CANCELLED"
 
-//TransactionMethodCode type
+// TransactionMethodCode type
 type TransactionMethodCode string
 
-//TransactionMethodMobileMoney type
+// TransactionMethodMobileMoney type
 const TransactionMethodMobileMoney TransactionMethodCode = "MOBILE_MONEY"
 
-//TransactionMethodCard type
+// TransactionMethodCard type
 const TransactionMethodCard TransactionMethodCode = "CARD"
 
-//TransactionMethodBank type
+// TransactionMethodBank type
 const TransactionMethodBank TransactionMethodCode = "BANK"
 
-//TransactionMethodCrypto type
+// TransactionMethodCrypto type
 const TransactionMethodCrypto TransactionMethodCode = "CRYPTO"
 
-//CountryCode type
+// CountryCode type
 type CountryCode string
 
-//CountryCodeUganda type
+// CountryCodeUganda type
 const CountryCodeUganda CountryCode = "UG"
 
-//CountryCodeKenya type
+// CountryCodeKenya type
 const CountryCodeKenya CountryCode = "KE"
 
-//CountryCodeTanzania type
+// CountryCodeTanzania type
 const CountryCodeTanzania CountryCode = "TZ"
 
-//CountryCodeRwanda type
+// CountryCodeRwanda type
 const CountryCodeRwanda CountryCode = "RW"
 
-//CountryCodeBurundi type
+// CountryCodeBurundi type
 const CountryCodeBurundi CountryCode = "BI"
 
-//CountryCodeGhana type
+// CountryCodeGhana type
 const CountryCodeGhana CountryCode = "GH"
 
-//CountryCodeCameroon type
+// CountryCodeCameroon type
 const CountryCodeCameroon CountryCode = "CM"
 
-//CountryCodeSouthAfrica type
+// CountryCodeSouthAfrica type
 const CountryCodeSouthAfrica CountryCode = "ZA"
 
-//CountryCodeNigeria type
+// CountryCodeNigeria type
 const CountryCodeNigeria CountryCode = "NG"
 
-//CountryCodeZambia type
+// CountryCodeZambia type
 const CountryCodeZambia CountryCode = "ZM"
 
-//CountryCodeUSA type
+// CountryCodeUSA type
 const CountryCodeUSA CountryCode = "US"
 
-//CountryCodeUnitedKingdom type
+// CountryCodeUnitedKingdom type
 const CountryCodeUnitedKingdom CountryCode = "GB"
 
-//CountryCodeEurope type
+// CountryCodeEurope type
 const CountryCodeEurope CountryCode = "EU"
 
-//CurrencyCode type
+// CurrencyCode type
 type CurrencyCode string
 
-//CurrencyCodeUGX type
+// CurrencyCodeUGX type
 const CurrencyCodeUGX CurrencyCode = "UGX"
 
-//CurrencyCodeKES type
+// CurrencyCodeKES type
 const CurrencyCodeKES CurrencyCode = "KES"
 
-//CurrencyCodeTZS type
+// CurrencyCodeTZS type
 const CurrencyCodeTZS CurrencyCode = "TZS"
 
-//CurrencyCodeRWF type
+// CurrencyCodeRWF type
 const CurrencyCodeRWF CurrencyCode = "RWF"
 
-//CurrencyCodeBIF type
+// CurrencyCodeBIF type
 const CurrencyCodeBIF CurrencyCode = "BIF"
 
-//CurrencyCodeGHS type
+// CurrencyCodeGHS type
 const CurrencyCodeGHS CurrencyCode = "GHS"
 
-//CurrencyCodeXAF type
+// CurrencyCodeXAF type
 const CurrencyCodeXAF CurrencyCode = "XAF"
 
-//CurrencyCodeZAR type
+// CurrencyCodeZAR type
 const CurrencyCodeZAR CurrencyCode = "ZAR"
 
-//CurrencyCodeNGN type
+// CurrencyCodeNGN type
 const CurrencyCodeNGN CurrencyCode = "NGN"
 
-//CurrencyCodeZMW type
+// CurrencyCodeZMW type
 const CurrencyCodeZMW CurrencyCode = "ZMW"
 
-//CurrencyCodeUSD type
+// CurrencyCodeUSD type
 const CurrencyCodeUSD CurrencyCode = "USD"
 
-//CurrencyCodeGBP type
+// CurrencyCodeGBP type
 const CurrencyCodeGBP CurrencyCode = "GBP"
 
-//CurrencyCodeEUR type
+// CurrencyCodeEUR type
 const CurrencyCodeEUR CurrencyCode = "EUR"
 
-//transformStructToMap method
+// transformStructToMap method
 func transformStructToMap(st interface{}) (map[string]interface{}, error) {
 	bytes, err := json.Marshal(st)
 	if err != nil {

@@ -2,40 +2,57 @@ package dusupay
 
 import (
 	"bytes"
-	"io/ioutil"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
+	"errors"
+	"io"
 	"net/http"
+	"os"
 	"strings"
 )
 
-const stubSignature = `gYC3u1wUtk6UFpOVvCx+AyCnE3LXkS9Sg74fiRUQxRDDlllPu5vuRUrEbEqq/TEO90fYr76KGAWC6YSo
-J9joYwk8RVftDQ1pNhROdfRkXL/yaQbrAvuT2gM2sO+HJhShCBLWbBcfXPOcjGcCedPCHSNFc5bq/Mk/
-DszqlFEoH0dUN8hmqXQr673zyFivaKT76CpJTcmn5nvJi8r6IGoOJXb5uN8CdMTXbT6J08OmsbILPlfX
-qe8PS/IlvXz11oy5xUaLXt+whhZL8rBrwQUsi9aNVf8Gd5m93D2ls1z03zDSOjSlb26Rvnvk97+XSM13
-KuGbYjc3eJ6CUlQuIbTC1A==`
+const stubSignature = `WCPX6n5yai4GD72/fhTr4nzzeyRCFv6mn8Gm8HNVznEMBPLQ391AODl3+Z6wBvQ2CMqUuEXMri+GiTLyMx0YQzJUInR5aac8RIyowS6a+ZRA22oUM9T+AEVEIjIMWZB8QIXmWIbG9WZEQLzEnZJTv4wPF/ffB9ib8ZyfYS61m/d1hpIOKIdExGQj6cvqZ6+RzKcDkfRcjw1H17n09KNcn+n4LjZXeh3VYpRK0hV61a/dTnB7YE4lkmELn5u0e331gESXVzBMvYCdHNtl2x0XqtjK8i9e/PJFOZmwPtLAnbCS4LrdkmicEw6TN5grLWMkA8t3NBIDcsoAnPhzDYRhhQ==`
 
 func BuildStubConfig() *Config {
 	return &Config{
-		Uri:       SandboxAPIUrl,
+		URI:       SandboxAPIUrl,
 		PublicKey: "PublicKey",
 		SecretKey: "SecretKey",
 	}
 }
 
-func BuildStubHttpTransport() *Transport {
-	return NewHttpTransport(BuildStubConfig(), &http.Client{})
+func BuildStubHTTPTransport() *Transport {
+	return NewHTTPTransport(BuildStubConfig(), &http.Client{})
 }
 
 func LoadStubResponseData(path string) ([]byte, error) {
-	return ioutil.ReadFile(path)
+	return os.ReadFile(path)
 }
 
 func BuildStubResponseFromString(statusCode int, json string) *http.Response {
-	body := ioutil.NopCloser(strings.NewReader(json))
+	body := io.NopCloser(strings.NewReader(json))
 	return &http.Response{Body: body, StatusCode: statusCode}
 }
 
 func BuildStubResponseFromFile(statusCode int, path string) *http.Response {
 	data, _ := LoadStubResponseData(path)
-	body := ioutil.NopCloser(bytes.NewReader(data))
+	body := io.NopCloser(bytes.NewReader(data))
 	return &http.Response{Body: body, StatusCode: statusCode}
+}
+
+func pemDecode(data []byte) (*pem.Block, []byte) {
+	return pem.Decode(data)
+}
+
+func parsePrivateKeyForTest(rawBytes []byte) (*rsa.PrivateKey, error) {
+	key, err := x509.ParsePKCS8PrivateKey(rawBytes)
+	if err != nil {
+		return nil, err
+	}
+	pk, ok := key.(*rsa.PrivateKey)
+	if !ok {
+		return nil, errors.New("not an RSA private key")
+	}
+	return pk, nil
 }

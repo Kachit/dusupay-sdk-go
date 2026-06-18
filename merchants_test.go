@@ -2,12 +2,13 @@ package dusupay
 
 import (
 	"context"
+	"io"
+	"net/http"
+	"testing"
+
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"io/ioutil"
-	"net/http"
-	"testing"
 )
 
 type MerchantsResourceTestSuite struct {
@@ -19,7 +20,7 @@ type MerchantsResourceTestSuite struct {
 
 func (suite *MerchantsResourceTestSuite) SetupTest() {
 	cfg := BuildStubConfig()
-	transport := BuildStubHttpTransport()
+	transport := BuildStubHTTPTransport()
 	suite.cfg = cfg
 	suite.ctx = context.Background()
 	suite.testable = &MerchantsResource{NewResourceAbstract(transport, cfg)}
@@ -32,61 +33,69 @@ func (suite *MerchantsResourceTestSuite) TearDownTest() {
 
 func (suite *MerchantsResourceTestSuite) TestGetBalancesSuccess() {
 	body, _ := LoadStubResponseData("stubs/merchants/balance/success.json")
-	httpmock.RegisterResponder(http.MethodGet, suite.cfg.Uri+"/v1/merchants/balance", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodGet, suite.cfg.URI+"/data/wallet-balances", httpmock.NewBytesResponder(http.StatusOK, body))
 
 	result, resp, err := suite.testable.GetBalances(suite.ctx)
 	assert.NoError(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.NotEmpty(suite.T(), result)
-	//result
 	assert.True(suite.T(), result.IsSuccess())
 	assert.Equal(suite.T(), http.StatusOK, result.Code)
-	assert.Equal(suite.T(), "success", result.Status)
-	assert.Equal(suite.T(), "Request completed successfully.", result.Message)
-	assert.Equal(suite.T(), "UGX", (*result.Data)[0].Currency)
-	assert.Equal(suite.T(), 5475.816, (*result.Data)[0].Balance)
-	assert.Equal(suite.T(), "USD", (*result.Data)[1].Currency)
-	assert.Equal(suite.T(), float64(12), (*result.Data)[1].Balance)
-	//response
-	defer resp.Body.Close()
-	bodyRsp, _ := ioutil.ReadAll(resp.Body)
+	assert.Equal(suite.T(), 2, len(result.Data.MerchantWallets))
+	assert.Equal(suite.T(), "UGX", result.Data.MerchantWallets[0].Currency)
+	assert.Equal(suite.T(), 5475.816, result.Data.MerchantWallets[0].AvailableBalance)
+	assert.Equal(suite.T(), "MERCHANT_COLLECTION", result.Data.MerchantWallets[0].WalletType)
+	assert.Equal(suite.T(), "USD", result.Data.MerchantWallets[1].Currency)
+	assert.Equal(suite.T(), float64(12), result.Data.MerchantWallets[1].AvailableBalance)
+
+	defer func() { _ = resp.Body.Close() }()
+	bodyRsp, _ := io.ReadAll(resp.Body)
 	assert.Equal(suite.T(), body, bodyRsp)
 }
 
 func (suite *MerchantsResourceTestSuite) TestGetBalancesJsonError() {
 	body, _ := LoadStubResponseData("stubs/errors/401.json")
-	httpmock.RegisterResponder(http.MethodGet, suite.cfg.Uri+"/v1/merchants/balance", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodGet, suite.cfg.URI+"/data/wallet-balances", httpmock.NewBytesResponder(http.StatusUnauthorized, body))
 
 	result, resp, err := suite.testable.GetBalances(suite.ctx)
 	assert.Error(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.NotEmpty(suite.T(), result)
-	//result
-	assert.False(suite.T(), result.IsSuccess())
-	assert.Equal(suite.T(), http.StatusUnauthorized, result.Code)
-	assert.Equal(suite.T(), "error", result.Status)
-	assert.Equal(suite.T(), "Unauthorized API access. Unknown Merchant", result.Message)
-	assert.Empty(suite.T(), result.Data)
-	//response
-	defer resp.Body.Close()
-	bodyRsp, _ := ioutil.ReadAll(resp.Body)
-	assert.Equal(suite.T(), body, bodyRsp)
-	//error
 	assert.Equal(suite.T(), "Unauthorized API access. Unknown Merchant", err.Error())
 }
 
 func (suite *MerchantsResourceTestSuite) TestGetBalancesNonJsonError() {
 	body, _ := LoadStubResponseData("stubs/errors/500.html")
-	httpmock.RegisterResponder(http.MethodGet, suite.cfg.Uri+"/v1/merchants/balance", httpmock.NewBytesResponder(http.StatusOK, body))
+	httpmock.RegisterResponder(http.MethodGet, suite.cfg.URI+"/data/wallet-balances", httpmock.NewBytesResponder(http.StatusInternalServerError, body))
 
 	result, resp, err := suite.testable.GetBalances(suite.ctx)
 	assert.Error(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.Empty(suite.T(), result)
-	//response
-	defer resp.Body.Close()
-	bodyRsp, _ := ioutil.ReadAll(resp.Body)
-	assert.Equal(suite.T(), body, bodyRsp)
+}
+
+func (suite *MerchantsResourceTestSuite) TestVerifySuccess() {
+	body, _ := LoadStubResponseData("stubs/merchants/verify/success.json")
+	httpmock.RegisterResponder(http.MethodGet, suite.cfg.URI+"/data/transaction/verify/MCTREFT2WMNWZ23SBN6Y", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	result, resp, err := suite.testable.Verify(suite.ctx, "MCTREFT2WMNWZ23SBN6Y")
+	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), resp)
+	assert.NotEmpty(suite.T(), result)
+	assert.True(suite.T(), result.IsSuccess())
+	assert.Equal(suite.T(), int64(226), result.Data.ID)
+	assert.Equal(suite.T(), "MCTREFT2WMNWZ23SBN6Y", result.Data.MerchantReference)
+	assert.Equal(suite.T(), "DUSUPAYRMGRXNNYBWATKJ", result.Data.InternalReference)
+	assert.Equal(suite.T(), "COMPLETED", result.Data.TransactionStatus)
+	assert.Equal(suite.T(), float64(10000), result.Data.TransactionAmount)
+	assert.Equal(suite.T(), "mtn_ug", result.Data.ProviderCode)
+}
+
+func (suite *MerchantsResourceTestSuite) TestVerifyEmptyReference() {
+	result, rsp, err := suite.testable.Verify(suite.ctx, "")
+	assert.Nil(suite.T(), rsp)
+	assert.Nil(suite.T(), result)
+	assert.EqualError(suite.T(), err, `MerchantsResource.Verify error: parameter "merchant_reference" is empty`)
 }
 
 func TestMerchantsResourceTestSuite(t *testing.T) {

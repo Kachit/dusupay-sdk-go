@@ -1,0 +1,9 @@
+{
+  "code": 202,
+  "status": "accepted",
+  "message": "Request Accepted",
+  "data": {
+    "internal_reference": "DUSUPAYRMGRXNNYBWATKJ",
+    "merchant_reference": "MCTREFT2WMNWZ23SBN6Y"
+  }
+}

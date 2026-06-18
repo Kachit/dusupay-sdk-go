@@ -2,23 +2,23 @@ package dusupay
 
 import "fmt"
 
-//Config structure
+// Config structure
 type Config struct {
-	Uri         string `json:"uri"`
-	PublicKey   string `json:"public_key"`
-	SecretKey   string `json:"secret_key"`
-	WebhookHash string `json:"webhook_hash"`
+	URI        string `json:"uri"`
+	PublicKey  string `json:"public_key"`
+	SecretKey  string `json:"secret_key"`
+	SigningKey string `json:"signing_key"`
 }
 
-//IsSandbox check is sandbox environment
+// IsSandbox check is sandbox environment
 func (c *Config) IsSandbox() bool {
-	return c.Uri != ProdAPIUrl
+	return c.URI != ProdAPIUrl
 }
 
-//IsValid check is valid config parameters
+// IsValid check is valid config parameters
 func (c *Config) IsValid() error {
 	var err error
-	if c.Uri == "" {
+	if c.URI == "" {
 		err = fmt.Errorf(`parameter "uri" is empty`)
 	} else if c.PublicKey == "" {
 		err = fmt.Errorf(`parameter "public_key" is empty`)
@@ -28,20 +28,20 @@ func (c *Config) IsValid() error {
 	return err
 }
 
-//NewConfig Create new config from credentials (Prod version)
+// NewConfig Create new config from credentials (Prod version)
 func NewConfig(publicKey string, secretKey string) *Config {
 	cfg := &Config{
-		Uri:       ProdAPIUrl,
+		URI:       ProdAPIUrl,
 		PublicKey: publicKey,
 		SecretKey: secretKey,
 	}
 	return cfg
 }
 
-//NewConfigSandbox Create new config from credentials (Sandbox version)
+// NewConfigSandbox Create new config from credentials (Sandbox version)
 func NewConfigSandbox(publicKey string, secretKey string) *Config {
 	cfg := &Config{
-		Uri:       SandboxAPIUrl,
+		URI:       SandboxAPIUrl,
 		PublicKey: publicKey,
 		SecretKey: secretKey,
 	}

@@ -1,0 +1,20 @@
+{
+  "code": 200,
+  "status": "success",
+  "message": "Request completed successfully.",
+  "data": {
+    "payment_providers": [
+      {
+        "provider_code": "mtn_ug",
+        "provider_name": "MTN Mobile Money Uganda",
+        "transaction_method": "MOBILE_MONEY",
+        "transaction_currency": "UGX",
+        "min_amount": 500,
+        "max_amount": 3000000,
+        "max_daily_amount": 5000000,
+        "is_active": true,
+        "option_prefixes": ["25677", "25678"]
+      }
+    ]
+  }
+}

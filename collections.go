@@ -7,97 +7,124 @@ import (
 	"net/http"
 )
 
-//CollectionRequest struct
+// CollectionRequest struct
 type CollectionRequest struct {
-	Currency          CurrencyCode          `json:"currency"`
-	Amount            float64               `json:"amount"`
-	Method            TransactionMethodCode `json:"method"`
-	ProviderId        string                `json:"provider_id"`
-	AccountNumber     string                `json:"account_number"`
-	MerchantReference string                `json:"merchant_reference"`
-	Narration         string                `json:"narration"`
-	MobileMoneyHpp    bool                  `json:"mobile_money_hpp"`
-	RedirectUrl       string                `json:"redirect_url"`
-	AccountName       string                `json:"account_name"`
-	AccountEmail      string                `json:"account_email"`
-	Voucher           string                `json:"voucher"`
+	Currency               CurrencyCode          `json:"currency"`
+	Amount                 float64               `json:"amount"`
+	TransactionMethod      TransactionMethodCode `json:"transaction_method"`
+	ProviderCode           string                `json:"provider_code"`
+	MerchantReference      string                `json:"merchant_reference"`
+	Description            string                `json:"description"`
+	Msisdn                 string                `json:"msisdn,omitempty"`
+	CustomerName           string                `json:"customer_name,omitempty"`
+	CustomerEmail          string                `json:"customer_email,omitempty"`
+	ChargeCustomer         bool                  `json:"charge_customer,omitempty"`
+	AllowFinalStatusChange bool                  `json:"allow_final_status_change,omitempty"`
 }
 
-//Check is valid CollectionRequest parameters
 func (cr *CollectionRequest) isValid() error {
-	var err error
 	if cr.Currency == "" {
-		err = fmt.Errorf(`parameter "currency" is empty`)
-	} else if cr.Amount == 0 {
-		err = fmt.Errorf(`parameter "amount" is empty`)
-	} else if cr.Method == "" {
-		err = fmt.Errorf(`parameter "method" is empty`)
-	} else if cr.ProviderId == "" {
-		err = fmt.Errorf(`parameter "provider_id" is empty`)
-	} else if cr.MerchantReference == "" {
-		err = fmt.Errorf(`parameter "merchant_reference" is empty`)
-	} else if cr.Narration == "" {
-		err = fmt.Errorf(`parameter "narration" is empty`)
-	} else if cr.RedirectUrl == "" && cr.Method != TransactionMethodMobileMoney {
-		err = fmt.Errorf(`parameter "redirect_url" is empty`)
-	} else if cr.AccountNumber == "" && cr.Method == TransactionMethodMobileMoney {
-		err = fmt.Errorf(`parameter "account_number" is empty`)
+		return fmt.Errorf(`parameter "currency" is empty`)
 	}
-	return err
+	if cr.Amount == 0 {
+		return fmt.Errorf(`parameter "amount" is empty`)
+	}
+	if cr.TransactionMethod == "" {
+		return fmt.Errorf(`parameter "transaction_method" is empty`)
+	}
+	if cr.ProviderCode == "" {
+		return fmt.Errorf(`parameter "provider_code" is empty`)
+	}
+	if cr.MerchantReference == "" {
+		return fmt.Errorf(`parameter "merchant_reference" is empty`)
+	}
+	if cr.Description == "" {
+		return fmt.Errorf(`parameter "description" is empty`)
+	}
+	if cr.Msisdn == "" && cr.TransactionMethod == TransactionMethodMobileMoney {
+		return fmt.Errorf(`parameter "msisdn" is empty`)
+	}
+	return nil
 }
 
-//CollectionResponse struct
+// CollectionResponse struct
 type CollectionResponse struct {
 	ResponseBody
 	Data *CollectionResponseData `json:"data,omitempty"`
 }
 
-//CollectionResponseData struct
+// CollectionResponseData struct
 type CollectionResponseData struct {
-	ID                int64   `json:"id"`
-	RequestAmount     float64 `json:"request_amount"`
-	RequestCurrency   string  `json:"request_currency"`
-	AccountAmount     float64 `json:"account_amount"`
-	AccountCurrency   string  `json:"account_currency"`
-	TransactionFee    float64 `json:"transaction_fee"`
-	TotalCredit       float64 `json:"total_credit"`
-	ProviderID        string  `json:"provider_id"`
-	MerchantReference string  `json:"merchant_reference"`
-	InternalReference string  `json:"internal_reference"`
-	TransactionStatus string  `json:"transaction_status"`
-	TransactionType   string  `json:"transaction_type"`
-	Message           string  `json:"message"`
-	CustomerCharged   bool    `json:"customer_charged"`
-	PaymentURL        string  `json:"payment_url"`
-	Instructions      []struct {
-		StepNo      string `json:"step_no"`
-		Description string `json:"description"`
-	} `json:"instructions"`
+	InternalReference string `json:"internal_reference"`
+	MerchantReference string `json:"merchant_reference"`
+	PaymentURL        string `json:"payment_url,omitempty"`
 }
 
-//CollectionsResource wrapper
+// CollectionAuthorizeRequest struct
+type CollectionAuthorizeRequest struct {
+	InternalReference string `json:"internal_reference"`
+	OTP               string `json:"otp"`
+}
+
+// CollectionAuthorizeResponse struct
+type CollectionAuthorizeResponse struct {
+	ResponseBody
+	Data *CollectionAuthorizeResponseData `json:"data,omitempty"`
+}
+
+// CollectionAuthorizeResponseData struct
+type CollectionAuthorizeResponseData struct {
+	InternalReference string `json:"internal_reference"`
+	MerchantReference string `json:"merchant_reference"`
+}
+
+// CollectionsResource wrapper
 type CollectionsResource struct {
 	ResourceAbstract
 }
 
-//Create collection request (see https://docs.dusupay.com/receiving-money/collections/post-collection-request)
+// Create collection request (see https://developer.dusupay.com/funds-collection/getting-started.md)
 func (r *CollectionsResource) Create(ctx context.Context, req *CollectionRequest) (*CollectionResponse, *http.Response, error) {
-	err := req.isValid()
-	if err != nil {
+	if err := req.isValid(); err != nil {
 		return nil, nil, fmt.Errorf("CollectionsResource.Create error: %v", err)
 	}
 	post, err := transformStructToMap(req)
 	if err != nil {
 		return nil, nil, fmt.Errorf("CollectionsResource.Create error: %v", err)
 	}
-	rsp, err := r.ResourceAbstract.tr.Post(ctx, "v1/collections", post, nil)
+	rsp, err := r.tr.Post(ctx, "collections/initialize", post, nil)
 	if err != nil {
 		return nil, nil, fmt.Errorf("CollectionsResource.Create error: %v", err)
 	}
 	var result CollectionResponse
-	err = unmarshalResponse(rsp, &result)
-	if err != nil {
+	if err = unmarshalResponse(rsp, &result); err != nil {
 		return nil, rsp, fmt.Errorf("CollectionsResource.Create error: %v", err)
+	}
+	if !result.IsSuccess() {
+		err = errors.New(result.Message)
+	}
+	return &result, rsp, err
+}
+
+// Authorize collection OTP (see https://developer.dusupay.com/funds-collection/mobile-money-collection/mobile-money-direct-charge.md)
+func (r *CollectionsResource) Authorize(ctx context.Context, req *CollectionAuthorizeRequest) (*CollectionAuthorizeResponse, *http.Response, error) {
+	if req.InternalReference == "" {
+		return nil, nil, fmt.Errorf(`CollectionsResource.Authorize error: parameter "internal_reference" is empty`)
+	}
+	if req.OTP == "" {
+		return nil, nil, fmt.Errorf(`CollectionsResource.Authorize error: parameter "otp" is empty`)
+	}
+	post, err := transformStructToMap(req)
+	if err != nil {
+		return nil, nil, fmt.Errorf("CollectionsResource.Authorize error: %v", err)
+	}
+	rsp, err := r.tr.Post(ctx, "collections/authorize", post, nil)
+	if err != nil {
+		return nil, nil, fmt.Errorf("CollectionsResource.Authorize error: %v", err)
+	}
+	var result CollectionAuthorizeResponse
+	if err = unmarshalResponse(rsp, &result); err != nil {
+		return nil, rsp, fmt.Errorf("CollectionsResource.Authorize error: %v", err)
 	}
 	if !result.IsSuccess() {
 		err = errors.New(result.Message)
