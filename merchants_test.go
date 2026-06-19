@@ -58,6 +58,7 @@ func (suite *MerchantsResourceTestSuite) TestGetBalancesJsonError() {
 	httpmock.RegisterResponder(http.MethodGet, suite.cfg.URI+"/data/wallet-balances", httpmock.NewBytesResponder(http.StatusUnauthorized, body))
 
 	result, resp, err := suite.testable.GetBalances(suite.ctx)
+	defer func() { _ = resp.Body.Close() }()
 	assert.Error(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.NotEmpty(suite.T(), result)
@@ -69,6 +70,7 @@ func (suite *MerchantsResourceTestSuite) TestGetBalancesNonJsonError() {
 	httpmock.RegisterResponder(http.MethodGet, suite.cfg.URI+"/data/wallet-balances", httpmock.NewBytesResponder(http.StatusInternalServerError, body))
 
 	result, resp, err := suite.testable.GetBalances(suite.ctx)
+	defer func() { _ = resp.Body.Close() }()
 	assert.Error(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.Empty(suite.T(), result)
@@ -79,6 +81,7 @@ func (suite *MerchantsResourceTestSuite) TestVerifySuccess() {
 	httpmock.RegisterResponder(http.MethodGet, suite.cfg.URI+"/data/transaction/verify/MCTREFT2WMNWZ23SBN6Y", httpmock.NewBytesResponder(http.StatusOK, body))
 
 	result, resp, err := suite.testable.Verify(suite.ctx, "MCTREFT2WMNWZ23SBN6Y")
+	defer func() { _ = resp.Body.Close() }()
 	assert.NoError(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.NotEmpty(suite.T(), result)
@@ -92,7 +95,7 @@ func (suite *MerchantsResourceTestSuite) TestVerifySuccess() {
 }
 
 func (suite *MerchantsResourceTestSuite) TestVerifyEmptyReference() {
-	result, rsp, err := suite.testable.Verify(suite.ctx, "")
+	result, rsp, err := suite.testable.Verify(suite.ctx, "") //nolint:bodyclose // returns nil response on validation error
 	assert.Nil(suite.T(), rsp)
 	assert.Nil(suite.T(), result)
 	assert.EqualError(suite.T(), err, `MerchantsResource.Verify error: parameter "merchant_reference" is empty`)

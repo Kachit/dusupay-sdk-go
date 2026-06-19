@@ -59,31 +59,41 @@ func (r *MerchantsResource) GetBalances(ctx context.Context) (*BalancesResponse,
 	if err != nil {
 		return nil, nil, fmt.Errorf("MerchantsResource.GetBalances error: %v", err)
 	}
+
 	var balances BalancesResponse
 	if err = unmarshalResponse(rsp, &balances); err != nil {
 		return nil, rsp, fmt.Errorf("MerchantsResource.GetBalances error: %v", err)
 	}
+
 	if !balances.IsSuccess() {
 		err = errors.New(balances.Message)
 	}
+
 	return &balances, rsp, err
 }
 
-// Verify transaction status by merchant reference (see https://developer.dusupay.com/utility-functions/transaction-status-verification.md)
-func (r *MerchantsResource) Verify(ctx context.Context, merchantReference string) (*VerifyResponse, *http.Response, error) {
+// Verify transaction status by merchant reference.
+// See https://developer.dusupay.com/utility-functions/transaction-status-verification.md
+func (r *MerchantsResource) Verify(
+	ctx context.Context, merchantReference string,
+) (*VerifyResponse, *http.Response, error) {
 	if merchantReference == "" {
 		return nil, nil, fmt.Errorf(`MerchantsResource.Verify error: parameter "merchant_reference" is empty`)
 	}
+
 	rsp, err := r.tr.Get(ctx, "data/transaction/verify/"+merchantReference, nil)
 	if err != nil {
 		return nil, nil, fmt.Errorf("MerchantsResource.Verify error: %v", err)
 	}
+
 	var result VerifyResponse
 	if err = unmarshalResponse(rsp, &result); err != nil {
 		return nil, rsp, fmt.Errorf("MerchantsResource.Verify error: %v", err)
 	}
+
 	if !result.IsSuccess() {
 		err = errors.New(result.Message)
 	}
+
 	return &result, rsp, err
 }

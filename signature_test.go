@@ -60,6 +60,7 @@ func (suite *SignatureTestSuite) TestValidateSignaturePayoutCallbackSuccess() {
 	privateKeyBytes, err := os.ReadFile("main/private.pem")
 	if err != nil {
 		suite.T().Skip("main/private.pem not available")
+
 		return
 	}
 	block, _ := pemDecode(privateKeyBytes)

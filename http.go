@@ -14,6 +14,7 @@ import (
 // NewHTTPTransport create new http transport
 func NewHTTPTransport(config *Config, h *http.Client) *Transport {
 	rb := &RequestBuilder{cfg: config}
+
 	return &Transport{http: h, rb: rb}
 }
 
@@ -24,21 +25,29 @@ type Transport struct {
 }
 
 // SendRequest Send request method
-func (tr *Transport) SendRequest(ctx context.Context, method string, path string, query map[string]interface{}, body map[string]interface{}) (resp *http.Response, err error) {
+func (tr *Transport) SendRequest(
+	ctx context.Context, method, path string,
+	query, body map[string]interface{},
+) (resp *http.Response, err error) {
 	req, err := tr.rb.BuildRequest(ctx, method, path, query, body)
 	if err != nil {
 		return nil, fmt.Errorf("transport.SendRequest: %v", err)
 	}
-	return tr.http.Do(req)
+
+	return tr.http.Do(req) //nolint:gosec // URL is built from validated Config, not user input
 }
 
 // Get method
-func (tr *Transport) Get(ctx context.Context, path string, query map[string]interface{}) (resp *http.Response, err error) {
+func (tr *Transport) Get(
+	ctx context.Context, path string, query map[string]interface{},
+) (resp *http.Response, err error) {
 	return tr.SendRequest(ctx, http.MethodGet, path, query, nil)
 }
 
 // Post method
-func (tr *Transport) Post(ctx context.Context, path string, body map[string]interface{}, query map[string]interface{}) (resp *http.Response, err error) {
+func (tr *Transport) Post(
+	ctx context.Context, path string, body, query map[string]interface{},
+) (resp *http.Response, err error) {
 	return tr.SendRequest(ctx, http.MethodPost, path, query, body)
 }
 
@@ -53,8 +62,10 @@ func (rb *RequestBuilder) buildURI(path string, query map[string]interface{}) (u
 	if err != nil {
 		return nil, fmt.Errorf("RequestBuilder.buildURI parse: %v", err)
 	}
+
 	u.Path = "/" + path
 	u.RawQuery = rb.buildQueryParams(query)
+
 	return u, err
 }
 
@@ -64,6 +75,7 @@ func (rb *RequestBuilder) buildQueryParams(query map[string]interface{}) string 
 	for k, v := range query {
 		q.Set(k, fmt.Sprintf("%v", v))
 	}
+
 	return q.Encode()
 }
 
@@ -74,6 +86,7 @@ func (rb *RequestBuilder) buildHeaders() http.Header {
 	headers.Set("x-api-version", "1")
 	headers.Set("public-key", rb.cfg.PublicKey)
 	headers.Set("secret-key", rb.cfg.SecretKey)
+
 	return headers
 }
 
@@ -83,12 +96,17 @@ func (rb *RequestBuilder) buildBody(data map[string]interface{}) (io.Reader, err
 	if err != nil {
 		return nil, fmt.Errorf("RequestBuilder.buildBody json convert: %v", err)
 	}
+
 	return bytes.NewBuffer(b), nil
 }
 
 // BuildRequest method
-func (rb *RequestBuilder) BuildRequest(ctx context.Context, method string, path string, query map[string]interface{}, body map[string]interface{}) (req *http.Request, err error) {
+func (rb *RequestBuilder) BuildRequest(
+	ctx context.Context, method, path string,
+	query, body map[string]interface{},
+) (req *http.Request, err error) {
 	method = strings.ToUpper(method)
+
 	var bodyReader io.Reader
 	if method == http.MethodPost {
 		bodyReader, err = rb.buildBody(body)
@@ -96,15 +114,19 @@ func (rb *RequestBuilder) BuildRequest(ctx context.Context, method string, path 
 			return nil, fmt.Errorf("transport.request build request body: %v", err)
 		}
 	}
+
 	uri, err := rb.buildURI(path, query)
 	if err != nil {
 		return nil, fmt.Errorf("transport.request build uri: %v", err)
 	}
+
 	req, err = http.NewRequestWithContext(ctx, method, uri.String(), bodyReader)
 	if err != nil {
 		return nil, fmt.Errorf("transport.request new request error: %v", err)
 	}
+
 	req.Header = rb.buildHeaders()
+
 	return req, nil
 }
 
@@ -123,11 +145,14 @@ func (r *ResponseBody) IsSuccess() bool {
 // unmarshalResponse func
 func unmarshalResponse(resp *http.Response, v interface{}) error {
 	defer func() { _ = resp.Body.Close() }()
+
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("Response.Unmarshal read body: %v", err)
 	}
+
 	resp.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
 	return json.Unmarshal(bodyBytes, &v)
 }
 

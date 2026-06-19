@@ -134,10 +134,13 @@ func transformStructToMap(st interface{}) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	jsonMap := make(map[string]interface{})
+
 	err = json.Unmarshal(bytes, &jsonMap)
 	if err != nil {
 		return nil, err
 	}
+
 	return jsonMap, nil
 }

@@ -127,6 +127,7 @@ func (suite *PayoutsResourceTestSuite) TestCreateJsonError() {
 
 	request := &PayoutRequest{Currency: CurrencyCodeUGX, Amount: 100, TransactionMethod: TransactionMethodMobileMoney, ProviderCode: "mtn_ug", AccountNumber: "256777000001", CustomerName: "John Doe", MerchantReference: "ref", Description: "desc"}
 	result, resp, err := suite.testable.Create(suite.ctx, request)
+	defer func() { _ = resp.Body.Close() }()
 	assert.Error(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.NotEmpty(suite.T(), result)
@@ -139,13 +140,14 @@ func (suite *PayoutsResourceTestSuite) TestCreateNonJsonError() {
 
 	request := &PayoutRequest{Currency: CurrencyCodeUGX, Amount: 100, TransactionMethod: TransactionMethodMobileMoney, ProviderCode: "mtn_ug", AccountNumber: "256777000001", CustomerName: "John Doe", MerchantReference: "ref", Description: "desc"}
 	result, resp, err := suite.testable.Create(suite.ctx, request)
+	defer func() { _ = resp.Body.Close() }()
 	assert.Error(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.Empty(suite.T(), result)
 }
 
 func (suite *PayoutsResourceTestSuite) TestCreateInvalidRequest() {
-	result, rsp, err := suite.testable.Create(suite.ctx, &PayoutRequest{})
+	result, rsp, err := suite.testable.Create(suite.ctx, &PayoutRequest{}) //nolint:bodyclose // returns nil response on validation error
 	assert.Nil(suite.T(), rsp)
 	assert.Nil(suite.T(), result)
 	assert.Error(suite.T(), err)

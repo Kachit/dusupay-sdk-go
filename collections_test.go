@@ -184,6 +184,7 @@ func (suite *CollectionsResourceTestSuite) TestCreateJsonError() {
 		Description:       "Test collection",
 	}
 	result, resp, err := suite.testable.Create(suite.ctx, request)
+	defer func() { _ = resp.Body.Close() }()
 	assert.Error(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.NotEmpty(suite.T(), result)
@@ -204,13 +205,14 @@ func (suite *CollectionsResourceTestSuite) TestCreateNonJsonError() {
 		Description:       "Test collection",
 	}
 	result, resp, err := suite.testable.Create(suite.ctx, request)
+	defer func() { _ = resp.Body.Close() }()
 	assert.Error(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.Empty(suite.T(), result)
 }
 
 func (suite *CollectionsResourceTestSuite) TestCreateInvalidRequest() {
-	result, rsp, err := suite.testable.Create(suite.ctx, &CollectionRequest{})
+	result, rsp, err := suite.testable.Create(suite.ctx, &CollectionRequest{}) //nolint:bodyclose // returns nil response on validation error
 	assert.Nil(suite.T(), rsp)
 	assert.Nil(suite.T(), result)
 	assert.Error(suite.T(), err)
@@ -225,6 +227,7 @@ func (suite *CollectionsResourceTestSuite) TestAuthorizeSuccess() {
 		OTP:               "123456",
 	}
 	result, resp, err := suite.testable.Authorize(suite.ctx, request)
+	defer func() { _ = resp.Body.Close() }()
 	assert.NoError(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.NotEmpty(suite.T(), result)
@@ -234,7 +237,7 @@ func (suite *CollectionsResourceTestSuite) TestAuthorizeSuccess() {
 }
 
 func (suite *CollectionsResourceTestSuite) TestAuthorizeInvalidRequest() {
-	result, rsp, err := suite.testable.Authorize(suite.ctx, &CollectionAuthorizeRequest{})
+	result, rsp, err := suite.testable.Authorize(suite.ctx, &CollectionAuthorizeRequest{}) //nolint:bodyclose // returns nil response on validation error
 	assert.Nil(suite.T(), rsp)
 	assert.Nil(suite.T(), result)
 	assert.Error(suite.T(), err)

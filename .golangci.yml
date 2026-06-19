@@ -1,26 +1,59 @@
 version: "2"
 linters:
+  default: none
   enable:
-    - govet
+    - bodyclose
+    - dogsled
     - errcheck
-    - staticcheck
+    - funlen
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - gosec
+    - govet
     - ineffassign
-    - unused
-    - revive
+    - lll
     - misspell
+    - nakedret
+    - nlreturn
+    - prealloc
+    - staticcheck
+    - unconvert
+    - unused
+    - wsl_v5
+  settings:
+    funlen:
+      lines: 70
+      statements: 50
+    gosec:
+      excludes:
+        - G115
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - funlen
+          - goconst
+          - lll
+          - staticcheck
+          - wsl_v5
+        path: (.+)_test\.go
+    paths:
+      - lua
+      - mocks
+      - tmp
 formatters:
   enable:
-    - goimports
-linters-settings:
-  errcheck:
-    exclude-functions:
-      - (io.Closer).Close
-  revive:
-    rules:
-      - name: comment-spacings
-        disabled: false
-issues:
-  exclude-rules:
-    - path: "_test\\.go"
-      linters:
-        - errcheck
+    - gofmt
+  exclusions:
+    generated: lax
+    paths:
+      - stubs
+      - main
+      - tmp

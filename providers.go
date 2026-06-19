@@ -18,9 +18,11 @@ func (pf *ProvidersFilter) isValid() error {
 	if pf.Currency == "" {
 		return fmt.Errorf(`parameter "currency" is empty`)
 	}
+
 	if pf.TransactionType == "" {
 		return fmt.Errorf(`parameter "transaction_type" is empty`)
 	}
+
 	return nil
 }
 
@@ -54,10 +56,13 @@ type ProvidersResource struct {
 }
 
 // GetList get providers list (see https://developer.dusupay.com/utility-functions/payment-options.md)
-func (r *ProvidersResource) GetList(ctx context.Context, filter *ProvidersFilter) (*ProvidersResponse, *http.Response, error) {
+func (r *ProvidersResource) GetList(
+	ctx context.Context, filter *ProvidersFilter,
+) (*ProvidersResponse, *http.Response, error) {
 	if err := filter.isValid(); err != nil {
 		return nil, nil, fmt.Errorf("ProvidersResource.GetList error: %v", err)
 	}
+
 	query := map[string]interface{}{
 		"currency":         filter.Currency,
 		"transaction_type": filter.TransactionType,
@@ -65,16 +70,20 @@ func (r *ProvidersResource) GetList(ctx context.Context, filter *ProvidersFilter
 	if filter.CountryCode != "" {
 		query["country_code"] = filter.CountryCode
 	}
+
 	rsp, err := r.tr.Get(ctx, "data/payment-providers", query)
 	if err != nil {
 		return nil, nil, fmt.Errorf("ProvidersResource.GetList error: %v", err)
 	}
+
 	var result ProvidersResponse
 	if err = unmarshalResponse(rsp, &result); err != nil {
 		return nil, rsp, fmt.Errorf("ProvidersResource.GetList error: %v", err)
 	}
+
 	if !result.IsSuccess() {
 		err = errors.New(result.Message)
 	}
+
 	return &result, rsp, err
 }

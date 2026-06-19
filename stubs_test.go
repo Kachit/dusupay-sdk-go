@@ -32,12 +32,14 @@ func LoadStubResponseData(path string) ([]byte, error) {
 
 func BuildStubResponseFromString(statusCode int, json string) *http.Response {
 	body := io.NopCloser(strings.NewReader(json))
+
 	return &http.Response{Body: body, StatusCode: statusCode}
 }
 
 func BuildStubResponseFromFile(statusCode int, path string) *http.Response {
 	data, _ := LoadStubResponseData(path)
 	body := io.NopCloser(bytes.NewReader(data))
+
 	return &http.Response{Body: body, StatusCode: statusCode}
 }
 
@@ -54,5 +56,6 @@ func parsePrivateKeyForTest(rawBytes []byte) (*rsa.PrivateKey, error) {
 	if !ok {
 		return nil, errors.New("not an RSA private key")
 	}
+
 	return pk, nil
 }

@@ -13,10 +13,13 @@ func NewClientFromConfig(config *Config, cl *http.Client) (*Client, error) {
 	if err := config.IsValid(); err != nil {
 		return nil, err
 	}
+
 	if cl == nil {
 		cl = &http.Client{}
 	}
+
 	transport := NewHTTPTransport(config, cl)
+
 	return &Client{transport, config}, nil
 }
 

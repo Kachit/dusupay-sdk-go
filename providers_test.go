@@ -83,6 +83,7 @@ func (suite *ProvidersResourceTestSuite) TestGetListJsonError() {
 
 	filter := &ProvidersFilter{Currency: CurrencyCodeUGX, TransactionType: TransactionTypeCollection}
 	result, resp, err := suite.testable.GetList(suite.ctx, filter)
+	defer func() { _ = resp.Body.Close() }()
 	assert.Error(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.NotEmpty(suite.T(), result)
@@ -95,13 +96,14 @@ func (suite *ProvidersResourceTestSuite) TestGetListNonJsonError() {
 
 	filter := &ProvidersFilter{Currency: CurrencyCodeUGX, TransactionType: TransactionTypeCollection}
 	result, resp, err := suite.testable.GetList(suite.ctx, filter)
+	defer func() { _ = resp.Body.Close() }()
 	assert.Error(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.Empty(suite.T(), result)
 }
 
 func (suite *ProvidersResourceTestSuite) TestGetListInvalidFilter() {
-	result, rsp, err := suite.testable.GetList(suite.ctx, &ProvidersFilter{})
+	result, rsp, err := suite.testable.GetList(suite.ctx, &ProvidersFilter{}) //nolint:bodyclose // returns nil response on validation error
 	assert.Nil(suite.T(), rsp)
 	assert.Nil(suite.T(), result)
 	assert.Error(suite.T(), err)

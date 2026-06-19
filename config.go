@@ -17,15 +17,16 @@ func (c *Config) IsSandbox() bool {
 
 // IsValid check is valid config parameters
 func (c *Config) IsValid() error {
-	var err error
-	if c.URI == "" {
-		err = fmt.Errorf(`parameter "uri" is empty`)
-	} else if c.PublicKey == "" {
-		err = fmt.Errorf(`parameter "public_key" is empty`)
-	} else if c.SecretKey == "" {
-		err = fmt.Errorf(`parameter "secret_key" is empty`)
+	switch {
+	case c.URI == "":
+		return fmt.Errorf(`parameter "uri" is empty`)
+	case c.PublicKey == "":
+		return fmt.Errorf(`parameter "public_key" is empty`)
+	case c.SecretKey == "":
+		return fmt.Errorf(`parameter "secret_key" is empty`)
 	}
-	return err
+
+	return nil
 }
 
 // NewConfig Create new config from credentials (Prod version)
@@ -35,6 +36,7 @@ func NewConfig(publicKey string, secretKey string) *Config {
 		PublicKey: publicKey,
 		SecretKey: secretKey,
 	}
+
 	return cfg
 }
 
@@ -45,5 +47,6 @@ func NewConfigSandbox(publicKey string, secretKey string) *Config {
 		PublicKey: publicKey,
 		SecretKey: secretKey,
 	}
+
 	return cfg
 }
