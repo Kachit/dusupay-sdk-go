@@ -3,10 +3,10 @@ name: test
 on:
   push:
     branches:
-      - '*'
+      - '**'
   pull_request:
     branches:
-      - '*'
+      - '**'
 
 jobs:
 
@@ -17,13 +17,15 @@ jobs:
     runs-on: ${{ matrix.vm-os }}
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Pin Go to the go.mod version: '>=1.24' pulled the newest Go, and golangci-lint
+      # panics when the toolchain is newer than the Go it was built with.
       - name: Set up go
         uses: actions/setup-go@v5
         with:
-          go-version: '>=1.24'
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
+          go-version-file: go.mod
 
       - name: Lint
         uses: golangci/golangci-lint-action@v9
