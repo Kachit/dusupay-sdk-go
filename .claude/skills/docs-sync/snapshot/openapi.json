@@ -1,0 +1,1138 @@
+{
+  "openapi": "3.0.0",
+  "x-hideTryItPanel": false,
+  "servers": [
+    {
+      "url": " https://sandboxapi.dusupay.com"
+    }
+  ],
+  "paths": {
+    "/data/payment-providers": {
+      "get": {
+        "operationId": "DataController_paymentOtpionsHandler",
+        "parameters": [
+          {
+            "name": "public-key",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-api-version",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "default": "en",
+              "enum": ["en", "fr", "sw"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "currency",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "transaction_type",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment providers retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IPaymentProvidersResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["DATA"]
+      }
+    },
+    "/data/wallet-balances": {
+      "get": {
+        "operationId": "DataController_merchantBalancesHandler",
+        "parameters": [
+          {
+            "name": "public-key",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-api-version",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "default": "en",
+              "enum": ["en", "fr", "sw"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "secret-key",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Wallet balances retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IWalletBalancesResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["DATA"]
+      }
+    },
+    "/data/transaction/verify/{merchant_reference}": {
+      "get": {
+        "operationId": "DataController_statusCheckHandler",
+        "parameters": [
+          {
+            "name": "public-key",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-api-version",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "default": "en",
+              "enum": ["en", "fr", "sw"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "merchant_reference",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ITransactionDetailsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["DATA"]
+      }
+    },
+    "/data/payout-bank-codes": {
+      "get": {
+        "operationId": "DataController_payoutOtpionsHandler",
+        "parameters": [
+          {
+            "name": "public-key",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-api-version",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "default": "en",
+              "enum": ["en", "fr", "sw"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "provider_code",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payout bank codes retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IPayoutBankCodesResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["DATA"]
+      }
+    },
+    "/collections/initialize": {
+      "post": {
+        "operationId": "CollectionController_collectionInitHandler",
+        "parameters": [
+          {
+            "name": "public-key",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-api-version",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "default": "en",
+              "enum": ["en", "fr", "sw"],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CollectionRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Collection initiated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ICollectionResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntityErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["COLLECTIONS"]
+      }
+    },
+    "/collections/authorize": {
+      "post": {
+        "operationId": "CollectionController_authorizeCollectionhandler",
+        "parameters": [
+          {
+            "name": "public-key",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-api-version",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "default": "en",
+              "enum": ["en", "fr", "sw"],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CollectionAuthDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Authorization request accepted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IAuthResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntityErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["COLLECTIONS"]
+      }
+    },
+    "/payout/send-funds": {
+      "post": {
+        "operationId": "PayoutController_handlePayoutRequest",
+        "parameters": [
+          {
+            "name": "public-key",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-api-version",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "default": "en",
+              "enum": ["en", "fr", "sw"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "secret-key",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IPayoutRequestDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Payout initiated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IPayoutResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UauthorizedErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntityErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["PAYOUTS"]
+      }
+    }
+  },
+  "info": {
+    "title": "Merchant API",
+    "description": "Merchant API",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "components": {
+    "schemas": {
+      "IPaymentProvidersResponseDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "description": "HTTP Status code",
+            "example": 200
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the response",
+            "enum": ["success", "accepted", "error"],
+            "example": "success"
+          },
+          "message": {
+            "type": "string",
+            "description": "The message of the response",
+            "example": "Request completed successfully"
+          },
+          "data": {
+            "type": "object",
+            "description": "Response data",
+            "example": {
+              "payment_providers": [
+                {
+                  "provider_name": "MTN Mobile Money Zambia",
+                  "provider_code": "mtn_zm",
+                  "transaction_method": "MOBILE_MONEY",
+                  "transaction_method_name": "Mobile Money",
+                  "transaction_type": "Collection",
+                  "transaction_currency": "ZMW",
+                  "min_amount": 1,
+                  "max_amount": 10000,
+                  "max_daily_amount": 100000,
+                  "is_active": true,
+                  "option_prefixes": ["76", "96"]
+                },
+                {
+                  "provider_name": "Airtel Money Zambia",
+                  "provider_code": "airtel_zm",
+                  "transaction_method": "MOBILE_MONEY",
+                  "transaction_method_name": "Mobile Money",
+                  "transaction_type": "Collection",
+                  "transaction_currency": "ZMW",
+                  "min_amount": 1,
+                  "max_amount": 10000,
+                  "max_daily_amount": 100000,
+                  "is_active": true,
+                  "option_prefixes": ["57", "77", "97"]
+                }
+              ]
+            }
+          }
+        },
+        "required": ["code", "status", "message", "data"]
+      },
+      "IWalletBalancesResponseDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "description": "HTTP Status code",
+            "example": 200
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the response",
+            "enum": ["success", "accepted", "error"],
+            "example": "success"
+          },
+          "message": {
+            "type": "string",
+            "description": "The message of the response",
+            "example": "Request completed successfully"
+          },
+          "data": {
+            "type": "object",
+            "description": "Response data",
+            "example": {
+              "merchant_wallets": [
+                {
+                  "available_balance": 40000,
+                  "actual_balance": 40000,
+                  "currency": "ZMW",
+                  "uncleared_balance": 40000,
+                  "reserve_balance": 0,
+                  "wallet_type": "MERCHANT_COLLECTION"
+                },
+                {
+                  "available_balance": 0,
+                  "actual_balance": 0,
+                  "currency": "ZMW",
+                  "uncleared_balance": 0,
+                  "reserve_balance": 0,
+                  "wallet_type": "MERCHANT_PAYOUT"
+                }
+              ]
+            }
+          }
+        },
+        "required": ["code", "status", "message", "data"]
+      },
+      "ITransactionDetailsResponseDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "description": "HTTP Status code",
+            "example": 200
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the response",
+            "enum": ["success", "accepted", "error"],
+            "example": "success"
+          },
+          "message": {
+            "type": "string",
+            "description": "The message of the response",
+            "example": "Request completed successfully"
+          },
+          "data": {
+            "type": "object",
+            "description": "Response data",
+            "example": {
+              "id": 20760,
+              "merchant_reference": "MCTREFT2WMNWZ23SBN6Y",
+              "internal_reference": "DUSUPAYRMGRXNNYBWATKJ",
+              "transaction_type": "COLLECTION",
+              "request_currency": "ZMW",
+              "transaction_amount": 100000,
+              "transaction_currency": "ZMW",
+              "transaction_charge": 3000,
+              "transaction_account": "256787008803",
+              "charge_customer": false,
+              "total_credit": 97000,
+              "provider_code": "mtn_zm",
+              "request_amount": 100000,
+              "customer_name": "JOHN DOE",
+              "transaction_status": "COMPLETED",
+              "status_message": "Transaction Completed Successfully"
+            }
+          }
+        },
+        "required": ["code", "status", "message", "data"]
+      },
+      "IPayoutBankCodesResponseDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "description": "HTTP Status code",
+            "example": 200
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the response",
+            "enum": ["success", "accepted", "error"],
+            "example": "success"
+          },
+          "message": {
+            "type": "string",
+            "description": "The message of the response",
+            "example": "Request completed successfully"
+          },
+          "data": {
+            "type": "object",
+            "description": "Response data",
+            "example": {
+              "payout_banks": [
+                {
+                  "bank_name": "Access Bank Nigeria",
+                  "bank_code": "access_bank_ng",
+                  "is_active": true
+                },
+                {
+                  "bank_name": "Guaranty Trust Bank",
+                  "bank_code": "gtbank_ng",
+                  "is_active": true
+                }
+              ]
+            }
+          }
+        },
+        "required": ["code", "status", "message", "data"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "description": "HTTP status code",
+            "example": 400
+          },
+          "status": {
+            "type": "string",
+            "description": "Response status",
+            "enum": ["success", "accepted", "error"],
+            "example": "error"
+          },
+          "message": {
+            "type": "string",
+            "description": "The message of the response",
+            "example": "Reason as to why the request is considered Bad"
+          },
+          "data": {
+            "type": "object",
+            "description": "Response data",
+            "example": {}
+          }
+        },
+        "required": ["code", "status", "message", "data"]
+      },
+      "UauthorizedErrorResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "description": "HTTP status code",
+            "example": 401
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the response",
+            "enum": ["success", "accepted", "error"],
+            "example": "error"
+          },
+          "message": {
+            "type": "string",
+            "description": "The message of the response",
+            "example": "Unauthorized API access. Merchant Public Key header missing"
+          },
+          "data": {
+            "type": "object",
+            "description": "Response data",
+            "example": {}
+          }
+        },
+        "required": ["code", "status", "message", "data"]
+      },
+      "UnprocessableEntityErrorResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "description": "HTTP status code",
+            "example": 422
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the response",
+            "enum": ["success", "accepted", "error"],
+            "example": "error"
+          },
+          "message": {
+            "type": "string",
+            "description": "Status message",
+            "example": "Any possible error message from the API that led to the unprocessable entity"
+          },
+          "data": {
+            "type": "object",
+            "description": "Response data",
+            "example": {}
+          }
+        },
+        "required": ["code", "status", "message", "data"]
+      },
+      "InternalServerErrorResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "description": "HTTP status code",
+            "example": 500
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the response",
+            "enum": ["success", "accepted", "error"],
+            "example": "error"
+          },
+          "message": {
+            "type": "string",
+            "description": "The message of the response",
+            "example": "A possible error message from the server or try again later"
+          },
+          "data": {
+            "type": "object",
+            "description": "Response data",
+            "example": {}
+          }
+        },
+        "required": ["code", "status", "message", "data"]
+      },
+      "CollectionRequestDto": {
+        "type": "object",
+        "properties": {
+          "transaction_method": {
+            "enum": ["BANK", "CARD", "MOBILE_MONEY", "CRYPTO"],
+            "type": "string",
+            "description": "The transaction method to be used.",
+            "example": "MOBILE_MONEY"
+          },
+          "provider_code": {
+            "type": "string",
+            "description": "The provider code as obtained from the payment options",
+            "example": "mtn_zm"
+          },
+          "merchant_reference": {
+            "type": "string",
+            "description": "The unique reference for this request. It must be at least 8 characters long. Alternatively, the value auto can be passed, and a unique reference will be created for you by the API",
+            "minLength": 8,
+            "maxLength": 36,
+            "example": "MCTREF123456"
+          },
+          "msisdn": {
+            "type": "string",
+            "description": "The mobile money number of the customer. Mandatory for Mobile Money.",
+            "example": "256787701800"
+          },
+          "mobile_money_hpp": {
+            "type": "boolean",
+            "description": "Should be sent with the value true in order for the API to handle the mobile money payment via hosted page",
+            "default": false
+          },
+          "currency": {
+            "type": "string",
+            "description": "The 3-character ISO currency code for the request currency"
+          },
+          "amount": {
+            "type": "number",
+            "description": "The amount being requested"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 30,
+            "description": "The description/narration for the transaction. Between 10-30 characters"
+          },
+          "customer_name": {
+            "type": "string",
+            "description": "The name of the customer"
+          },
+          "customer_email": {
+            "type": "string",
+            "description": "The email of the customer"
+          },
+          "redirect_url": {
+            "type": "string",
+            "description": "The HTTPs redirect URL to which the API will redirect when the payment is successful/failed"
+          },
+          "card_cipher": {
+            "type": "string"
+          },
+          "charge_customer": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether or not the customer should bear the charge for the transaction. By default, this is false to mean that the merchant bears the charge"
+          },
+          "allow_final_status_change": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether or not the final transaction status can be altered as described in the document"
+          }
+        },
+        "required": [
+          "transaction_method",
+          "provider_code",
+          "merchant_reference",
+          "currency",
+          "amount",
+          "description"
+        ]
+      },
+      "ICollectionResponseDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "description": "HTTP Status code",
+            "example": 202
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the response",
+            "enum": ["success", "accepted", "error"],
+            "example": "accepted"
+          },
+          "message": {
+            "type": "string",
+            "description": "Response messae",
+            "example": "Request Accepted"
+          },
+          "data": {
+            "type": "object",
+            "description": "Response data",
+            "example": {
+              "internal_reference": "DUSUPAYRMGRXNNYBWATKJ",
+              "merchant_reference": "MCTREFT2WMNWZ23SBN6Y"
+            }
+          }
+        },
+        "required": ["code", "status", "message", "data"]
+      },
+      "CollectionAuthDto": {
+        "type": "object",
+        "properties": {
+          "internal_reference": {
+            "type": "string",
+            "description": "Internal/gateway transaction reference",
+            "example": "DUSUPAYRMGRXNNYBWATKJ"
+          },
+          "otp": {
+            "type": "number",
+            "description": "OTP Auth",
+            "minLength": 4,
+            "example": 123456
+          }
+        },
+        "required": ["internal_reference", "otp"]
+      },
+      "IAuthResponseDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "description": "HTTP Status code",
+            "example": 202
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the response",
+            "enum": ["success", "accepted", "error"],
+            "example": "accepted"
+          },
+          "message": {
+            "type": "string",
+            "description": "Response messae",
+            "example": "Request Accepted"
+          },
+          "data": {
+            "type": "object",
+            "description": "Response data",
+            "example": {
+              "internal_reference": "DUSUPAYRMGRXNNYBWATKJ",
+              "merchant_reference": "MCTREFT2WMNWZ23SBN6Y",
+              "payment_url": "https://devpay.dusupay.com/pay/collection/DUSUPAYRMGRXNNYBWATKJ"
+            }
+          }
+        },
+        "required": ["code", "status", "message", "data"]
+      },
+      "PayoutExtraParamsDto": {
+        "type": "object",
+        "properties": {
+          "bank_code": {
+            "type": "string"
+          },
+          "branch_code": {
+            "type": "string"
+          },
+          "beneficiary_address": {
+            "type": "string"
+          },
+          "beneficiary_country": {
+            "type": "string"
+          },
+          "address_city": {
+            "type": "string"
+          },
+          "swift_code": {
+            "type": "string"
+          }
+        },
+        "required": ["bank_code"]
+      },
+      "IPayoutRequestDTO": {
+        "type": "object",
+        "properties": {
+          "merchant_reference": {
+            "type": "string",
+            "description": "The unique reference for this request. It must be at least 8 characters long.",
+            "minLength": 8,
+            "maxLength": 36,
+            "example": "MCTREF123456"
+          },
+          "transaction_method": {
+            "enum": ["BANK", "MOBILE_MONEY"],
+            "type": "string",
+            "description": "The transaction method to be used.",
+            "example": "MOBILE_MONEY"
+          },
+          "currency": {
+            "type": "string",
+            "description": "The 3-character ISO currency code for the request currency.",
+            "minLength": 3,
+            "example": "ZMW"
+          },
+          "amount": {
+            "type": "number",
+            "description": "The amount being requested",
+            "example": 5000
+          },
+          "provider_code": {
+            "type": "string",
+            "description": "The provider code as obtained from the payment options",
+            "example": "mtn_zm"
+          },
+          "account_number": {
+            "type": "string",
+            "description": "The bank account  or mobile money number of the recipient.",
+            "example": "17100000034"
+          },
+          "customer_name": {
+            "type": "string",
+            "description": "The name of the customer.",
+            "example": "John Doe"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 30,
+            "description": "The description/narration for the transaction. Between 10-30 characters"
+          },
+          "extra_params": {
+            "description": "Specific details about the bank (Mandatory for bank transfers)",
+            "properties": {
+              "bank_code": {
+                "type": "string",
+                "example": "access_bank_ng"
+              },
+              "branch_code": {
+                "type": "string",
+                "example": 12345
+              }
+            },
+            "example": {
+              "bank_code": "access_bank_ng",
+              "branch_code": "046"
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PayoutExtraParamsDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "merchant_reference",
+          "transaction_method",
+          "currency",
+          "amount",
+          "provider_code",
+          "account_number",
+          "customer_name",
+          "description"
+        ]
+      },
+      "IPayoutResponseDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "description": "HTTP Status code",
+            "example": 202
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the response",
+            "enum": ["success", "accepted", "error"],
+            "example": "accepted"
+          },
+          "message": {
+            "type": "string",
+            "description": "The message of the response",
+            "example": "Request Accepted"
+          },
+          "data": {
+            "type": "object",
+            "description": "Response data",
+            "example": {
+              "internal_reference": "DUSUPAYRMGRXNNYBWATKJ",
+              "merchant_reference": "MCTREFT2WMNWZ23SBN6Y"
+            }
+          }
+        },
+        "required": ["code", "status", "message", "data"]
+      }
+    }
+  }
+}
