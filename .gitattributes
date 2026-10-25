@@ -1,0 +1,6 @@
+# Keep LF line endings in every checkout, regardless of core.autocrlf.
+# gofmt rejects CRLF Go files, and the docs-sync snapshot is compared byte-for-byte
+# with freshly fetched (LF) docs.
+* text=auto eol=lf
+
+*.pem text eol=lf
