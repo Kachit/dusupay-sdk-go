@@ -7,6 +7,11 @@ import (
 	"net/http"
 )
 
+// BalancesFilter optional balances filter
+type BalancesFilter struct {
+	Currency CurrencyCode `json:"currency,omitempty"`
+}
+
 // BalancesResponse struct
 type BalancesResponse struct {
 	ResponseBody
@@ -36,16 +41,24 @@ type VerifyResponse struct {
 
 // VerifyResponseData struct
 type VerifyResponseData struct {
-	ID                int64   `json:"id"`
-	MerchantReference string  `json:"merchant_reference"`
-	InternalReference string  `json:"internal_reference"`
-	TransactionStatus string  `json:"transaction_status"`
-	TransactionAmount float64 `json:"transaction_amount"`
-	TransactionCharge float64 `json:"transaction_charge"`
-	TotalCredit       float64 `json:"total_credit"`
-	ProviderCode      string  `json:"provider_code"`
-	CustomerName      string  `json:"customer_name"`
-	StatusMessage     string  `json:"status_message"`
+	ID                  int64   `json:"id"`
+	MerchantReference   string  `json:"merchant_reference"`
+	InternalReference   string  `json:"internal_reference"`
+	TransactionType     string  `json:"transaction_type"`
+	RequestCurrency     string  `json:"request_currency"`
+	RequestAmount       float64 `json:"request_amount"`
+	TransactionCurrency string  `json:"transaction_currency"`
+	TransactionAmount   float64 `json:"transaction_amount"`
+	TransactionCharge   float64 `json:"transaction_charge"`
+	TransactionAccount  string  `json:"transaction_account"`
+	ChargeCustomer      bool    `json:"charge_customer"`
+	TotalCredit         float64 `json:"total_credit,omitempty"`
+	TotalDebit          float64 `json:"total_debit,omitempty"`
+	ProviderCode        string  `json:"provider_code"`
+	CustomerName        string  `json:"customer_name"`
+	InstitutionName     string  `json:"institution_name,omitempty"`
+	TransactionStatus   string  `json:"transaction_status"`
+	StatusMessage       string  `json:"status_message"`
 }
 
 // MerchantsResource wrapper
@@ -53,9 +66,17 @@ type MerchantsResource struct {
 	ResourceAbstract
 }
 
-// GetBalances get balances list (see https://developer.dusupay.com/utility-functions/balance-inquiry.md)
-func (r *MerchantsResource) GetBalances(ctx context.Context) (*BalancesResponse, *http.Response, error) {
-	rsp, err := r.tr.Get(ctx, "data/wallet-balances", nil)
+// GetBalances get balances list, filter is optional.
+// See https://developer.dusupay.com/utility-functions/balance-inquiry.md
+func (r *MerchantsResource) GetBalances(
+	ctx context.Context, filter *BalancesFilter,
+) (*BalancesResponse, *http.Response, error) {
+	var query map[string]interface{}
+	if filter != nil && filter.Currency != "" {
+		query = map[string]interface{}{"currency": filter.Currency}
+	}
+
+	rsp, err := r.tr.Get(ctx, "data/wallet-balances", query)
 	if err != nil {
 		return nil, nil, fmt.Errorf("MerchantsResource.GetBalances error: %v", err)
 	}

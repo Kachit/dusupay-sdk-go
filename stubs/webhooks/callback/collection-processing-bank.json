@@ -1,0 +1,29 @@
+{
+  "event": "transaction.processing",
+  "payload": {
+    "id": 14848,
+    "merchant_reference": "MCTREFQSSBHMHU3RCTLA",
+    "internal_reference": "DUSUPAYZAERK2SBE6WJAG",
+    "transaction_type": "COLLECTION",
+    "request_currency": "NGN",
+    "request_amount": 4000,
+    "transaction_currency": "NGN",
+    "transaction_amount": 4000,
+    "transaction_charge": 80,
+    "charge_customer": false,
+    "total_credit": 3920,
+    "transaction_account": "1771825717058",
+    "customer_name": "JOHN DOE",
+    "provider_code": "bank_ng",
+    "transaction_status": "PROCESSING",
+    "status_message": "Transaction Initiated successfully. Deposit funds to the account",
+    "payment_instructions": "Please make a payment of NGN 4,000 to the following account.",
+    "sub_account_details": {
+      "account_name": "DUSUPAY",
+      "account_no": "2121562123",
+      "bank_name": "WEMA",
+      "amount": 4000
+    },
+    "authorization": {}
+  }
+}

@@ -8,6 +8,8 @@
         "provider_code": "mtn_ug",
         "provider_name": "MTN Mobile Money Uganda",
         "transaction_method": "MOBILE_MONEY",
+        "transaction_method_name": "Mobile Money",
+        "transaction_type": "Collection",
         "transaction_currency": "UGX",
         "min_amount": 500,
         "max_amount": 3000000,

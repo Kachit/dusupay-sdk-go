@@ -87,6 +87,10 @@ func (rb *RequestBuilder) buildHeaders() http.Header {
 	headers.Set("public-key", rb.cfg.PublicKey)
 	headers.Set("secret-key", rb.cfg.SecretKey)
 
+	if rb.cfg.Language != "" {
+		headers.Set("Accept-Language", string(rb.cfg.Language))
+	}
+
 	return headers
 }
 

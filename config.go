@@ -8,11 +8,22 @@ type Config struct {
 	PublicKey  string `json:"public_key"`
 	SecretKey  string `json:"secret_key"`
 	SigningKey string `json:"signing_key"`
+	// Language optional Accept-Language header value for API messages (en, fr, sw)
+	Language LanguageCode `json:"language,omitempty"`
 }
 
 // IsSandbox check is sandbox environment
 func (c *Config) IsSandbox() bool {
 	return c.URI != ProdAPIUrl
+}
+
+// DusupayPublicKey returns the DusuPay PEM public key for the configured environment
+func (c *Config) DusupayPublicKey() []byte {
+	if c.IsSandbox() {
+		return []byte(SandboxPublicKey)
+	}
+
+	return []byte(ProdPublicKey)
 }
 
 // IsValid check is valid config parameters

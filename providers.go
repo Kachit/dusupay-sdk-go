@@ -39,15 +39,17 @@ type ProvidersResponseData struct {
 
 // ProvidersResponseDataItem struct
 type ProvidersResponseDataItem struct {
-	ProviderCode        string   `json:"provider_code"`
-	ProviderName        string   `json:"provider_name"`
-	TransactionMethod   string   `json:"transaction_method"`
-	TransactionCurrency string   `json:"transaction_currency"`
-	MinAmount           float64  `json:"min_amount"`
-	MaxAmount           float64  `json:"max_amount"`
-	MaxDailyAmount      float64  `json:"max_daily_amount"`
-	IsActive            bool     `json:"is_active"`
-	OptionPrefixes      []string `json:"option_prefixes"`
+	ProviderCode          string   `json:"provider_code"`
+	ProviderName          string   `json:"provider_name"`
+	TransactionMethod     string   `json:"transaction_method"`
+	TransactionMethodName string   `json:"transaction_method_name"`
+	TransactionType       string   `json:"transaction_type"`
+	TransactionCurrency   string   `json:"transaction_currency"`
+	MinAmount             float64  `json:"min_amount"`
+	MaxAmount             float64  `json:"max_amount"`
+	MaxDailyAmount        float64  `json:"max_daily_amount"`
+	IsActive              bool     `json:"is_active"`
+	OptionPrefixes        []string `json:"option_prefixes"`
 }
 
 // ProvidersResource wrapper

@@ -6,12 +6,18 @@
     "id": 226,
     "merchant_reference": "MCTREFT2WMNWZ23SBN6Y",
     "internal_reference": "DUSUPAYRMGRXNNYBWATKJ",
-    "transaction_status": "COMPLETED",
+    "transaction_type": "COLLECTION",
+    "request_currency": "UGX",
     "transaction_amount": 10000,
+    "transaction_currency": "UGX",
     "transaction_charge": 300,
+    "transaction_account": "256787008803",
+    "charge_customer": false,
     "total_credit": 9700,
     "provider_code": "mtn_ug",
+    "request_amount": 10000,
     "customer_name": "JOHN DOE",
+    "transaction_status": "COMPLETED",
     "status_message": "Transaction Completed Successfully"
   }
 }

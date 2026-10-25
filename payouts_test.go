@@ -69,6 +69,29 @@ func (suite *PayoutsTestSuite) TestPayoutRequestIsValidEmptyCustomerName() {
 	assert.EqualError(suite.T(), request.isValid(), `parameter "customer_name" is empty`)
 }
 
+func (suite *PayoutsTestSuite) TestPayoutRequestIsValidBankEmptyBankCode() {
+	request := PayoutRequest{
+		Currency:          CurrencyCodeNGN,
+		Amount:            4000,
+		TransactionMethod: TransactionMethodBank,
+		ProviderCode:      "bank_ng",
+		AccountNumber:     "2121562123",
+		CustomerName:      "John Doe",
+		MerchantReference: "MCTREFT2WMNWZ23SBN6Y",
+		Description:       "Test payout",
+	}
+	assert.EqualError(suite.T(), request.isValid(), `parameter "extra_params.bank_code" is empty`)
+
+	request.ExtraParams = &PayoutExtraParams{BankCode: "access_bank_ng", BranchCode: "046"}
+	assert.NoError(suite.T(), request.isValid())
+
+	result, _ := transformStructToMap(&request)
+	extra := result["extra_params"].(map[string]interface{})
+	assert.Equal(suite.T(), "access_bank_ng", extra["bank_code"])
+	assert.Equal(suite.T(), "046", extra["branch_code"])
+	assert.NotContains(suite.T(), extra, "swift_code")
+}
+
 func TestPayoutsTestSuite(t *testing.T) {
 	suite.Run(t, new(PayoutsTestSuite))
 }

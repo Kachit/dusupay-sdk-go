@@ -61,6 +61,11 @@ func (suite *ConfigTestSuite) TestIsValidEmptySecretKey() {
 	assert.Equal(suite.T(), `parameter "secret_key" is empty`, result.Error())
 }
 
+func (suite *ConfigTestSuite) TestDusupayPublicKey() {
+	assert.Equal(suite.T(), []byte(SandboxPublicKey), NewConfigSandbox("pub", "sec").DusupayPublicKey())
+	assert.Equal(suite.T(), []byte(ProdPublicKey), NewConfig("pub", "sec").DusupayPublicKey())
+}
+
 func TestConfigTestSuite(t *testing.T) {
 	suite.Run(t, new(ConfigTestSuite))
 }

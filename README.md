@@ -37,7 +37,8 @@ func main(){
 ### Get wallet balances
 ```go
 ctx := context.Background()
-balances, response, err := client.Merchants().GetBalances(ctx)
+// filter is optional, pass nil to get all wallets
+balances, response, err := client.Merchants().GetBalances(ctx, &dusupay.BalancesFilter{Currency: dusupay.CurrencyCodeUGX})
 if err != nil {
     panic(err)
 }
@@ -101,6 +102,53 @@ fmt.Println(result.Data.MerchantReference)
 fmt.Println(result.Data.PaymentURL)
 ```
 
+### Create hosted page collection request
+```go
+request := &dusupay.CollectionRequest{
+    Currency:          dusupay.CurrencyCodeUGX,
+    Amount:            10000,
+    TransactionMethod: dusupay.TransactionMethodMobileMoney,
+    ProviderCode:      "mtn_ug",
+    MerchantReference: "auto",
+    Description:       "payment description",
+    Msisdn:            "256777000001",
+    MobileMoneyHPP:    true,
+    RedirectURL:       "https://your-redirect-url",
+}
+result, response, err := client.Collections().Create(ctx, request)
+// redirect the customer to result.Data.PaymentURL
+```
+
+### Create direct card (S2S) collection request
+```go
+encryptor, _ := dusupay.NewCardEncryptor(cfg.DusupayPublicKey())
+cipher, err := encryptor.Encrypt(&dusupay.CardData{
+    FirstName: "John",
+    LastName:  "Doe",
+    CardNo:    "4622000000005678",
+    ExpMonth:  "06",
+    ExpYear:   "22",
+    CVV:       "123",
+})
+request := &dusupay.CollectionRequest{
+    Currency:          dusupay.CurrencyCodeNGN,
+    Amount:            1000,
+    TransactionMethod: dusupay.TransactionMethodCard,
+    ProviderCode:      "local_ngn",
+    MerchantReference: "auto",
+    Description:       "payment description",
+    CardCipher:        cipher,
+    RedirectURL:       "https://your-redirect-url",
+}
+result, response, err := client.Collections().Create(ctx, request)
+```
+
+### Authorize collection with OTP
+```go
+request := &dusupay.CollectionAuthorizeRequest{InternalReference: "DUSUPAYSTPDKZ6MLY5WPQ", OTP: "123456"}
+result, response, err := client.Collections().Authorize(ctx, request)
+```
+
 ### Create payout request
 ```go
 ctx := context.Background()
@@ -122,21 +170,51 @@ fmt.Println(result.Data.InternalReference)
 fmt.Println(result.Data.MerchantReference)
 ```
 
-### Verify RSA webhook signature
+### Create bank payout request
 ```go
-var payload dusupay.CollectionCallbackPayload
-_ = json.Unmarshal(requestBody, &payload)
+request := &dusupay.PayoutRequest{
+    Currency:          dusupay.CurrencyCodeNGN,
+    Amount:            4000,
+    TransactionMethod: dusupay.TransactionMethodBank,
+    ProviderCode:      "bank_ng",
+    MerchantReference: "1234567893",
+    Description:       "payout description",
+    AccountNumber:     "2121562123",
+    CustomerName:      "Foo Bar",
+    ExtraParams:       &dusupay.PayoutExtraParams{BankCode: "access_bank_ng"},
+}
+result, response, err := client.Payouts().Create(ctx, request)
+```
 
-rawBytes, _ := os.ReadFile("path/to/dusupay-public-key.pem")
-validator, _ := dusupay.NewSignatureValidator(rawBytes)
-err := validator.ValidateSignature(&payload, signatureHeader)
+### Handle webhook callback and verify RSA signature
+Callbacks are sent as `{"event": "...", "payload": {...}}`. Use `dusupay.PayoutCallback` for payout callbacks.
+```go
+var callback dusupay.CollectionCallback
+_ = json.Unmarshal(requestBody, &callback)
+
+validator, _ := dusupay.NewSignatureValidator(cfg.DusupayPublicKey())
+err := validator.ValidateSignature(&callback, r.Header.Get("rsa-signature"))
+
+if callback.Event == dusupay.CallbackEventTransactionProcessing &&
+    callback.Payload.Authorization != nil &&
+    callback.Payload.Authorization.Mode == dusupay.AuthorizationModeOTP {
+    // collect OTP from the customer and call client.Collections().Authorize
+}
 ```
 
 ### Verify HMAC webhook signature
 ```go
-var payload dusupay.CollectionCallbackPayload
-_ = json.Unmarshal(requestBody, &payload)
+var callback dusupay.CollectionCallback
+_ = json.Unmarshal(requestBody, &callback)
 
 validator := dusupay.NewHMACSignatureValidator("your-signing-key")
-err := validator.ValidateSignature(&payload, signatureHeader)
+err := validator.ValidateSignature(&callback, r.Header.Get("hmac-signature"))
+```
+
+### Verify redirect signature (hosted pages, cards)
+```go
+payload := dusupay.NewRedirectPayload(r.URL.Query())
+
+validator := dusupay.NewHMACSignatureValidator("your-signing-key")
+err := validator.ValidateSignature(payload, payload.HMACSignature)
 ```

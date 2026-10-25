@@ -118,6 +118,50 @@ func (suite *CollectionsTestSuite) TestCollectionRequestIsValidMobileMoneyWithMs
 	assert.NoError(suite.T(), request.isValid())
 }
 
+func (suite *CollectionsTestSuite) TestCollectionRequestIsValidCardEmptyRedirectURL() {
+	request := CollectionRequest{
+		Currency:          CurrencyCodeNGN,
+		Amount:            1000,
+		TransactionMethod: TransactionMethodCard,
+		ProviderCode:      "local_ngn",
+		MerchantReference: "merchant_reference",
+		Description:       "test description",
+		CardCipher:        "cipher",
+	}
+	assert.EqualError(suite.T(), request.isValid(), `parameter "redirect_url" is empty`)
+}
+
+func (suite *CollectionsTestSuite) TestCollectionRequestIsValidHostedPageEmptyRedirectURL() {
+	request := CollectionRequest{
+		Currency:          CurrencyCodeUGX,
+		Amount:            1000,
+		TransactionMethod: TransactionMethodMobileMoney,
+		ProviderCode:      "mtn_ug",
+		MerchantReference: "auto",
+		Description:       "test description",
+		Msisdn:            "256777000001",
+		MobileMoneyHPP:    true,
+	}
+	assert.EqualError(suite.T(), request.isValid(), `parameter "redirect_url" is empty`)
+}
+
+func (suite *CollectionsTestSuite) TestCollectionRequestAllowFinalStatusChangeFalseIsSent() {
+	allow := false
+	request := CollectionRequest{AllowFinalStatusChange: &allow, MobileMoneyHPP: true, RedirectURL: "https://example.com"}
+	result, err := transformStructToMap(&request)
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), false, result["allow_final_status_change"])
+	assert.Equal(suite.T(), true, result["mobile_money_hpp"])
+	assert.Equal(suite.T(), "https://example.com", result["redirect_url"])
+	assert.NotContains(suite.T(), result, "card_cipher")
+}
+
+func (suite *CollectionsTestSuite) TestCollectionRequestAllowFinalStatusChangeNilIsOmitted() {
+	result, err := transformStructToMap(&CollectionRequest{})
+	assert.NoError(suite.T(), err)
+	assert.NotContains(suite.T(), result, "allow_final_status_change")
+}
+
 func TestCollectionsTestSuite(t *testing.T) {
 	suite.Run(t, new(CollectionsTestSuite))
 }

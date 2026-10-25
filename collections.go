@@ -9,17 +9,24 @@ import (
 
 // CollectionRequest struct
 type CollectionRequest struct {
-	Currency               CurrencyCode          `json:"currency"`
-	Amount                 float64               `json:"amount"`
-	TransactionMethod      TransactionMethodCode `json:"transaction_method"`
-	ProviderCode           string                `json:"provider_code"`
-	MerchantReference      string                `json:"merchant_reference"`
-	Description            string                `json:"description"`
-	Msisdn                 string                `json:"msisdn,omitempty"`
-	CustomerName           string                `json:"customer_name,omitempty"`
-	CustomerEmail          string                `json:"customer_email,omitempty"`
-	ChargeCustomer         bool                  `json:"charge_customer,omitempty"`
-	AllowFinalStatusChange bool                  `json:"allow_final_status_change,omitempty"`
+	Currency          CurrencyCode          `json:"currency"`
+	Amount            float64               `json:"amount"`
+	TransactionMethod TransactionMethodCode `json:"transaction_method"`
+	ProviderCode      string                `json:"provider_code"`
+	MerchantReference string                `json:"merchant_reference"`
+	Description       string                `json:"description"`
+	Msisdn            string                `json:"msisdn,omitempty"`
+	CustomerName      string                `json:"customer_name,omitempty"`
+	CustomerEmail     string                `json:"customer_email,omitempty"`
+	ChargeCustomer    bool                  `json:"charge_customer,omitempty"`
+	// AllowFinalStatusChange is a pointer because the API default is true; nil leaves the default
+	AllowFinalStatusChange *bool `json:"allow_final_status_change,omitempty"`
+	// MobileMoneyHPP set true to process mobile money via the hosted payment page
+	MobileMoneyHPP bool `json:"mobile_money_hpp,omitempty"`
+	// RedirectURL HTTPS URL the customer is redirected to (hosted pages and cards)
+	RedirectURL string `json:"redirect_url,omitempty"`
+	// CardCipher encrypted card data for direct card payments (see CardEncryptor)
+	CardCipher string `json:"card_cipher,omitempty"`
 }
 
 func (cr *CollectionRequest) isValid() error {
@@ -49,6 +56,10 @@ func (cr *CollectionRequest) isValid() error {
 
 	if cr.Msisdn == "" && cr.TransactionMethod == TransactionMethodMobileMoney {
 		return fmt.Errorf(`parameter "msisdn" is empty`)
+	}
+
+	if cr.RedirectURL == "" && (cr.MobileMoneyHPP || cr.TransactionMethod == TransactionMethodCard) {
+		return fmt.Errorf(`parameter "redirect_url" is empty`)
 	}
 
 	return nil

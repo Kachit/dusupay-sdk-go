@@ -49,6 +49,13 @@ func (suite *HTTPRequestBuilderTestSuite) TestBuildHeaders() {
 	assert.Equal(suite.T(), "1", headers.Get("x-api-version"))
 	assert.Equal(suite.T(), suite.cfg.PublicKey, headers.Get("public-key"))
 	assert.Equal(suite.T(), suite.cfg.SecretKey, headers.Get("secret-key"))
+	assert.Empty(suite.T(), headers.Get("Accept-Language"))
+}
+
+func (suite *HTTPRequestBuilderTestSuite) TestBuildHeadersWithLanguage() {
+	suite.cfg.Language = LanguageFrench
+	headers := suite.testable.buildHeaders()
+	assert.Equal(suite.T(), "fr", headers.Get("Accept-Language"))
 }
 
 func (suite *HTTPRequestBuilderTestSuite) TestBuildBody() {

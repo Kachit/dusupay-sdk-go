@@ -20,9 +20,14 @@ type PayoutRequest struct {
 	ExtraParams       *PayoutExtraParams    `json:"extra_params,omitempty"`
 }
 
-// PayoutExtraParams struct
+// PayoutExtraParams bank details (mandatory for bank transfers)
 type PayoutExtraParams struct {
-	BankCode string `json:"bank_code"`
+	BankCode           string `json:"bank_code"`
+	BranchCode         string `json:"branch_code,omitempty"`
+	BeneficiaryAddress string `json:"beneficiary_address,omitempty"`
+	BeneficiaryCountry string `json:"beneficiary_country,omitempty"`
+	AddressCity        string `json:"address_city,omitempty"`
+	SwiftCode          string `json:"swift_code,omitempty"`
 }
 
 func (pr *PayoutRequest) isValid() error {
@@ -56,6 +61,10 @@ func (pr *PayoutRequest) isValid() error {
 
 	if pr.CustomerName == "" {
 		return fmt.Errorf(`parameter "customer_name" is empty`)
+	}
+
+	if pr.TransactionMethod == TransactionMethodBank && (pr.ExtraParams == nil || pr.ExtraParams.BankCode == "") {
+		return fmt.Errorf(`parameter "extra_params.bank_code" is empty`)
 	}
 
 	return nil

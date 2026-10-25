@@ -20,6 +20,9 @@ type TransactionStatusCode string
 // TransactionStatusPending const
 const TransactionStatusPending TransactionStatusCode = "PENDING"
 
+// TransactionStatusProcessing const
+const TransactionStatusProcessing TransactionStatusCode = "PROCESSING"
+
 // TransactionStatusFailed const
 const TransactionStatusFailed TransactionStatusCode = "FAILED"
 
@@ -28,6 +31,61 @@ const TransactionStatusCompleted TransactionStatusCode = "COMPLETED"
 
 // TransactionStatusCancelled const
 const TransactionStatusCancelled TransactionStatusCode = "CANCELLED"
+
+// CallbackEventCode type
+// See https://developer.dusupay.com/utility-functions/handling-notifications-callbacks/callback-events.md
+type CallbackEventCode string
+
+// CallbackEventRequestFailed const
+const CallbackEventRequestFailed CallbackEventCode = "request.failed"
+
+// CallbackEventTransactionCharges const
+const CallbackEventTransactionCharges CallbackEventCode = "transaction.charges"
+
+// CallbackEventTransactionProcessing const
+const CallbackEventTransactionProcessing CallbackEventCode = "transaction.processing"
+
+// CallbackEventTransactionFailed const
+const CallbackEventTransactionFailed CallbackEventCode = "transaction.failed"
+
+// CallbackEventTransactionCompleted const
+const CallbackEventTransactionCompleted CallbackEventCode = "transaction.completed"
+
+// CallbackEventInvoiceGenerated const
+const CallbackEventInvoiceGenerated CallbackEventCode = "invoice.generated"
+
+// CallbackEventInvoicePaid const
+const CallbackEventInvoicePaid CallbackEventCode = "invoice.paid"
+
+// AuthorizationModeCode type
+type AuthorizationModeCode string
+
+// AuthorizationModeNone const
+const AuthorizationModeNone AuthorizationModeCode = "NONE"
+
+// AuthorizationModeOTP const
+const AuthorizationModeOTP AuthorizationModeCode = "OTP"
+
+// WalletTypeCode type
+type WalletTypeCode string
+
+// WalletTypeMerchantCollection const
+const WalletTypeMerchantCollection WalletTypeCode = "MERCHANT_COLLECTION"
+
+// WalletTypeMerchantPayout const
+const WalletTypeMerchantPayout WalletTypeCode = "MERCHANT_PAYOUT"
+
+// LanguageCode type (Accept-Language header)
+type LanguageCode string
+
+// LanguageEnglish const
+const LanguageEnglish LanguageCode = "en"
+
+// LanguageFrench const
+const LanguageFrench LanguageCode = "fr"
+
+// LanguageSwahili const
+const LanguageSwahili LanguageCode = "sw"
 
 // TransactionMethodCode type
 type TransactionMethodCode string

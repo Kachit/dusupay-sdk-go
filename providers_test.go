@@ -67,6 +67,8 @@ func (suite *ProvidersResourceTestSuite) TestGetListSuccess() {
 	assert.Equal(suite.T(), 1, len(result.Data.PaymentProviders))
 	assert.Equal(suite.T(), "mtn_ug", result.Data.PaymentProviders[0].ProviderCode)
 	assert.Equal(suite.T(), "MTN Mobile Money Uganda", result.Data.PaymentProviders[0].ProviderName)
+	assert.Equal(suite.T(), "Mobile Money", result.Data.PaymentProviders[0].TransactionMethodName)
+	assert.Equal(suite.T(), "Collection", result.Data.PaymentProviders[0].TransactionType)
 	assert.Equal(suite.T(), "MOBILE_MONEY", result.Data.PaymentProviders[0].TransactionMethod)
 	assert.Equal(suite.T(), "UGX", result.Data.PaymentProviders[0].TransactionCurrency)
 	assert.Equal(suite.T(), float64(500), result.Data.PaymentProviders[0].MinAmount)

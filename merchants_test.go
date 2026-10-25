@@ -35,7 +35,7 @@ func (suite *MerchantsResourceTestSuite) TestGetBalancesSuccess() {
 	body, _ := LoadStubResponseData("stubs/merchants/balance/success.json")
 	httpmock.RegisterResponder(http.MethodGet, suite.cfg.URI+"/data/wallet-balances", httpmock.NewBytesResponder(http.StatusOK, body))
 
-	result, resp, err := suite.testable.GetBalances(suite.ctx)
+	result, resp, err := suite.testable.GetBalances(suite.ctx, nil)
 	assert.NoError(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
 	assert.NotEmpty(suite.T(), result)
@@ -57,7 +57,7 @@ func (suite *MerchantsResourceTestSuite) TestGetBalancesJsonError() {
 	body, _ := LoadStubResponseData("stubs/errors/401.json")
 	httpmock.RegisterResponder(http.MethodGet, suite.cfg.URI+"/data/wallet-balances", httpmock.NewBytesResponder(http.StatusUnauthorized, body))
 
-	result, resp, err := suite.testable.GetBalances(suite.ctx)
+	result, resp, err := suite.testable.GetBalances(suite.ctx, nil)
 	defer func() { _ = resp.Body.Close() }()
 	assert.Error(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
@@ -69,7 +69,7 @@ func (suite *MerchantsResourceTestSuite) TestGetBalancesNonJsonError() {
 	body, _ := LoadStubResponseData("stubs/errors/500.html")
 	httpmock.RegisterResponder(http.MethodGet, suite.cfg.URI+"/data/wallet-balances", httpmock.NewBytesResponder(http.StatusInternalServerError, body))
 
-	result, resp, err := suite.testable.GetBalances(suite.ctx)
+	result, resp, err := suite.testable.GetBalances(suite.ctx, nil)
 	defer func() { _ = resp.Body.Close() }()
 	assert.Error(suite.T(), err)
 	assert.NotEmpty(suite.T(), resp)
@@ -92,6 +92,22 @@ func (suite *MerchantsResourceTestSuite) TestVerifySuccess() {
 	assert.Equal(suite.T(), "COMPLETED", result.Data.TransactionStatus)
 	assert.Equal(suite.T(), float64(10000), result.Data.TransactionAmount)
 	assert.Equal(suite.T(), "mtn_ug", result.Data.ProviderCode)
+	assert.Equal(suite.T(), "COLLECTION", result.Data.TransactionType)
+	assert.Equal(suite.T(), "UGX", result.Data.RequestCurrency)
+	assert.Equal(suite.T(), float64(10000), result.Data.RequestAmount)
+	assert.Equal(suite.T(), "UGX", result.Data.TransactionCurrency)
+	assert.Equal(suite.T(), "256787008803", result.Data.TransactionAccount)
+	assert.Equal(suite.T(), float64(9700), result.Data.TotalCredit)
+}
+
+func (suite *MerchantsResourceTestSuite) TestGetBalancesWithCurrencyFilter() {
+	body, _ := LoadStubResponseData("stubs/merchants/balance/success.json")
+	httpmock.RegisterResponderWithQuery(http.MethodGet, suite.cfg.URI+"/data/wallet-balances", "currency=UGX", httpmock.NewBytesResponder(http.StatusOK, body))
+
+	result, resp, err := suite.testable.GetBalances(suite.ctx, &BalancesFilter{Currency: CurrencyCodeUGX})
+	defer func() { _ = resp.Body.Close() }()
+	assert.NoError(suite.T(), err)
+	assert.True(suite.T(), result.IsSuccess())
 }
 
 func (suite *MerchantsResourceTestSuite) TestVerifyEmptyReference() {
