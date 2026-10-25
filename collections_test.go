@@ -278,6 +278,7 @@ func (suite *CollectionsResourceTestSuite) TestAuthorizeSuccess() {
 	assert.True(suite.T(), result.IsSuccess())
 	assert.Equal(suite.T(), "DUSUPAYSTPDKZ6MLY5WPQ", result.Data.InternalReference)
 	assert.Equal(suite.T(), "MCTREF9WVCPGFRHYCWSK", result.Data.MerchantReference)
+	assert.Equal(suite.T(), "https://devpay.dusupay.com/pay/collection/DUSUPAYSTPDKZ6MLY5WPQ", result.Data.PaymentURL)
 }
 
 func (suite *CollectionsResourceTestSuite) TestAuthorizeInvalidRequest() {

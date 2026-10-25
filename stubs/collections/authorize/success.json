@@ -4,6 +4,7 @@
   "message": "Request Accepted",
   "data": {
     "internal_reference": "DUSUPAYSTPDKZ6MLY5WPQ",
-    "merchant_reference": "MCTREF9WVCPGFRHYCWSK"
+    "merchant_reference": "MCTREF9WVCPGFRHYCWSK",
+    "payment_url": "https://devpay.dusupay.com/pay/collection/DUSUPAYSTPDKZ6MLY5WPQ"
   }
 }

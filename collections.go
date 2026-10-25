@@ -94,6 +94,7 @@ type CollectionAuthorizeResponse struct {
 type CollectionAuthorizeResponseData struct {
 	InternalReference string `json:"internal_reference"`
 	MerchantReference string `json:"merchant_reference"`
+	PaymentURL        string `json:"payment_url,omitempty"`
 }
 
 // CollectionsResource wrapper
