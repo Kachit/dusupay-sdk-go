@@ -1,126 +1,153 @@
 package dusupay
 
 import (
-	"context"
-	"errors"
 	"fmt"
-	"net/http"
+	"net/url"
+	"strconv"
 )
 
-//CollectionWebhook struct
-type CollectionWebhook struct {
-	ID                int64   `json:"id"`
-	RequestAmount     float64 `json:"request_amount"`
-	RequestCurrency   string  `json:"request_currency"`
-	AccountAmount     float64 `json:"account_amount"`
-	AccountCurrency   string  `json:"account_currency"`
-	TransactionFee    float64 `json:"transaction_fee"`
-	TotalCredit       float64 `json:"total_credit"`
-	CustomerCharged   bool    `json:"customer_charged"`
-	ProviderID        string  `json:"provider_id"`
-	MerchantReference string  `json:"merchant_reference"`
-	InternalReference string  `json:"internal_reference"`
-	TransactionStatus string  `json:"transaction_status"`
-	TransactionType   string  `json:"transaction_type"`
-	Message           string  `json:"message"`
-	AccountNumber     string  `json:"account_number"`
-	AccountName       string  `json:"account_name"`
-	InstitutionName   string  `json:"institution_name"`
+// CallbackPayloadInterface implemented by all callback payload types
+type CallbackPayloadInterface interface {
+	BuildPayloadString() string
 }
 
-func (cw *CollectionWebhook) BuildPayloadString(url string) string {
-	return fmt.Sprintf("%d:%s:%s:%s", cw.ID, cw.InternalReference, cw.TransactionStatus, url)
+// buildPayloadString builds the RSA/HMAC verification payload string
+// Payload format: event:merchant_reference:internal_reference:transaction_type:transaction_status
+func buildPayloadString(event CallbackEventCode, merchantRef, internalRef, txType, txStatus string) string {
+	return fmt.Sprintf("%s:%s:%s:%s:%s", event, merchantRef, internalRef, txType, txStatus)
 }
 
-//PayoutWebhook struct
-type PayoutWebhook struct {
-	ID                int64   `json:"id"`
-	RequestAmount     float64 `json:"request_amount"`
-	RequestCurrency   string  `json:"request_currency"`
-	AccountAmount     float64 `json:"account_amount"`
-	AccountCurrency   string  `json:"account_currency"`
-	TransactionFee    float64 `json:"transaction_fee"`
-	TotalDebit        float64 `json:"total_debit"`
-	ProviderID        string  `json:"provider_id"`
-	MerchantReference string  `json:"merchant_reference"`
-	InternalReference string  `json:"internal_reference"`
-	TransactionStatus string  `json:"transaction_status"`
-	TransactionType   string  `json:"transaction_type"`
-	Message           string  `json:"message"`
-	AccountNumber     string  `json:"account_number"`
-	AccountName       string  `json:"account_name"`
-	InstitutionName   string  `json:"institution_name"`
+// CollectionCallback webhook callback request body for collection transactions.
+// See https://developer.dusupay.com/funds-collection/getting-started.md
+type CollectionCallback struct {
+	Event   CallbackEventCode          `json:"event"`
+	Payload *CollectionCallbackPayload `json:"payload"`
 }
 
-func (pw *PayoutWebhook) BuildPayloadString(url string) string {
-	return fmt.Sprintf("%d:%s:%s:%s", pw.ID, pw.InternalReference, pw.TransactionStatus, url)
+// BuildPayloadString builds the RSA/HMAC verification payload string
+func (cc *CollectionCallback) BuildPayloadString() string {
+	p := cc.Payload
+	if p == nil {
+		p = &CollectionCallbackPayload{}
+	}
+
+	return buildPayloadString(cc.Event, p.MerchantReference, p.InternalReference, p.TransactionType, p.TransactionStatus)
 }
 
-//RefundWebhook struct
-type RefundWebhook struct {
+// CollectionCallbackPayload collection transaction details sent in the callback
+type CollectionCallbackPayload struct {
+	ID                  int64                  `json:"id"`
+	MerchantReference   string                 `json:"merchant_reference"`
+	InternalReference   string                 `json:"internal_reference"`
+	TransactionType     string                 `json:"transaction_type"`
+	RequestCurrency     string                 `json:"request_currency"`
+	RequestAmount       float64                `json:"request_amount"`
+	TransactionCurrency string                 `json:"transaction_currency"`
+	TransactionAmount   float64                `json:"transaction_amount"`
+	TransactionCharge   float64                `json:"transaction_charge"`
+	TransactionAccount  string                 `json:"transaction_account"`
+	ChargeCustomer      bool                   `json:"charge_customer"`
+	TotalCredit         float64                `json:"total_credit"`
+	ProviderCode        string                 `json:"provider_code"`
+	CustomerName        string                 `json:"customer_name"`
+	InstitutionName     string                 `json:"institution_name,omitempty"`
+	TransactionStatus   string                 `json:"transaction_status"`
+	StatusMessage       string                 `json:"status_message"`
+	PaymentInstructions string                 `json:"payment_instructions,omitempty"`
+	Authorization       *CallbackAuthorization `json:"authorization,omitempty"`
+	SubAccountDetails   *CallbackSubAccount    `json:"sub_account_details,omitempty"`
+}
+
+// CallbackAuthorization authorization requirements sent with transaction.processing callbacks
+type CallbackAuthorization struct {
+	Mode               AuthorizationModeCode             `json:"mode"`
+	RequiredParameters []*CallbackAuthorizationParameter `json:"required_parameters"`
+}
+
+// CallbackAuthorizationParameter parameter the merchant must collect and submit (e.g. otp)
+type CallbackAuthorizationParameter struct {
+	ParameterName string `json:"parameter_name"`
+}
+
+// CallbackSubAccount virtual bank account details for bank transfer collections
+type CallbackSubAccount struct {
+	AccountName string  `json:"account_name"`
+	AccountNo   string  `json:"account_no"`
+	BankName    string  `json:"bank_name"`
+	Amount      float64 `json:"amount"`
+}
+
+// PayoutCallback webhook callback request body for payout transactions.
+// See https://developer.dusupay.com/payouts-disbursements/getting-started.md
+type PayoutCallback struct {
+	Event   CallbackEventCode      `json:"event"`
+	Payload *PayoutCallbackPayload `json:"payload"`
+}
+
+// BuildPayloadString builds the RSA/HMAC verification payload string
+func (pc *PayoutCallback) BuildPayloadString() string {
+	p := pc.Payload
+	if p == nil {
+		p = &PayoutCallbackPayload{}
+	}
+
+	return buildPayloadString(pc.Event, p.MerchantReference, p.InternalReference, p.TransactionType, p.TransactionStatus)
+}
+
+// PayoutCallbackPayload payout transaction details sent in the callback
+type PayoutCallbackPayload struct {
 	ID                  int64   `json:"id"`
-	RefundAmount        float64 `json:"refund_amount"`
-	RefundCurrency      string  `json:"refund_currency"`
-	TransactionFee      float64 `json:"transaction_fee"`
-	TotalDebit          float64 `json:"total_debit"`
-	ProviderID          string  `json:"provider_id"`
-	CollectionReference string  `json:"collection_reference"`
+	MerchantReference   string  `json:"merchant_reference"`
 	InternalReference   string  `json:"internal_reference"`
 	TransactionType     string  `json:"transaction_type"`
+	RequestCurrency     string  `json:"request_currency"`
+	RequestAmount       float64 `json:"request_amount"`
+	TransactionCurrency string  `json:"transaction_currency"`
+	TransactionAmount   float64 `json:"transaction_amount"`
+	TransactionCharge   float64 `json:"transaction_charge"`
+	TransactionAccount  string  `json:"transaction_account"`
+	ChargeCustomer      bool    `json:"charge_customer"`
+	TotalDebit          float64 `json:"total_debit"`
+	ProviderCode        string  `json:"provider_code"`
+	CustomerName        string  `json:"customer_name"`
 	TransactionStatus   string  `json:"transaction_status"`
-	AccountNumber       string  `json:"account_number"`
-	Message             string  `json:"message"`
+	StatusMessage       string  `json:"status_message"`
 }
 
-func (rw *RefundWebhook) BuildPayloadString(url string) string {
-	return fmt.Sprintf("%d:%s:%s:%s", rw.ID, rw.InternalReference, rw.TransactionStatus, url)
+// RedirectPayload data passed as query parameters to the merchant redirect_url (hosted pages and card payments).
+// See https://developer.dusupay.com/funds-collection/card-payments/hosted-payment-page.md
+type RedirectPayload struct {
+	ID                int64
+	Event             CallbackEventCode
+	MerchantReference string
+	InternalReference string
+	TransactionType   string
+	TransactionStatus string
+	StatusMessage     string
+	RSASignature      string
+	HMACSignature     string
 }
 
-//WebhookResponse struct
-type WebhookResponse struct {
-	ResponseBody
-	Data *WebhookResponseData `json:"data,omitempty"`
-}
+// NewRedirectPayload parses redirect query parameters
+func NewRedirectPayload(query url.Values) *RedirectPayload {
+	id, _ := strconv.ParseInt(query.Get("id"), 10, 64)
 
-//WebhookResponseData struct
-type WebhookResponseData struct {
-	Payload *WebhookResponsePayload `json:"payload,omitempty"`
-}
-
-//WebhookResponsePayload struct
-type WebhookResponsePayload struct {
-	ID                int64   `json:"id"`
-	RequestAmount     float64 `json:"request_amount"`
-	RequestCurrency   string  `json:"request_currency"`
-	AccountAmount     float64 `json:"account_amount"`
-	AccountCurrency   string  `json:"account_currency"`
-	TransactionFee    float64 `json:"transaction_fee"`
-	ProviderID        string  `json:"provider_id"`
-	MerchantReference string  `json:"merchant_reference"`
-	InternalReference string  `json:"internal_reference"`
-	TransactionStatus string  `json:"transaction_status"`
-	TransactionType   string  `json:"transaction_type"`
-	Message           string  `json:"message"`
-}
-
-//WebhooksResource wrapper
-type WebhooksResource struct {
-	ResourceAbstract
-}
-
-//SendCallback (see https://docs.dusupay.com/appendix/webhooks/webhook-trigger)
-func (r *WebhooksResource) SendCallback(ctx context.Context, internalReference string) (*WebhookResponse, *http.Response, error) {
-	rsp, err := r.ResourceAbstract.tr.Get(ctx, "v1/send-callback/"+internalReference, nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("WebhooksResource.SendCallback error: %v", err)
+	return &RedirectPayload{
+		ID:                id,
+		Event:             CallbackEventCode(query.Get("event")),
+		MerchantReference: query.Get("merchant_reference"),
+		InternalReference: query.Get("internal_reference"),
+		TransactionType:   query.Get("transaction_type"),
+		TransactionStatus: query.Get("transaction_status"),
+		StatusMessage:     query.Get("status_message"),
+		RSASignature:      query.Get("rsa_signature"),
+		HMACSignature:     query.Get("hmac_signature"),
 	}
-	var response WebhookResponse
-	err = unmarshalResponse(rsp, &response)
-	if err != nil {
-		return nil, rsp, fmt.Errorf("WebhooksResource.SendCallback error: %v", err)
-	}
-	if !response.IsSuccess() {
-		err = errors.New(response.Message)
-	}
-	return &response, rsp, err
+}
+
+// BuildPayloadString builds the RSA/HMAC verification payload string
+func (rp *RedirectPayload) BuildPayloadString() string {
+	return buildPayloadString(
+		rp.Event, rp.MerchantReference, rp.InternalReference, rp.TransactionType, rp.TransactionStatus,
+	)
 }

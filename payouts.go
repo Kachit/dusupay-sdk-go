@@ -7,95 +7,110 @@ import (
 	"net/http"
 )
 
-//PayoutRequest struct
+// PayoutRequest struct
 type PayoutRequest struct {
 	Currency          CurrencyCode          `json:"currency"`
 	Amount            float64               `json:"amount"`
-	Method            TransactionMethodCode `json:"method"`
-	ProviderId        string                `json:"provider_id"`
+	TransactionMethod TransactionMethodCode `json:"transaction_method"`
+	ProviderCode      string                `json:"provider_code"`
 	AccountNumber     string                `json:"account_number"`
-	AccountName       string                `json:"account_name"`
-	AccountEmail      string                `json:"account_email"`
+	CustomerName      string                `json:"customer_name"`
 	MerchantReference string                `json:"merchant_reference"`
-	Narration         string                `json:"narration"`
-	ExtraParams       struct {
-		BankCode       string `json:"bank_code"`
-		BankBranchCode string `json:"branch_code"`
-	} `json:"extra_params"`
+	Description       string                `json:"description"`
+	ExtraParams       *PayoutExtraParams    `json:"extra_params,omitempty"`
 }
 
-//Check is valid PayoutRequest parameters
+// PayoutExtraParams bank details (mandatory for bank transfers)
+type PayoutExtraParams struct {
+	BankCode           string `json:"bank_code"`
+	BranchCode         string `json:"branch_code,omitempty"`
+	BeneficiaryAddress string `json:"beneficiary_address,omitempty"`
+	BeneficiaryCountry string `json:"beneficiary_country,omitempty"`
+	AddressCity        string `json:"address_city,omitempty"`
+	SwiftCode          string `json:"swift_code,omitempty"`
+}
+
 func (pr *PayoutRequest) isValid() error {
-	var err error
 	if pr.Currency == "" {
-		err = fmt.Errorf(`parameter "currency" is empty`)
-	} else if pr.Amount == 0 {
-		err = fmt.Errorf(`parameter "amount" is empty`)
-	} else if pr.Method == "" {
-		err = fmt.Errorf(`parameter "method" is empty`)
-	} else if pr.ProviderId == "" {
-		err = fmt.Errorf(`parameter "provider_id" is empty`)
-	} else if pr.MerchantReference == "" {
-		err = fmt.Errorf(`parameter "merchant_reference" is empty`)
-	} else if pr.Narration == "" {
-		err = fmt.Errorf(`parameter "narration" is empty`)
-	} else if pr.AccountNumber == "" {
-		err = fmt.Errorf(`parameter "account_number" is empty`)
-	} else if pr.AccountName == "" {
-		err = fmt.Errorf(`parameter "account_name" is empty`)
+		return fmt.Errorf(`parameter "currency" is empty`)
 	}
-	return err
+
+	if pr.Amount == 0 {
+		return fmt.Errorf(`parameter "amount" is empty`)
+	}
+
+	if pr.TransactionMethod == "" {
+		return fmt.Errorf(`parameter "transaction_method" is empty`)
+	}
+
+	if pr.ProviderCode == "" {
+		return fmt.Errorf(`parameter "provider_code" is empty`)
+	}
+
+	if pr.MerchantReference == "" {
+		return fmt.Errorf(`parameter "merchant_reference" is empty`)
+	}
+
+	if pr.Description == "" {
+		return fmt.Errorf(`parameter "description" is empty`)
+	}
+
+	if pr.AccountNumber == "" {
+		return fmt.Errorf(`parameter "account_number" is empty`)
+	}
+
+	if pr.CustomerName == "" {
+		return fmt.Errorf(`parameter "customer_name" is empty`)
+	}
+
+	if pr.TransactionMethod == TransactionMethodBank && (pr.ExtraParams == nil || pr.ExtraParams.BankCode == "") {
+		return fmt.Errorf(`parameter "extra_params.bank_code" is empty`)
+	}
+
+	return nil
 }
 
-//PayoutResponse struct
+// PayoutResponse struct
 type PayoutResponse struct {
 	ResponseBody
 	Data *PayoutResponseData `json:"data,omitempty"`
 }
 
-//PayoutResponseData struct
+// PayoutResponseData struct
 type PayoutResponseData struct {
-	ID                int64   `json:"id"`
-	RequestAmount     float64 `json:"request_amount"`
-	RequestCurrency   string  `json:"request_currency"`
-	AccountAmount     float64 `json:"account_amount"`
-	AccountCurrency   string  `json:"account_currency"`
-	TransactionFee    float64 `json:"transaction_fee"`
-	TotalDebit        float64 `json:"total_debit"`
-	ProviderID        string  `json:"provider_id"`
-	MerchantReference string  `json:"merchant_reference"`
-	InternalReference string  `json:"internal_reference"`
-	TransactionStatus string  `json:"transaction_status"`
-	TransactionType   string  `json:"transaction_type"`
-	Message           string  `json:"message"`
+	InternalReference string `json:"internal_reference"`
+	MerchantReference string `json:"merchant_reference"`
 }
 
-//PayoutsResource wrapper
+// PayoutsResource wrapper
 type PayoutsResource struct {
 	ResourceAbstract
 }
 
-//Create payout request (see https://docs.dusupay.com/sending-money/payouts/post-payout-request)
+// Create payout request (see https://developer.dusupay.com/payouts-disbursements/mobile-money-payouts.md)
 func (r *PayoutsResource) Create(ctx context.Context, req *PayoutRequest) (*PayoutResponse, *http.Response, error) {
-	err := req.isValid()
-	if err != nil {
+	if err := req.isValid(); err != nil {
 		return nil, nil, fmt.Errorf("PayoutsResource.Create error: %v", err)
 	}
+
 	post, err := transformStructToMap(req)
 	if err != nil {
 		return nil, nil, fmt.Errorf("PayoutsResource.Create error: %v", err)
 	}
-	rsp, err := r.ResourceAbstract.tr.Post(ctx, "v1/payouts", post, nil)
+
+	rsp, err := r.tr.Post(ctx, "payout/send-funds", post, nil)
 	if err != nil {
 		return nil, nil, fmt.Errorf("PayoutsResource.Create error: %v", err)
 	}
+
 	var result PayoutResponse
-	err = unmarshalResponse(rsp, &result)
-	if err != nil {
+	if err = unmarshalResponse(rsp, &result); err != nil {
 		return nil, rsp, fmt.Errorf("PayoutsResource.Create error: %v", err)
 	}
+
 	if !result.IsSuccess() {
 		err = errors.New(result.Message)
 	}
+
 	return &result, rsp, err
 }

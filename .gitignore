@@ -16,3 +16,5 @@
 #Custom
 tmp
 main
+.tasks
+.claude/settings.local.json

@@ -1,9 +1,10 @@
 package dusupay
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"testing"
 )
 
 type ClientTestSuite struct {
@@ -19,7 +20,7 @@ func (suite *ClientTestSuite) TestNewClientFromConfigValid() {
 
 func (suite *ClientTestSuite) TestNewClientFromConfigInvalid() {
 	cfg := BuildStubConfig()
-	cfg.Uri = ""
+	cfg.URI = ""
 	client, err := NewClientFromConfig(cfg, nil)
 	assert.Error(suite.T(), err)
 	assert.Empty(suite.T(), client)
@@ -53,23 +54,9 @@ func (suite *ClientTestSuite) TestGetMerchantsResource() {
 	assert.NotEmpty(suite.T(), result)
 }
 
-func (suite *ClientTestSuite) TestGetRefundsResource() {
-	client, err := NewClientFromConfig(BuildStubConfig(), nil)
-	result := client.Refunds()
-	assert.NoError(suite.T(), err)
-	assert.NotEmpty(suite.T(), result)
-}
-
 func (suite *ClientTestSuite) TestGetBanksResource() {
 	client, err := NewClientFromConfig(BuildStubConfig(), nil)
 	result := client.Banks()
-	assert.NoError(suite.T(), err)
-	assert.NotEmpty(suite.T(), result)
-}
-
-func (suite *ClientTestSuite) TestGetWebhooksResource() {
-	client, err := NewClientFromConfig(BuildStubConfig(), nil)
-	result := client.Webhooks()
 	assert.NoError(suite.T(), err)
 	assert.NotEmpty(suite.T(), result)
 }

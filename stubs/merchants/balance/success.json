@@ -2,14 +2,24 @@
   "code": 200,
   "status": "success",
   "message": "Request completed successfully.",
-  "data": [
-    {
-      "currency": "UGX",
-      "balance": 5475.816
-    },
-    {
-      "currency": "USD",
-      "balance": 12
-    }
-  ]
+  "data": {
+    "merchant_wallets": [
+      {
+        "available_balance": 5475.816,
+        "actual_balance": 5475.816,
+        "currency": "UGX",
+        "uncleared_balance": 0,
+        "reserve_balance": 0,
+        "wallet_type": "MERCHANT_COLLECTION"
+      },
+      {
+        "available_balance": 12,
+        "actual_balance": 12,
+        "currency": "USD",
+        "uncleared_balance": 0,
+        "reserve_balance": 0,
+        "wallet_type": "MERCHANT_PAYOUT"
+      }
+    ]
+  }
 }

@@ -1,22 +1,21 @@
 # Dusupay API SDK GO (Unofficial)
-[![Build Status](https://app.travis-ci.com/Kachit/dusupay-sdk-go.svg?branch=master)](https://app.travis-ci.com/github/Kachit/dusupay-sdk-go)
+[![Tests](https://github.com/Kachit/dusupay-sdk-go/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/Kachit/dusupay-sdk-go/actions/workflows/tests.yml)
 [![Codecov](https://codecov.io/gh/Kachit/dusupay-sdk-go/branch/master/graph/badge.svg)](https://codecov.io/gh/Kachit/dusupay-sdk-go)
-[![Go Report Card](https://goreportcard.com/badge/github.com/kachit/dusupay-sdk-go)](https://goreportcard.com/report/github.com/kachit/dusupay-sdk-go)
-[![Version](https://img.shields.io/github/go-mod/go-version/Kachit/dusupay-sdk-go)](https://go.dev/doc/go1.14)
+[![Version](https://img.shields.io/github/go-mod/go-version/Kachit/dusupay-sdk-go)](https://go.dev/doc/go1.24)
 [![Release](https://img.shields.io/github/v/release/Kachit/dusupay-sdk-go.svg)](https://github.com/Kachit/dusupay-sdk-go/releases)
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/kachit/dusupay-sdk-go/blob/master/LICENSE)
-[![GoDoc](https://pkg.go.dev/badge/github.com/kachit/dusupay-sdk-go)](https://pkg.go.dev/github.com/kachit/dusupay-sdk-go)
+[![GoDoc](https://pkg.go.dev/badge/github.com/kachit/dusupay-sdk-go/v2)](https://pkg.go.dev/github.com/kachit/dusupay-sdk-go/v2)
 [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go#third-party-apis)
 
 ## Description
 Unofficial Dusupay payment gateway API Client for Go
 
 ## API documentation
-https://docs.dusupay.com
+https://developer.dusupay.com/
 
 ## Installation
 ```shell
-go get -u github.com/kachit/dusupay-sdk-go
+go get -u github.com/kachit/dusupay-sdk-go/v2
 ```
 
 ## Usage
@@ -26,105 +25,63 @@ package main
 import (
     "fmt"
     "context"
-    dusupay "github.com/kachit/dusupay-sdk-go"
+    dusupay "github.com/kachit/dusupay-sdk-go/v2"
 )
 
 func main(){
-    // Create a client instance
     cfg := dusupay.NewConfig("Your public key", "Your secret key")
     client, err := dusupay.NewClientFromConfig(cfg, nil)
     if err != nil {
-        fmt.Printf("config parameter error " + err.Error())
         panic(err)
     }
 }
 ```
-### Get balances list
+
+### Get wallet balances
 ```go
 ctx := context.Background()
-balances, response, err := client.Merchants().GetBalances(ctx)
-
+// filter is optional, pass nil to get all wallets
+balances, response, err := client.Merchants().GetBalances(ctx, &dusupay.BalancesFilter{Currency: dusupay.CurrencyCodeUGX})
 if err != nil {
-    fmt.Printf("Wrong API request " + err.Error())
     panic(err)
 }
-
-//Dump raw response
-fmt.Println(response)
-
-//Dump result
-fmt.Println(balances.Status)
-fmt.Println(balances.Code)
-fmt.Println(balances.Message)
-fmt.Println((*balances.Data)[0].Currency)
-fmt.Println((*balances.Data)[0].Balance)
+fmt.Println(balances.Data.MerchantWallets[0].Currency)
+fmt.Println(balances.Data.MerchantWallets[0].AvailableBalance)
 ```
 
-### Get banks list
+### Verify transaction
 ```go
 ctx := context.Background()
-filter := &dusupay.BanksFilter{TransactionType: dusupay.TransactionTypePayout, Country: dusupay.CountryCodeGhana}
-banks, response, err := client.Banks().GetList(ctx, filter)
-
+result, response, err := client.Merchants().Verify(ctx, "DUSUPAY5FNZCVUKZ8C0KZE")
 if err != nil {
-    fmt.Printf("Wrong API request " + err.Error())
     panic(err)
 }
-
-//Dump raw response
-fmt.Println(response)
-
-//Dump result
-fmt.Println(banks.Status)
-fmt.Println(banks.Code)
-fmt.Println(banks.Message)
-fmt.Println((*banks.Data)[0].Id)
-fmt.Println((*banks.Data)[0].Name)
-fmt.Println((*banks.Data)[0].BankCode)
+fmt.Println(result.Data.InternalReference)
+fmt.Println(result.Data.TransactionStatus)
 ```
 
-### Get banks branches list
+### Get payment providers list
 ```go
 ctx := context.Background()
-filter := &dusupay.BanksBranchesFilter{Country: dusupay.CountryCodeGhana, Bank: "BankCode"}
-branches, response, err := client.Banks().GetBranchesList(ctx, filter)
-
-if err != nil {
-    fmt.Printf("Wrong API request " + err.Error())
-    panic(err)
-}
-
-//Dump raw response
-fmt.Println(response)
-
-//Dump result
-fmt.Println(branches.Status)
-fmt.Println(branches.Code)
-fmt.Println(branches.Message)
-fmt.Println((*branches.Data)[0].Name)
-fmt.Println((*branches.Data)[0].Code)
-```
-
-### Get providers list
-```go
-ctx := context.Background()
-filter := &dusupay.ProvidersFilter{Country: dusupay.CountryCodeUganda, Method: dusupay.TransactionMethodMobileMoney, TransactionType: dusupay.TransactionTypeCollection}
+filter := &dusupay.ProvidersFilter{Currency: dusupay.CurrencyCodeUGX, TransactionType: dusupay.TransactionTypeCollection}
 providers, response, err := client.Providers().GetList(ctx, filter)
-
 if err != nil {
-    fmt.Printf("Wrong API request " + err.Error())
     panic(err)
 }
+fmt.Println(providers.Data.PaymentProviders[0].ProviderCode)
+fmt.Println(providers.Data.PaymentProviders[0].ProviderName)
+```
 
-//Dump raw response
-fmt.Println(response)
-
-//Dump result
-fmt.Println(providers.Status)
-fmt.Println(providers.Code)
-fmt.Println(providers.Message)
-fmt.Println((*providers.Data)[0].ID)
-fmt.Println((*providers.Data)[0].Name)
+### Get payout banks list
+```go
+ctx := context.Background()
+filter := &dusupay.BanksFilter{ProviderCode: "bank_ng"}
+banks, response, err := client.Banks().GetList(ctx, filter)
+if err != nil {
+    panic(err)
+}
+fmt.Println(banks.Data.PayoutBanks[0].BankName)
+fmt.Println(banks.Data.PayoutBanks[0].BankCode)
 ```
 
 ### Create collection request
@@ -133,30 +90,66 @@ ctx := context.Background()
 request := &dusupay.CollectionRequest{
     Currency:          dusupay.CurrencyCodeUGX,
     Amount:            10000,
-    Method:            dusupay.TransactionMethodMobileMoney,
-    ProviderId:        "airtel_ug",
+    TransactionMethod: dusupay.TransactionMethodMobileMoney,
+    ProviderCode:      "airtel_ug",
     MerchantReference: "1234567891",
-    RedirectUrl:       "http://foo.bar",
-    Narration:         "narration",
-    AccountNumber:         "256752000123",
-    MobileMoneyHpp:         true,
+    Description:       "payment description",
+    Msisdn:            "256752000123",
 }
 result, response, err := client.Collections().Create(ctx, request)
-
 if err != nil {
-    fmt.Printf("Wrong API request " + err.Error())
     panic(err)
 }
+fmt.Println(result.Data.InternalReference)
+fmt.Println(result.Data.MerchantReference)
+fmt.Println(result.Data.PaymentURL)
+```
 
-//Dump raw response
-fmt.Println(response)
+### Create hosted page collection request
+```go
+request := &dusupay.CollectionRequest{
+    Currency:          dusupay.CurrencyCodeUGX,
+    Amount:            10000,
+    TransactionMethod: dusupay.TransactionMethodMobileMoney,
+    ProviderCode:      "mtn_ug",
+    MerchantReference: "auto",
+    Description:       "payment description",
+    Msisdn:            "256777000001",
+    MobileMoneyHPP:    true,
+    RedirectURL:       "https://your-redirect-url",
+}
+result, response, err := client.Collections().Create(ctx, request)
+// redirect the customer to result.Data.PaymentURL
+```
 
-//Dump result
-fmt.Println(result.Status)
-fmt.Println(result.Code)
-fmt.Println(result.Message)
-fmt.Println((*result.Data).ID)
-fmt.Println((*result.Data).PaymentURL)
+### Create direct card (S2S) collection request
+```go
+encryptor, _ := dusupay.NewCardEncryptor(cfg.DusupayPublicKey())
+cipher, err := encryptor.Encrypt(&dusupay.CardData{
+    FirstName: "John",
+    LastName:  "Doe",
+    CardNo:    "4622000000005678",
+    ExpMonth:  "06",
+    ExpYear:   "22",
+    CVV:       "123",
+})
+request := &dusupay.CollectionRequest{
+    Currency:          dusupay.CurrencyCodeNGN,
+    Amount:            1000,
+    TransactionMethod: dusupay.TransactionMethodCard,
+    ProviderCode:      "local_ngn",
+    MerchantReference: "auto",
+    Description:       "payment description",
+    CardCipher:        cipher,
+    RedirectURL:       "https://your-redirect-url",
+}
+result, response, err := client.Collections().Create(ctx, request)
+```
+
+### Authorize collection with OTP
+```go
+request := &dusupay.CollectionAuthorizeRequest{InternalReference: "DUSUPAYSTPDKZ6MLY5WPQ", OTP: "123456"}
+result, response, err := client.Collections().Authorize(ctx, request)
 ```
 
 ### Create payout request
@@ -165,82 +158,66 @@ ctx := context.Background()
 request := &dusupay.PayoutRequest{
     Currency:          dusupay.CurrencyCodeUGX,
     Amount:            10000,
-    Method:            dusupay.TransactionMethodMobileMoney,
-    ProviderId:        "airtel_ug",
+    TransactionMethod: dusupay.TransactionMethodMobileMoney,
+    ProviderCode:      "airtel_ug",
     MerchantReference: "1234567892",
-    Narration:         "narration",
-    AccountNumber:         "256752000123",
-    AccountName:         "Foo Bar",
+    Description:       "payout description",
+    AccountNumber:     "256752000123",
+    CustomerName:      "Foo Bar",
 }
 result, response, err := client.Payouts().Create(ctx, request)
-
 if err != nil {
-    fmt.Printf("Wrong API request " + err.Error())
     panic(err)
 }
-
-//Dump raw response
-fmt.Println(response)
-
-//Dump result
-fmt.Println(result.Status)
-fmt.Println(result.Code)
-fmt.Println(result.Message)
-fmt.Println((*result.Data).ID)
+fmt.Println(result.Data.InternalReference)
+fmt.Println(result.Data.MerchantReference)
 ```
 
-### Create refund request
+### Create bank payout request
 ```go
-ctx := context.Background()
-request := &dusupay.RefundRequest{
-    Amount:            100,
-    InternalReference:            "DUSUPAY5FNZCVUKZ8C0KZE",
+request := &dusupay.PayoutRequest{
+    Currency:          dusupay.CurrencyCodeNGN,
+    Amount:            4000,
+    TransactionMethod: dusupay.TransactionMethodBank,
+    ProviderCode:      "bank_ng",
+    MerchantReference: "1234567893",
+    Description:       "payout description",
+    AccountNumber:     "2121562123",
+    CustomerName:      "Foo Bar",
+    ExtraParams:       &dusupay.PayoutExtraParams{BankCode: "access_bank_ng"},
 }
-result, response, err := client.Refunds().Create(ctx, request)
-
-if err != nil {
-    fmt.Printf("Wrong API request " + err.Error())
-    panic(err)
-}
-
-//Dump raw response
-fmt.Println(response)
-
-//Dump result
-fmt.Println(result.Status)
-fmt.Println(result.Code)
-fmt.Println(result.Message)
-fmt.Println((*result.Data).ID)
+result, response, err := client.Payouts().Create(ctx, request)
 ```
 
-### Verify webhook signature
+### Handle webhook callback and verify RSA signature
+Callbacks are sent as `{"event": "...", "payload": {...}}`. Use `dusupay.PayoutCallback` for payout callbacks.
 ```go
-requestPayload := `
-{
-    "id": 226,
-    "request_amount": 10,
-    "request_currency": "USD",
-    "account_amount": 737.9934,
-    "account_currency": "UGX",
-    "transaction_fee": 21.4018,
-    "total_credit": 716.5916,
-    "customer_charged": false,
-    "provider_id": "mtn_ug",
-    "merchant_reference": "76859aae-f148-48c5-9901-2e474cf19b71",
-    "internal_reference": "DUSUPAY405GZM1G5JXGA71IK",
-    "transaction_status": "COMPLETED",
-    "transaction_type": "collection",
-    "message": "Transaction Completed Successfully"
+var callback dusupay.CollectionCallback
+_ = json.Unmarshal(requestBody, &callback)
+
+validator, _ := dusupay.NewSignatureValidator(cfg.DusupayPublicKey())
+err := validator.ValidateSignature(&callback, r.Header.Get("rsa-signature"))
+
+if callback.Event == dusupay.CallbackEventTransactionProcessing &&
+    callback.Payload.Authorization != nil &&
+    callback.Payload.Authorization.Mode == dusupay.AuthorizationModeOTP {
+    // collect OTP from the customer and call client.Collections().Authorize
 }
-`
-requestUri := "https://www.sample-url.com/callback"
-signature := "value from 'dusupay-signature' http header"
+```
 
-var webhook dusupay.CollectionWebhook
-_ = json.Unmarshal(requestPayload, &webhook)
+### Verify HMAC webhook signature
+```go
+var callback dusupay.CollectionCallback
+_ = json.Unmarshal(requestBody, &callback)
 
-rawBytes, _ := ioutil.ReadFile("path/to/dusupay-public-key.pem")
+validator := dusupay.NewHMACSignatureValidator("your-signing-key")
+err := validator.ValidateSignature(&callback, r.Header.Get("hmac-signature"))
+```
 
-validator, _ := dusupay.NewSignatureValidator(rawBytes)
-err := validator.ValidateSignature(webhook, requestUri, signature)
+### Verify redirect signature (hosted pages, cards)
+```go
+payload := dusupay.NewRedirectPayload(r.URL.Query())
+
+validator := dusupay.NewHMACSignatureValidator("your-signing-key")
+err := validator.ValidateSignature(payload, payload.HMACSignature)
 ```

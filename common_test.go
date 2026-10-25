@@ -1,10 +1,11 @@
 package dusupay
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 	"math"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
 type CommonTestSuite struct {
@@ -14,14 +15,14 @@ type CommonTestSuite struct {
 func (suite *CommonTestSuite) TestTransformStructToMapSuccess() {
 	req := &CollectionRequest{}
 	req.Amount = 100
-	req.ProviderId = "foo"
+	req.ProviderCode = "foo"
 	req.Currency = CurrencyCodeEUR
-	req.Method = TransactionMethodCard
+	req.TransactionMethod = TransactionMethodCard
 	result, err := transformStructToMap(req)
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), req.Amount, result["amount"])
-	assert.Equal(suite.T(), req.ProviderId, result["provider_id"])
-	assert.Equal(suite.T(), string(req.Method), result["method"])
+	assert.Equal(suite.T(), req.ProviderCode, result["provider_code"])
+	assert.Equal(suite.T(), string(req.TransactionMethod), result["transaction_method"])
 	assert.Equal(suite.T(), string(req.Currency), result["currency"])
 }
 

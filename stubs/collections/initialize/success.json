@@ -1,0 +1,10 @@
+{
+  "code": 202,
+  "status": "accepted",
+  "message": "Request Accepted",
+  "data": {
+    "internal_reference": "DUSUPAYSTPDKZ6MLY5WPQ",
+    "merchant_reference": "MCTREF9WVCPGFRHYCWSK",
+    "payment_url": "https://sandboxapi.dusupay.com/checkout/DUSUPAYSTPDKZ6MLY5WPQ"
+  }
+}

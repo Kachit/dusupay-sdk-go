@@ -1,0 +1,59 @@
+version: "2"
+linters:
+  default: none
+  enable:
+    - bodyclose
+    - dogsled
+    - errcheck
+    - funlen
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - gosec
+    - govet
+    - ineffassign
+    - lll
+    - misspell
+    - nakedret
+    - nlreturn
+    - prealloc
+    - staticcheck
+    - unconvert
+    - unused
+    - wsl_v5
+  settings:
+    funlen:
+      lines: 70
+      statements: 50
+    gosec:
+      excludes:
+        - G115
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - funlen
+          - goconst
+          - lll
+          - staticcheck
+          - wsl_v5
+        path: (.+)_test\.go
+    paths:
+      - lua
+      - mocks
+      - tmp
+formatters:
+  enable:
+    - gofmt
+  exclusions:
+    generated: lax
+    paths:
+      - stubs
+      - main
+      - tmp

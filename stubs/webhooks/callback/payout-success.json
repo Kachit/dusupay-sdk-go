@@ -1,0 +1,21 @@
+{
+  "event": "transaction.completed",
+  "payload": {
+    "id": 227,
+    "merchant_reference": "76859aae-f148-48c5-9901-2e474cf19b72",
+    "internal_reference": "DUSUPAY405GZM1G5JXGA71IZ",
+    "transaction_type": "PAYOUT",
+    "request_currency": "UGX",
+    "request_amount": 10000,
+    "transaction_currency": "UGX",
+    "transaction_amount": 10000,
+    "transaction_charge": 300,
+    "transaction_account": "256777111786",
+    "charge_customer": false,
+    "total_debit": 10300,
+    "provider_code": "mtn_ug",
+    "customer_name": "JOHN DOE",
+    "transaction_status": "COMPLETED",
+    "status_message": "Transaction Completed Successfully"
+  }
+}

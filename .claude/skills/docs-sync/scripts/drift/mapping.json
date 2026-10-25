@@ -1,0 +1,21 @@
+{
+  "_comment": "Maps documented API shapes to SDK Go types. Update when the SDK adds a type or the API adds an endpoint. Endpoint keys are 'METHOD /path' with path params written as {}.",
+  "endpoints": {
+    "GET /data/payment-providers": {"query": "ProvidersFilter", "data": "ProvidersResponseData"},
+    "GET /data/wallet-balances": {"query": "BalancesFilter", "data": "BalancesResponseData"},
+    "GET /data/transaction/verify/{}": {"data": "VerifyResponseData"},
+    "GET /data/payout-bank-codes": {"query": "BanksFilter", "data": "BanksResponseData"},
+    "POST /collections/initialize": {"body": "CollectionRequest", "data": "CollectionResponseData"},
+    "POST /collections/authorize": {"body": "CollectionAuthorizeRequest", "data": "CollectionAuthorizeResponseData"},
+    "POST /payout/send-funds": {"body": "PayoutRequest", "data": "PayoutResponseData"}
+  },
+  "callbacks": {
+    "COLLECTION": "CollectionCallbackPayload",
+    "PAYOUT": "PayoutCallbackPayload"
+  },
+  "card_data": "CardData",
+  "page_requests": {
+    "funds-collection/": "CollectionRequest",
+    "payouts-disbursements/": "PayoutRequest"
+  }
+}

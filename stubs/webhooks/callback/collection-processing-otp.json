@@ -1,0 +1,30 @@
+{
+  "event": "transaction.processing",
+  "payload": {
+    "id": 27594,
+    "merchant_reference": "MCTREF9WVCPGFRHYCWSK",
+    "internal_reference": "DUSUPAYSTPDKZ6MLY5WPQ",
+    "transaction_type": "COLLECTION",
+    "request_currency": "GHS",
+    "transaction_amount": 500,
+    "transaction_currency": "GHS",
+    "transaction_charge": 150,
+    "transaction_account": "233545503456",
+    "charge_customer": false,
+    "total_credit": 350,
+    "provider_code": "mtn_gh",
+    "request_amount": 500,
+    "customer_name": "JOHN DOE",
+    "transaction_status": "PROCESSING",
+    "status_message": "Transaction Initiated successfully. OTP sent",
+    "authorization": {
+      "mode": "OTP",
+      "required_parameters": [
+        {
+          "parameter_name": "otp"
+        }
+      ]
+    },
+    "payment_instructions": " Authorize Payment using the OTP sent to  233545503456 . "
+  }
+}
