@@ -18,12 +18,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Pin Go to the go.mod version: '>=1.24' pulled the newest Go, and golangci-lint
       # panics when the toolchain is newer than the Go it was built with.
       - name: Set up go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
 
@@ -36,6 +36,6 @@ jobs:
         run: go test -coverprofile='coverage.txt' -covermode=atomic
 
       - name: Upload coverage file
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7
         with:
           token: ${{secrets.CODECOV_TOKEN}}
